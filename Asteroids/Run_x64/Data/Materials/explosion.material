@@ -1,0 +1,6 @@
+<material name="explosion">
+    <shader src="Data/Shaders/explosion.shader" />
+    <textures>
+        <diffuse src="Data/Images/explosion.png" />
+    </textures>
+</material>

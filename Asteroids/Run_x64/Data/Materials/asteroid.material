@@ -1,0 +1,6 @@
+<material name="asteroid">
+    <shader src="Data/Shaders/asteroid.shader" />
+    <textures>
+        <diffuse src="Data/Images/asteroid.png" />
+    </textures>
+</material>

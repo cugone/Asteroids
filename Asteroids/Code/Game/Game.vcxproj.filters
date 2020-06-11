@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="General">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{7af33695-c06d-49f5-bd26-63fc967f3568}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data">
+      <UniqueIdentifier>{e55b867b-04ce-4af6-8c4f-f1490f896af2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\Images">
+      <UniqueIdentifier>{0caa49b2-1f26-43a8-bcfc-31c469501070}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\Audio">
+      <UniqueIdentifier>{830b22be-d0e1-434a-b956-05f2afdc995a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\Materials">
+      <UniqueIdentifier>{8e44ca74-aeb6-4158-b478-f608f1d89f22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\Shaders">
+      <UniqueIdentifier>{e8318f4a-1bd3-4063-8c2c-1a86a826094a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\ShaderPrograms">
+      <UniqueIdentifier>{0bd323b2-9848-40b7-9f0b-34f3dc5d135b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Main_Win32.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="GameCommon.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="App.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="GameConfig.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Ship.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Asteroid.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Bullet.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Explosion.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GameCommon.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="App.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="GameConfig.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Asteroid.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Bullet.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Ship.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Explosion.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\Run_x64\Data\Images\asteroid.png">
+      <Filter>Data\Images</Filter>
+    </Image>
+    <Image Include="..\..\Run_x64\Data\Images\laserBullet.png">
+      <Filter>Data\Images</Filter>
+    </Image>
+    <Image Include="..\..\Run_x64\Data\Images\ship.png">
+      <Filter>Data\Images</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\..\Run_x64\Data\Audio\Explosion.wav">
+      <Filter>Data\Audio</Filter>
+    </Media>
+    <Media Include="..\..\Run_x64\Data\Audio\Laser_Shoot.wav">
+      <Filter>Data\Audio</Filter>
+    </Media>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Run_x64\Data\Materials\asteroid.material">
+      <Filter>Data\Materials</Filter>
+    </None>
+    <None Include="..\..\Run_x64\Data\Materials\bullet.material">
+      <Filter>Data\Materials</Filter>
+    </None>
+    <None Include="..\..\Run_x64\Data\Materials\ship.material">
+      <Filter>Data\Materials</Filter>
+    </None>
+    <None Include="..\..\Run_x64\Data\Shaders\asteroid.shader">
+      <Filter>Data\Shaders</Filter>
+    </None>
+    <None Include="..\..\Run_x64\Data\Materials\explosion.material">
+      <Filter>Data\Materials</Filter>
+    </None>
+    <None Include="..\..\Run_x64\Data\Shaders\explosion.shader">
+      <Filter>Data\Shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>
