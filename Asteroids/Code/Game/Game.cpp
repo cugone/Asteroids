@@ -39,6 +39,9 @@ void Game::Update(TimeUtils::FPSeconds deltaSeconds) {
         g_theApp->SetIsQuitting(true);
         return;
     }
+    if(GameOver()) {
+        return;
+    }
     Camera2D& base_camera = _camera2D;
     HandleDebugInput(base_camera, deltaSeconds);
     HandlePlayerInput(base_camera, deltaSeconds);
@@ -59,23 +62,28 @@ void Game::Render() const {
     //2D View / HUD
     const float ui_view_height = currentGraphicsOptions.WindowHeight;
     const float ui_view_width = ui_view_height * _camera2D.GetAspectRatio();
-    const auto ui_view_extents = Vector2{ ui_view_width, ui_view_height };
+    const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
     const auto ui_view_half_extents = ui_view_extents * 0.5f;
-    auto ui_leftBottom = Vector2{ -ui_view_half_extents.x, ui_view_half_extents.y };
-    auto ui_rightTop = Vector2{ ui_view_half_extents.x, -ui_view_half_extents.y };
-    auto ui_nearFar = Vector2{ 0.0f, 1.0f };
+    auto ui_leftBottom = Vector2{-ui_view_half_extents.x, ui_view_half_extents.y};
+    auto ui_rightTop = Vector2{ui_view_half_extents.x, -ui_view_half_extents.y};
+    auto ui_nearFar = Vector2{0.0f, 1.0f};
     auto ui_cam_pos = ui_view_half_extents;
     _camera2D.position = ui_cam_pos;
     _camera2D.orientation_degrees = 0.0f;
     _camera2D.SetupView(ui_leftBottom, ui_rightTop, ui_nearFar, MathUtils::M_16_BY_9_RATIO);
     g_theRenderer->SetCamera(_camera2D);
 
-    RenderEntities();
-    if(_debug_render) {
-        DebugRenderEntities();
+    if(!GameOver()) {
+        RenderEntities();
+        if(_debug_render) {
+            DebugRenderEntities();
+        }
+        RenderStatus(ui_cam_pos, ui_view_half_extents);
+    } else {
+        const auto* font = g_theRenderer->GetFont("System32");
+        g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(ui_view_half_extents));
+        g_theRenderer->DrawTextLine(font, "GAME OVER");
     }
-    RenderStatus(ui_cam_pos, ui_view_half_extents);
-
 }
 
 void Game::RenderStatus(const Vector2 camPos, const Vector2 viewHalfExtents) const noexcept {
@@ -83,23 +91,35 @@ void Game::RenderStatus(const Vector2 camPos, const Vector2 viewHalfExtents) con
     const auto* font = g_theRenderer->GetFont("System32");
     const auto font_position = camPos - viewHalfExtents + Vector2{5.0f, font->GetLineHeight() * 0.0f};
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(font_position));
-    g_theRenderer->DrawMultilineText(g_theRenderer->GetFont("System32"), "Score: " + std::to_string(player.GetScore()) + "\nLives:      x" + std::to_string(player.lives));
+    g_theRenderer->DrawMultilineText(g_theRenderer->GetFont("System32"), "Score: " + std::to_string(player.GetScore()) + "\n      x" + std::to_string(player.lives));
 
     const auto uvs = AABB2::ZERO_TO_ONE;
-    const auto mat = ship->GetMaterial();
+    const auto mat = g_theRenderer->GetMaterial("ship");
     const auto tex = mat->GetTexture(Material::TextureID::Diffuse);
     const auto frameWidth = static_cast<float>(tex->GetDimensions().x);
     const auto frameHeight = static_cast<float>(tex->GetDimensions().y);
     const auto half_extents = Vector2{frameWidth, frameHeight};
     const auto S = Matrix4::CreateScaleMatrix(half_extents);
     const auto R = Matrix4::I;
-    const auto T = Matrix4::CreateTranslationMatrix(font_position + Vector2{15.0f + font->CalculateTextWidth("Lives: "), font->GetLineHeight() * 1.8f});
+    const auto T = Matrix4::CreateTranslationMatrix(font_position + Vector2{15.0f + font->CalculateTextWidth(" "), font->GetLineHeight() * 1.8f});
     const auto transform = Matrix4::MakeSRT(S, R, T);
 
     g_theRenderer->SetModelMatrix(transform);
-    g_theRenderer->SetMaterial("ship");
+    g_theRenderer->SetMaterial(mat);
     g_theRenderer->DrawQuad2D();
 
+}
+
+void Game::Respawn() noexcept {
+    MakeShip();
+}
+
+bool Game::GameOver() const noexcept {
+    return player.lives == 0;
+}
+
+void Game::DecrementLives() noexcept {
+    player.DecrementLives();
 }
 
 void Game::EndFrame() {
@@ -358,6 +378,9 @@ void Game::HandleDebugKeyboardInput(Camera2D& baseCamera, TimeUtils::FPSeconds /
     }
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::N)) {
         MakeShip();
+    }
+    if(g_theInputSystem->WasKeyJustPressed(KeyCode::R)) {
+        Respawn();
     }
 }
 

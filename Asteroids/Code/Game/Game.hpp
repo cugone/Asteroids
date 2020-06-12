@@ -39,6 +39,8 @@ public:
     void Render() const;
     void EndFrame();
 
+    void DecrementLives() noexcept;
+
     void MakeBullet(const Entity* parent, Vector2 pos, Vector2 vel) noexcept;
     void MakeLargeAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
     void MakeMediumAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
@@ -75,6 +77,9 @@ private:
     void DebugRenderEntities() const noexcept;
     void RenderStatus(const Vector2 cameraPos, const  Vector2 viewHalfExtents) const noexcept;
 
+    void Respawn() noexcept;
+    bool GameOver() const noexcept;
+
     mutable Camera2D _camera2D{};
     std::vector<std::unique_ptr<Entity>> _entities{};
     std::vector<std::unique_ptr<Entity>> _pending_entities{};
@@ -83,5 +88,6 @@ private:
     bool _keyboard_control_active{false};
     bool _mouse_control_active{false};
     bool _controller_control_active{false};
+    bool is_gameover{false};
 };
 
