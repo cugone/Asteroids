@@ -4,6 +4,8 @@
 
 #include "Engine/Math/Disc2.hpp"
 
+#include "Engine/Renderer/Material.hpp"
+
 #include "Game/GameCommon.hpp"
 #include "Game/GameConfig.hpp"
 
@@ -79,9 +81,25 @@ void Game::Render() const {
 void Game::RenderStatus(const Vector2 camPos, const Vector2 viewHalfExtents) const noexcept {
     g_theRenderer->SetModelMatrix(Matrix4::I);
     const auto* font = g_theRenderer->GetFont("System32");
-    const auto font_position = camPos - viewHalfExtents + Vector2{0.0f, font->GetLineHeight() * 1.0f};
+    const auto font_position = camPos - viewHalfExtents + Vector2{5.0f, font->GetLineHeight() * 0.0f};
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(font_position));
-    g_theRenderer->DrawTextLine(g_theRenderer->GetFont("System32"), "Score: " + std::to_string(player.GetScore()));
+    g_theRenderer->DrawMultilineText(g_theRenderer->GetFont("System32"), "Score: " + std::to_string(player.GetScore()) + "\nLives:      x" + std::to_string(player.lives));
+
+    const auto uvs = AABB2::ZERO_TO_ONE;
+    const auto mat = ship->GetMaterial();
+    const auto tex = mat->GetTexture(Material::TextureID::Diffuse);
+    const auto frameWidth = static_cast<float>(tex->GetDimensions().x);
+    const auto frameHeight = static_cast<float>(tex->GetDimensions().y);
+    const auto half_extents = Vector2{frameWidth, frameHeight};
+    const auto S = Matrix4::CreateScaleMatrix(half_extents);
+    const auto R = Matrix4::I;
+    const auto T = Matrix4::CreateTranslationMatrix(font_position + Vector2{15.0f + font->CalculateTextWidth("Lives: "), font->GetLineHeight() * 1.8f});
+    const auto transform = Matrix4::MakeSRT(S, R, T);
+
+    g_theRenderer->SetModelMatrix(transform);
+    g_theRenderer->SetMaterial("ship");
+    g_theRenderer->DrawQuad2D();
+
 }
 
 void Game::EndFrame() {
