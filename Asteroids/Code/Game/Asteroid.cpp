@@ -89,6 +89,7 @@ void Asteroid::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 }
 
 void Asteroid::EndFrame() noexcept {
+    Entity::EndFrame();
     if(const auto& found = std::find(std::begin(g_theGame->asteroids), std::end(g_theGame->asteroids), this);
         (found != std::end(g_theGame->asteroids) &&
     (*found)->IsDead()))

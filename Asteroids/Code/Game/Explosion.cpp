@@ -60,7 +60,7 @@ void Explosion::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 }
 
 void Explosion::EndFrame() noexcept {
-
+    Entity::EndFrame();
     if(_sprite->IsFinished()) {
         Kill();
     }

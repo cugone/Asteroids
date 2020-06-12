@@ -63,6 +63,7 @@ void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 }
 
 void Ship::EndFrame() noexcept {
+    Entity::EndFrame();
     if(_fireRate.CheckAndReset()) {
         _canFire = true;
     }
@@ -91,6 +92,7 @@ void Ship::OnCollision(Entity* a, Entity* b) noexcept {
     const auto* asAsteroid = dynamic_cast<Asteroid*>(b);
     if(asAsteroid) {
         a->Kill();
+        g_theGame->DecrementLives();
     }
 }
 

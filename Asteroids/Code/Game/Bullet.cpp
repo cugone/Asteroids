@@ -69,6 +69,7 @@ void Bullet::EndFrame() noexcept {
     {
         *found = nullptr;
     }
+    Entity::EndFrame();
 }
 
 void Bullet::OnDestroy() noexcept {
