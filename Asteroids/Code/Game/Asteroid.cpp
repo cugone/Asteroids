@@ -25,8 +25,16 @@ Asteroid::Asteroid(Type type, Vector2 position, Vector2 velocity, float rotation
     auto [cosmeticRadius, physicalRadius] = GetRadiiFromType(type);
     SetCosmeticRadius(cosmeticRadius);
     SetPhysicalRadius(physicalRadius);
-    _sprite = g_theRenderer->CreateAnimatedSprite(g_theGame->asteroid_sheet);
-    _sprite->SetMaterial(g_theRenderer->GetMaterial("asteroid"));
+
+    AnimatedSpriteDesc desc{};
+    desc.material = g_theRenderer->GetMaterial("asteroid");
+    desc.spriteSheet = g_theGame->asteroid_sheet;
+    desc.durationSeconds = TimeUtils::FPSeconds{1.0f};
+    desc.playbackMode = AnimatedSprite::SpriteAnimMode::Looping;
+    desc.frameLength = 30;
+    desc.startSpriteIndex = 0;
+    material = desc.material;
+    _sprite = g_theRenderer->CreateAnimatedSprite(desc);
 }
 
 long long Asteroid::GetScoreFromType(Type type) {
@@ -49,7 +57,6 @@ void Asteroid::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     _sprite->Update(deltaSeconds);
 
     const auto uvs = _sprite->GetCurrentTexCoords();
-    const auto mat = _sprite->GetMaterial();
     const auto frameWidth = static_cast<float>(_sprite->GetFrameDimensions().x);
     const auto frameHeight = static_cast<float>(_sprite->GetFrameDimensions().y);
     const auto extent_scale = _type == Type::Large ? 1.0f : (_type == Type::Medium ? 0.75f : (_type == Type::Small ? 0.50f : 1.0f));
@@ -78,7 +85,7 @@ void Asteroid::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     builder.AddVertex(Vector2{+0.5f, -0.5f});
 
     builder.AddIndicies(Mesh::Builder::Primitive::Quad);
-    builder.End(mat);
+    builder.End(material);
 }
 
 void Asteroid::EndFrame() noexcept {
