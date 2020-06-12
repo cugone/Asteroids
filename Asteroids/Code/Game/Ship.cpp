@@ -19,6 +19,7 @@ Ship::Ship() : Ship(Vector2::ZERO) {}
 Ship::Ship(Vector2 position)
     : Entity()
 {
+    material = g_theRenderer->GetMaterial("ship");
     scoreValue = -100LL;
     SetPosition(position);
     SetCosmeticRadius(25.0f);
@@ -30,8 +31,7 @@ void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     Entity::Update(deltaSeconds);
     
     const auto uvs = AABB2::ZERO_TO_ONE;
-    const auto mat = g_theRenderer->GetMaterial("ship");
-    const auto tex = mat->GetTexture(Material::TextureID::Diffuse);
+    const auto tex = material->GetTexture(Material::TextureID::Diffuse);
     const auto frameWidth = static_cast<float>(tex->GetDimensions().x);
     const auto frameHeight = static_cast<float>(tex->GetDimensions().y);
     const auto half_extents = Vector2{frameWidth, frameHeight};
@@ -59,7 +59,7 @@ void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     builder.AddVertex(Vector2{+0.5f, -0.5f});
 
     builder.AddIndicies(Mesh::Builder::Primitive::Quad);
-    builder.End(mat);
+    builder.End(material);
 }
 
 void Ship::EndFrame() noexcept {

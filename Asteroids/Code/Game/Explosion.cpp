@@ -20,6 +20,7 @@ Explosion::Explosion(Vector2 position)
     desc.playbackMode = AnimatedSprite::SpriteAnimMode::Play_To_End;
     desc.frameLength = 25;
     desc.startSpriteIndex = 0;
+    material = desc.material;
     _sprite = g_theRenderer->CreateAnimatedSprite(desc);
 }
 
@@ -28,7 +29,6 @@ void Explosion::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     _sprite->Update(deltaSeconds);
 
     const auto uvs = _sprite->GetCurrentTexCoords();
-    const auto mat = _sprite->GetMaterial();
     const auto frameWidth = static_cast<float>(_sprite->GetFrameDimensions().x);
     const auto frameHeight = static_cast<float>(_sprite->GetFrameDimensions().y);
     const auto half_extents = Vector2{frameWidth, frameHeight};
@@ -56,7 +56,7 @@ void Explosion::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     builder.AddVertex(Vector2{+0.5f, -0.5f});
 
     builder.AddIndicies(Mesh::Builder::Primitive::Quad);
-    builder.End(mat);
+    builder.End(material);
 }
 
 void Explosion::EndFrame() noexcept {
