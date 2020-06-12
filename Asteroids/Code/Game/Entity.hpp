@@ -44,6 +44,8 @@ public:
 
     const Matrix4& GetTransform() const noexcept;
 
+    Material* GetMaterial() const noexcept;
+
     long long scoreValue = 0ll;
 protected:
     Vector2 GetForward() const noexcept;
@@ -55,6 +57,7 @@ protected:
     void SetCosmeticRadius(float value) noexcept;
     void SetPhysicalRadius(float value) noexcept;
 
+    Material* material{};
     Matrix4 transform{};
     Mesh::Builder mesh_builder{};
 private:
