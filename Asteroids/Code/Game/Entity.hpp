@@ -46,8 +46,12 @@ public:
 
     Material* GetMaterial() const noexcept;
 
+    void DecrementHealth() noexcept;
+
     long long scoreValue = 0ll;
 protected:
+    void SetHealth(int newHealth) noexcept;
+
     Vector2 GetForward() const noexcept;
     void AddForce(const Vector2& force) noexcept;
 

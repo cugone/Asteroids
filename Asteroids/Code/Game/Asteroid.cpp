@@ -19,6 +19,7 @@ Asteroid::Asteroid(Type type, Vector2 position, Vector2 velocity, float rotation
     , _type(type)
 {
     scoreValue = GetScoreFromType(type);
+    SetHealth(GetHealthFromType(type));
     SetPosition(position);
     SetVelocity(velocity);
     SetRotationSpeed(rotationSpeed);
@@ -159,7 +160,8 @@ void Asteroid::OnFire() noexcept {
 void Asteroid::OnCollision(Entity* a, Entity* b) noexcept {
     const auto* asBullet = dynamic_cast<Bullet*>(b);
     if(asBullet) {
-        a->Kill();
+        a->DecrementHealth();
+        g_theAudioSystem->Play("Data/Audio/Hit.wav");
     }
 }
 
@@ -177,6 +179,19 @@ std::pair<float, float> Asteroid::GetRadiiFromType(Type type) const noexcept {
         return std::make_pair(12.0f, 10.0f);
     default:
         return std::make_pair(50.0f, 40.0f);
+    }
+}
+
+int Asteroid::GetHealthFromType(Type type) const noexcept {
+    switch(type) {
+    case Type::Large:
+        return 3;
+    case Type::Medium:
+        return 2;
+    case Type::Small:
+        return 1;
+    default:
+        return 1;
     }
 }
 

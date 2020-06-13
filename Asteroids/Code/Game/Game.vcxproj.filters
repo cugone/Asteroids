@@ -112,6 +112,9 @@
     <Media Include="..\..\Run_x64\Data\Audio\Laser_Shoot.wav">
       <Filter>Data\Audio</Filter>
     </Media>
+    <Media Include="..\..\Run_x64\Data\Audio\Hit.wav">
+      <Filter>Data\Audio</Filter>
+    </Media>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Run_x64\Data\Materials\asteroid.material">

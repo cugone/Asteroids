@@ -110,6 +110,18 @@ Material* Entity::GetMaterial() const noexcept {
     return material;
 }
 
+void Entity::DecrementHealth() noexcept {
+    if(health) {
+        --health;
+    } else {
+        Kill();
+    }
+}
+
+void Entity::SetHealth(int newHealth) noexcept {
+    health = newHealth;
+}
+
 void Entity::SetPosition(Vector2 newPosition) noexcept {
     position_orientation_speed.x = newPosition.x;
     position_orientation_speed.y = newPosition.y;

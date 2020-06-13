@@ -171,6 +171,7 @@
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\..\Run_x64\Data\Audio\Explosion.wav" />
+    <Media Include="..\..\Run_x64\Data\Audio\Hit.wav" />
     <Media Include="..\..\Run_x64\Data\Audio\Laser_Shoot.wav" />
   </ItemGroup>
   <ItemGroup>

@@ -34,6 +34,7 @@ public:
 private:
     long long GetScoreFromType(Type type);
     std::pair<float, float> GetRadiiFromType(Type type) const noexcept;
+    int GetHealthFromType(Type type) const noexcept;
 
     Type _type{Type::Large};
     std::unique_ptr<AnimatedSprite> _sprite{};
