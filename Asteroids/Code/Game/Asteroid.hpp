@@ -32,12 +32,20 @@ public:
 
 
 private:
+    Vector4 WasHit() noexcept;
     long long GetScoreFromType(Type type);
     std::pair<float, float> GetRadiiFromType(Type type) const noexcept;
     int GetHealthFromType(Type type) const noexcept;
 
+    struct asteroid_state_t {
+        Vector4 wasHit = Vector4::ZERO;
+    };
+
+    ConstantBuffer* asteroid_state_cb{nullptr};
+    asteroid_state_t asteroid_state{};
     Type _type{Type::Large};
     std::unique_ptr<AnimatedSprite> _sprite{};
+    TimeUtils::FPSeconds _timeSinceLastHit{0.0f};
 };
 
 

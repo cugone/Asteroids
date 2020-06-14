@@ -4,12 +4,16 @@
 
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/Material.hpp"
+#include "Engine/Renderer/Shader.hpp"
+#include "Engine/Renderer/ConstantBuffer.hpp"
 
 #include "Game/GameCommon.hpp"
 
 #include "Game/Bullet.hpp"
 
 #include <algorithm>
+#include <type_traits>
+#include <vector>
 
 Asteroid::Asteroid(Vector2 position, Vector2 velocity, float rotationSpeed)
     : Asteroid(Type::Large, position, velocity, rotationSpeed) {/* DO NOTHING */}
@@ -34,8 +38,14 @@ Asteroid::Asteroid(Type type, Vector2 position, Vector2 velocity, float rotation
     desc.playbackMode = AnimatedSprite::SpriteAnimMode::Looping;
     desc.frameLength = 30;
     desc.startSpriteIndex = 0;
+    
     material = desc.material;
+
+    auto cbs = material->GetShader()->GetConstantBuffers();
+    asteroid_state_cb = &cbs[0].get();
+
     _sprite = g_theRenderer->CreateAnimatedSprite(desc);
+
 }
 
 long long Asteroid::GetScoreFromType(Type type) {
@@ -49,6 +59,8 @@ long long Asteroid::GetScoreFromType(Type type) {
 
 void Asteroid::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     Entity::Update(deltaSeconds);
+    _timeSinceLastHit += deltaSeconds;
+
     const auto theta = GetRotationSpeed() * deltaSeconds.count();
     if(theta < 0.0f) {
         RotateClockwise(theta);
@@ -87,7 +99,15 @@ void Asteroid::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 
     builder.AddIndicies(Mesh::Builder::Primitive::Quad);
     builder.End(material);
+
+    asteroid_state.wasHit = WasHit();
+    asteroid_state_cb->Update(*g_theRenderer->GetDeviceContext(), &asteroid_state);
 }
+
+Vector4 Asteroid::WasHit() noexcept {
+    return _timeSinceLastHit.count() == 0.0f ? Vector4::X_AXIS : Vector4::ZERO;
+}
+
 
 void Asteroid::EndFrame() noexcept {
     Entity::EndFrame();
@@ -160,8 +180,13 @@ void Asteroid::OnFire() noexcept {
 void Asteroid::OnCollision(Entity* a, Entity* b) noexcept {
     const auto* asBullet = dynamic_cast<Bullet*>(b);
     if(asBullet) {
+        if(TimeUtils::FPFrames{1.0f} < _timeSinceLastHit) {
+            _timeSinceLastHit = _timeSinceLastHit.zero();
+        }
         a->DecrementHealth();
         g_theAudioSystem->Play("Data/Audio/Hit.wav");
+        asteroid_state.wasHit = WasHit();
+        asteroid_state_cb->Update(*g_theRenderer->GetDeviceContext(), &asteroid_state);
     }
 }
 
@@ -194,4 +219,3 @@ int Asteroid::GetHealthFromType(Type type) const noexcept {
         return 1;
     }
 }
-

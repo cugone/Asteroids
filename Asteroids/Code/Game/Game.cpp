@@ -24,6 +24,7 @@ void Game::Initialize() {
     world_bounds = AABB2{Vector2::ZERO, Vector2{g_theRenderer->GetOutput()->GetDimensions()}};
     _entities.emplace_back(std::move(std::make_unique<Ship>(world_bounds.CalcCenter())));
     ship = reinterpret_cast<Ship*>(_entities.back().get());
+
 }
 
 void Game::BeginFrame() {

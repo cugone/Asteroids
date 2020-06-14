@@ -135,5 +135,11 @@
     <None Include="..\..\Run_x64\Data\Shaders\explosion.shader">
       <Filter>Data\Shaders</Filter>
     </None>
+    <None Include="..\..\Run_x64\Data\ShaderPrograms\asteroid_PS.cso">
+      <Filter>Data\ShaderPrograms</Filter>
+    </None>
+    <None Include="..\..\Run_x64\Data\ShaderPrograms\asteroid_VS.cso">
+      <Filter>Data\ShaderPrograms</Filter>
+    </None>
   </ItemGroup>
 </Project>

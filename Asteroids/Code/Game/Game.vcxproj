@@ -179,6 +179,8 @@
     <None Include="..\..\Run_x64\Data\Materials\bullet.material" />
     <None Include="..\..\Run_x64\Data\Materials\explosion.material" />
     <None Include="..\..\Run_x64\Data\Materials\ship.material" />
+    <None Include="..\..\Run_x64\Data\ShaderPrograms\asteroid_PS.cso" />
+    <None Include="..\..\Run_x64\Data\ShaderPrograms\asteroid_VS.cso" />
     <None Include="..\..\Run_x64\Data\Shaders\asteroid.shader" />
     <None Include="..\..\Run_x64\Data\Shaders\explosion.shader" />
   </ItemGroup>
