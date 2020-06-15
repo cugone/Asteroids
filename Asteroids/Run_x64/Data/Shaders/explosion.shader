@@ -1,19 +1,5 @@
 <shader name="explosion">
     <shaderprogram src="__unlit"/>
-    <!--
-    <shaderprogram src="Data/ShaderPrograms/explosion.hlsl">
-        <pipelinestages>
-            <vertex entrypoint="VertexFunction" />
-            <pixel entrypoint="PixelFunction" />
-            <geometry entrypoint="GeometryFunction" />
-        </pipelinestages>
-    </shaderprogram>
-    -->
-    <!--
-    <shaderprogram src="Data/ShaderPrograms/explosion_VS.cso"/>
-    <shaderprogram src="Data/ShaderPrograms/explosion_PS.cso"/>
-    <shaderprogram src="Data/ShaderPrograms/explosion_GS.cso"/>
-    -->
     <raster>
         <fill>solid</fill>
         <cull>none</cull>

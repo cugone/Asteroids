@@ -1,13 +1,4 @@
 <shader name="asteroid">
-    <!--
-    <shaderprogram src="__unlit"/>
-    <shaderprogram src="Data/ShaderPrograms/asteroid.hlsl">
-        <pipelinestages>
-            <vertex entrypoint="VertexFunction" />
-            <pixel entrypoint="PixelFunction" />
-        </pipelinestages>
-    </shaderprogram>
-    -->
     <shaderprogram src="Data/ShaderPrograms/asteroid_VS.cso"/>
     <shaderprogram src="Data/ShaderPrograms/asteroid_PS.cso"/>
     <raster>
