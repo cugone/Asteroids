@@ -83,7 +83,7 @@ private:
     mutable Camera2D _camera2D{};
     std::vector<std::unique_ptr<Entity>> _entities{};
     std::vector<std::unique_ptr<Entity>> _pending_entities{};
-    float _thrust_force{1.0f};
+    float _thrust_force{100.0f};
     bool _debug_render{false};
     bool _keyboard_control_active{false};
     bool _mouse_control_active{false};

@@ -30,6 +30,6 @@ private:
 
     Stopwatch _fireRate;
     const float _minimumBulletSpeed = 10.0f;
-    const float _bulletSpeedFactor = 40.0f;
+    const float _bulletSpeedFactor = 10.0f;
     bool _canFire = false;
 };
