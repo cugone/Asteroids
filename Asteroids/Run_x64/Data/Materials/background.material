@@ -1,0 +1,6 @@
+<material name="background">
+    <shader src="__2D" />
+    <textures>
+        <diffuse src="Data/Images/bkgd_0.png" />
+    </textures>
+</material>

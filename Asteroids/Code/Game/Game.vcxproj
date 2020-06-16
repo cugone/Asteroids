@@ -176,6 +176,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Run_x64\Data\Materials\asteroid.material" />
+    <None Include="..\..\Run_x64\Data\Materials\background.material" />
     <None Include="..\..\Run_x64\Data\Materials\bullet.material" />
     <None Include="..\..\Run_x64\Data\Materials\explosion.material" />
     <None Include="..\..\Run_x64\Data\Materials\ship.material" />

@@ -75,6 +75,7 @@ void Game::Render() const {
     g_theRenderer->SetCamera(_camera2D);
 
     if(!GameOver()) {
+        RenderBackground(ui_view_half_extents);
         RenderEntities();
         if(_debug_render) {
             DebugRenderEntities();

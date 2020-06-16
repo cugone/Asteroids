@@ -141,5 +141,8 @@
     <None Include="..\..\Run_x64\Data\ShaderPrograms\asteroid_VS.cso">
       <Filter>Data\ShaderPrograms</Filter>
     </None>
+    <None Include="..\..\Run_x64\Data\Materials\background.material">
+      <Filter>Data\Materials</Filter>
+    </None>
   </ItemGroup>
 </Project>

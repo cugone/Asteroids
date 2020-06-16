@@ -76,6 +76,7 @@ private:
     void HandleBulletAsteroidCollision() const noexcept;
     void HandleShipAsteroidCollision() const noexcept;
 
+    void RenderBackground(const Vector2& ui_view_half_extents) const noexcept;
     void RenderEntities() const noexcept;
     void DebugRenderEntities() const noexcept;
     void RenderStatus(const Vector2 cameraPos, const  Vector2 viewHalfExtents) const noexcept;
