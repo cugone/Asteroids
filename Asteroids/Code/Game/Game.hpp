@@ -68,6 +68,7 @@ private:
 
     void UpdateEntities(TimeUtils::FPSeconds deltaSeconds) noexcept;
 
+    void MakeLargeAsteroidOffScreen() noexcept;
     void MakeLargeAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
     void MakeShip() noexcept;
 
@@ -79,6 +80,7 @@ private:
     void DebugRenderEntities() const noexcept;
     void RenderStatus(const Vector2 cameraPos, const  Vector2 viewHalfExtents) const noexcept;
 
+    void StartNewWave(unsigned int wave_number) noexcept;
     void Respawn() noexcept;
     bool GameOver() const noexcept;
 
@@ -86,6 +88,7 @@ private:
     std::vector<std::unique_ptr<Entity>> _entities{};
     std::vector<std::unique_ptr<Entity>> _pending_entities{};
     float _thrust_force{100.0f};
+    unsigned int _current_wave{1};
     bool _debug_render{false};
     bool _keyboard_control_active{false};
     bool _mouse_control_active{false};

@@ -119,6 +119,22 @@ bool Game::GameOver() const noexcept {
     return player.lives == 0;
 }
 
+void Game::RenderBackground(const Vector2& ui_view_half_extents) const noexcept {
+    const auto S = Matrix4::CreateScaleMatrix(ui_view_half_extents * 2.0f);
+    const auto R = Matrix4::I;
+    const auto T = Matrix4::CreateTranslationMatrix(ui_view_half_extents);
+    const auto M = Matrix4::MakeSRT(S, R, T);
+    g_theRenderer->SetModelMatrix(M);
+    g_theRenderer->SetMaterial("background");
+    g_theRenderer->DrawQuad2D();
+}
+
+void Game::StartNewWave(unsigned int wave_number) noexcept {
+    for(unsigned int i = 0; i < wave_number * 5; ++i) {
+        MakeLargeAsteroidOffScreen();
+    }
+}
+
 void Game::DecrementLives() noexcept {
     player.DecrementLives();
 }
@@ -152,6 +168,34 @@ void Game::MakeBullet(const Entity* parent, Vector2 pos, Vector2 vel) noexcept {
     auto* asBullet = reinterpret_cast<Bullet*>(last_entity);
     bullets.push_back(asBullet);
     asBullet->OnCreate();
+}
+
+void Game::MakeLargeAsteroidOffScreen() noexcept {
+    const auto pos = [this]()->const Vector2 {
+        const auto left = Vector2{world_bounds.mins.x, MathUtils::GetRandomFloatNegOneToOne() * world_bounds.CalcDimensions().y};
+        const auto right = Vector2{world_bounds.maxs.x, MathUtils::GetRandomFloatNegOneToOne() * world_bounds.CalcDimensions().y};
+        const auto top = Vector2{MathUtils::GetRandomFloatNegOneToOne() * world_bounds.CalcDimensions().x, world_bounds.mins.y};
+        const auto bottom = Vector2{MathUtils::GetRandomFloatNegOneToOne() * world_bounds.CalcDimensions().x, world_bounds.maxs.y};
+        const auto i = MathUtils::GetRandomIntLessThan(4);
+        switch(i) {
+        case 0:
+            return left;
+        case 1:
+            return right;
+        case 2:
+            return top;
+        case 3:
+            return bottom;
+        default:
+            return left;
+        }
+    }();
+    const auto vx = MathUtils::GetRandomFloatNegOneToOne() * 100.0f;
+    const auto vy = MathUtils::GetRandomFloatNegOneToOne() * 100.0f;
+    const auto s = MathUtils::GetRandomFloatInRange(20.0f, 100.0f);
+    const auto vel = Vector2{vx, vy};
+    const auto rot = MathUtils::GetRandomFloatNegOneToOne() * 180.0f;
+    MakeLargeAsteroid(pos, vel, rot);
 }
 
 void Game::MakeLargeAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept {
@@ -286,13 +330,16 @@ void Game::HandleControllerInput(Camera2D& /*baseCamera*/, TimeUtils::FPSeconds 
 }
 
 void Game::UpdateEntities(TimeUtils::FPSeconds deltaSeconds) noexcept {
+    if(asteroids.empty()) {
+        StartNewWave(_current_wave++);
+    }
+    HandleBulletAsteroidCollision();
+    HandleShipAsteroidCollision();
     for(auto& entity : _entities) {
         if(entity) {
             entity->Update(deltaSeconds);
         }
     }
-    HandleBulletAsteroidCollision();
-    HandleShipAsteroidCollision();
 }
 
 void Game::HandleBulletAsteroidCollision() const noexcept {
