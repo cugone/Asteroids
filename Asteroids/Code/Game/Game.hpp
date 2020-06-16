@@ -41,12 +41,10 @@ public:
 
     void DecrementLives() noexcept;
 
+    void MakeExplosion(Vector2 position) noexcept;
     void MakeBullet(const Entity* parent, Vector2 pos, Vector2 vel) noexcept;
-    void MakeLargeAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
     void MakeMediumAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
     void MakeSmallAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
-    void MakeShip() noexcept;
-    void MakeExplosion(Vector2 position) noexcept;
 
     Player player{};
     Ship* ship{nullptr};
@@ -69,6 +67,10 @@ private:
     void HandleControllerInput(Camera2D& baseCamera, TimeUtils::FPSeconds deltaSeconds);
 
     void UpdateEntities(TimeUtils::FPSeconds deltaSeconds) noexcept;
+
+    void MakeLargeAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
+    void MakeShip() noexcept;
+
 
     void HandleBulletAsteroidCollision() const noexcept;
     void HandleShipAsteroidCollision() const noexcept;
