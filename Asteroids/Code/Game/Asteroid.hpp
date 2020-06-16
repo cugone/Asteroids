@@ -22,6 +22,7 @@ public:
     explicit Asteroid(Type type, Vector2 position, Vector2 velocity, float rotationSpeed);
 
     virtual ~Asteroid() = default;
+
     void Update(TimeUtils::FPSeconds deltaSeconds) noexcept override;
     void EndFrame() noexcept override;
 
@@ -29,7 +30,6 @@ public:
     void OnFire() noexcept override;
     void OnCollision(Entity* a, Entity* b) noexcept override;
     void OnDestroy() noexcept override;
-
 
 private:
     Vector4 WasHit() noexcept;

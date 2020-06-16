@@ -41,8 +41,9 @@ Asteroid::Asteroid(Type type, Vector2 position, Vector2 velocity, float rotation
     
     material = desc.material;
 
-    auto cbs = material->GetShader()->GetConstantBuffers();
-    asteroid_state_cb = &cbs[0].get();
+    if(auto cbs = material->GetShader()->GetConstantBuffers(); !cbs.empty()) {
+        asteroid_state_cb = &cbs[0].get();
+    }
 
     _sprite = g_theRenderer->CreateAnimatedSprite(desc);
 
@@ -185,8 +186,7 @@ void Asteroid::OnCollision(Entity* a, Entity* b) noexcept {
         }
         a->DecrementHealth();
         g_theAudioSystem->Play("Data/Audio/Hit.wav");
-        asteroid_state.wasHit = WasHit();
-        asteroid_state_cb->Update(*g_theRenderer->GetDeviceContext(), &asteroid_state);
+        //asteroid_state.wasHit = WasHit();
     }
 }
 
