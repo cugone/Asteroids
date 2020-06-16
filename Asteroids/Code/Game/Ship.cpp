@@ -105,7 +105,7 @@ void Ship::MakeBullet() const noexcept {
 }
 
 const Vector2 Ship::CalcNewBulletVelocity() const noexcept {
-    return GetForward() * (_minimumBulletSpeed + GetSpeed()) * _bulletSpeedFactor;
+    return GetForward() * _bulletSpeed;
 }
 
 const Vector2 Ship::CalcNewBulletPosition() const noexcept {

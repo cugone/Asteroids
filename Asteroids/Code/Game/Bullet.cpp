@@ -18,7 +18,7 @@ Bullet::Bullet(const Entity* parent, Vector2 position, Vector2 velocity) noexcep
     SetCosmeticRadius(15.0f);
     SetPhysicalRadius(10.0f);
     SetOrientationDegrees(_parent->GetOrientationDegrees());
-    ttl.SetSeconds(TimeUtils::FPSeconds{3.0f});
+    ttl.SetSeconds(TimeUtils::FPSeconds{10.0f});
 }
 
 void Bullet::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {

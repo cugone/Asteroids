@@ -29,7 +29,6 @@ private:
     const Vector2 CalcNewBulletPosition() const noexcept;
 
     Stopwatch _fireRate;
-    const float _minimumBulletSpeed = 10.0f;
-    const float _bulletSpeedFactor = 10.0f;
+    const float _bulletSpeed = 400.0f;
     bool _canFire = false;
 };
