@@ -275,7 +275,7 @@ void Game::HandleKeyboardInput(Camera2D& /*baseCamera*/, TimeUtils::FPSeconds de
         if(g_theInputSystem->IsKeyDown(KeyCode::W)) {
             ship->Thrust(_thrust_force);
         }
-        if(g_theInputSystem->WasKeyJustPressed(KeyCode::Space)) {
+        if(g_theInputSystem->IsKeyDown(KeyCode::Space)) {
             ship->OnFire();
         }
     }
@@ -297,7 +297,7 @@ void Game::HandleMouseInput(Camera2D& baseCamera, TimeUtils::FPSeconds /*deltaSe
             ship->SetOrientationDegrees(newFacing);
         }
 
-        if(g_theInputSystem->WasKeyJustPressed(KeyCode::LButton)) {
+        if(g_theInputSystem->IsKeyDown(KeyCode::LButton)) {
             ship->OnFire();
         }
         if(g_theInputSystem->IsKeyDown(KeyCode::RButton)) {
