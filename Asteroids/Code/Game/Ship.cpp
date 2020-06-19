@@ -30,7 +30,11 @@ Ship::Ship(Vector2 position)
 void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     Entity::Update(deltaSeconds);
     if(GetForce().CalcLengthSquared() == 0.0f) {
-        SetVelocity(GetVelocity() * 0.99f * deltaSeconds.count());
+        auto newVelocity = GetVelocity() * 0.99f;
+        if(MathUtils::IsEquivalentToZero(newVelocity)) {
+            newVelocity = Vector2::ZERO;
+        }
+        SetVelocity(newVelocity);
     }
     const auto uvs = AABB2::ZERO_TO_ONE;
     const auto tex = material->GetTexture(Material::TextureID::Diffuse);
