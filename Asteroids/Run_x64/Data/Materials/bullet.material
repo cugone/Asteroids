@@ -1,5 +1,5 @@
 <material name="bullet">
-    <shader src="__2D" />
+    <shader src="Data/Shaders/bullet.shader" />
     <textures>
         <diffuse src="Data/Images/laserBullet.png" />
     </textures>

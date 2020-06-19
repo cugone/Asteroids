@@ -1,4 +1,4 @@
-<shader name="asteroid">
+<shader name="bullet">
     <shaderprogram src="Data/ShaderPrograms/entity_VS.cso"/>
     <shaderprogram src="Data/ShaderPrograms/entity_PS.cso"/>
     <raster>

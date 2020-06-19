@@ -1,5 +1,6 @@
 <shader name="explosion">
-    <shaderprogram src="__unlit"/>
+    <shaderprogram src="Data/ShaderPrograms/entity_VS.cso"/>
+    <shaderprogram src="Data/ShaderPrograms/entity_PS.cso"/>
     <raster>
         <fill>solid</fill>
         <cull>none</cull>

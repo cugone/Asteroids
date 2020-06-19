@@ -1,5 +1,5 @@
 <material name="ship">
-    <shader src="__2D" />
+    <shader src="Data/Shaders/ship.shader" />
     <textures>
         <diffuse src="Data/Images/ship.png"/>
     </textures>
