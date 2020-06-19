@@ -24,6 +24,11 @@ class Bullet;
 class Explosion;
 class Ship;
 
+enum class Difficulty {
+    Easy,
+    Normal,
+    Hard
+};
 
 enum class GameState {
     Title,
@@ -127,6 +132,7 @@ private:
     std::vector<std::unique_ptr<Entity>> _pending_entities{};
     float _thrust_force{100.0f};
     unsigned int _current_wave{1};
+    Difficulty _difficulty{Difficulty::Normal};
     GameState _current_state{GameState::Title};
     GameState _next_state{GameState::Title};
     bool _debug_render{false};
