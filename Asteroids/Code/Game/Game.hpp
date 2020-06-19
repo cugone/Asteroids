@@ -24,6 +24,13 @@ class Bullet;
 class Explosion;
 class Ship;
 
+
+enum class GameState {
+    Title,
+    Main,
+    GameOver,
+};
+
 class Game {
 public:
     Game() = default;
@@ -72,9 +79,37 @@ private:
     void MakeLargeAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
     void MakeShip() noexcept;
 
-
+    void KillAll() noexcept;
     void HandleBulletAsteroidCollision() const noexcept;
     void HandleShipAsteroidCollision() const noexcept;
+
+    void ChangeState(GameState newState) noexcept;
+    void OnEnterState(GameState state) noexcept;
+    void OnExitState(GameState state) noexcept;
+
+    void OnEnter_Title() noexcept;
+    void OnEnter_Main() noexcept;
+    void OnEnter_GameOver() noexcept;
+
+    void OnExit_Title() noexcept;
+    void OnExit_Main() noexcept;
+    void OnExit_GameOver() noexcept;
+
+    void BeginFrame_Title() noexcept;
+    void BeginFrame_Main() noexcept;
+    void BeginFrame_GameOver() noexcept;
+
+    void Update_Title([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept;
+    void Update_Main([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept;
+    void Update_GameOver([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept;
+    
+    void Render_Title() const noexcept;
+    void Render_Main() const noexcept;
+    void Render_GameOver() const noexcept;
+    
+    void EndFrame_Title() noexcept;
+    void EndFrame_Main() noexcept;
+    void EndFrame_GameOver() noexcept;
 
     void RenderBackground(const Vector2& ui_view_half_extents) const noexcept;
     void RenderEntities() const noexcept;
@@ -83,17 +118,20 @@ private:
 
     void StartNewWave(unsigned int wave_number) noexcept;
     void Respawn() noexcept;
-    bool GameOver() const noexcept;
+    bool IsGameOver() const noexcept;
+
+    void SetControlType() noexcept;
 
     mutable Camera2D _camera2D{};
     std::vector<std::unique_ptr<Entity>> _entities{};
     std::vector<std::unique_ptr<Entity>> _pending_entities{};
     float _thrust_force{100.0f};
     unsigned int _current_wave{1};
+    GameState _current_state{GameState::Title};
+    GameState _next_state{GameState::Title};
     bool _debug_render{false};
     bool _keyboard_control_active{false};
     bool _mouse_control_active{false};
     bool _controller_control_active{false};
-    bool is_gameover{false};
 };
 

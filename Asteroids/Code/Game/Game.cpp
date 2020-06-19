@@ -21,13 +21,50 @@ void Game::Initialize() {
     g_theRenderer->SetWindowTitle("Asteroids");
     g_theAudioSystem->RegisterWavFilesFromFolder("Data/Audio/");
     g_theRenderer->RegisterMaterialsFromFolder("Data/Materials/");
-    world_bounds = AABB2{Vector2::ZERO, Vector2{g_theRenderer->GetOutput()->GetDimensions()}};
-    _entities.emplace_back(std::move(std::make_unique<Ship>(world_bounds.CalcCenter())));
-    ship = reinterpret_cast<Ship*>(_entities.back().get());
-
 }
 
 void Game::BeginFrame() {
+    if(_current_state != _next_state) {
+        OnExitState(_current_state);
+        _current_state = _next_state;
+        OnEnterState(_current_state);
+    }
+
+    switch(_current_state) {
+    case GameState::Title: BeginFrame_Title(); return;
+    case GameState::Main: BeginFrame_Main(); return;
+    case GameState::GameOver: BeginFrame_GameOver(); return;
+    default: ERROR_AND_DIE("BeginFrame Undefined Game State.");
+    }
+}
+
+void Game::ChangeState(GameState newState) noexcept {
+    _next_state = newState;
+}
+
+void Game::OnEnterState(GameState state) noexcept {
+    switch(state) {
+    case GameState::Title: OnEnter_Title(); return;
+    case GameState::Main: OnEnter_Main(); return;
+    case GameState::GameOver: OnEnter_GameOver(); return;
+    default: ERROR_AND_DIE("OnEnterState: Undefined state");
+    }
+}
+
+void Game::OnExitState(GameState state) noexcept {
+    switch(state) {
+    case GameState::Title: OnExit_Title(); return;
+    case GameState::Main: OnExit_Main(); return;
+    case GameState::GameOver: OnExit_GameOver(); return;
+    }
+}
+
+void Game::BeginFrame_Title() noexcept {
+    SetControlType();
+}
+
+void Game::BeginFrame_Main() noexcept {
+    SetControlType();
     for(auto& entity : _entities) {
         if(entity) {
             entity->BeginFrame();
@@ -35,12 +72,67 @@ void Game::BeginFrame() {
     }
 }
 
+void Game::BeginFrame_GameOver() noexcept {
+    SetControlType();
+}
+
+void Game::SetControlType() noexcept {
+    if(g_theInputSystem->WasAnyKeyPressed()) {
+        _keyboard_control_active = true;
+        _mouse_control_active = false;
+        _controller_control_active = false;
+    }
+    if(g_theInputSystem->WasAnyMouseButtonPressed()) {
+        _keyboard_control_active = false;
+        _mouse_control_active = true;
+        _controller_control_active = false;
+    }
+    if(g_theInputSystem->WasAnyControllerJustUsed()) {
+        _keyboard_control_active = false;
+        _mouse_control_active = false;
+        _controller_control_active = true;
+    }
+}
+
 void Game::Update(TimeUtils::FPSeconds deltaSeconds) {
+    switch(_current_state) {
+    case GameState::Title: Update_Title(deltaSeconds); return;
+    case GameState::Main: Update_Main(deltaSeconds); return;
+    case GameState::GameOver: Update_GameOver(deltaSeconds); return;
+    default: ERROR_AND_DIE("Update Undefined Game State.");
+    }
+}
+
+void Game::Render() const {
+    switch(_current_state) {
+    case GameState::Title:    Render_Title(); return;
+    case GameState::Main:     Render_Main(); return;
+    case GameState::GameOver: Render_GameOver(); return;
+    default: ERROR_AND_DIE("Render Undefined Game State.");
+    }
+}
+
+void Game::EndFrame() {
+    switch(_current_state) {
+    case GameState::Title:    EndFrame_Title(); return;
+    case GameState::Main:     EndFrame_Main(); return;
+    case GameState::GameOver: EndFrame_GameOver(); return;
+    default: ERROR_AND_DIE("EndFrame Undefined Game State.");
+    }
+}
+
+void Game::Update_Title([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
+    if(g_theInputSystem->WasAnyKeyPressed()) {
+        ChangeState(GameState::Main);
+    }
+}
+
+void Game::Update_Main([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::Esc)) {
         g_theApp->SetIsQuitting(true);
         return;
     }
-    if(GameOver()) {
+    if(IsGameOver()) {
         return;
     }
     Camera2D& base_camera = _camera2D;
@@ -49,9 +141,20 @@ void Game::Update(TimeUtils::FPSeconds deltaSeconds) {
     base_camera.Update(deltaSeconds);
 
     UpdateEntities(deltaSeconds);
+
+    if(IsGameOver()) {
+        KillAll();
+        ChangeState(GameState::GameOver);
+    }
 }
 
-void Game::Render() const {
+void Game::Update_GameOver([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
+    if(g_theInputSystem->WasAnyKeyPressed()) {
+        ChangeState(GameState::Title);
+    }
+}
+
+void Game::Render_Title() const noexcept {
     g_theRenderer->ResetModelViewProjection();
     g_theRenderer->SetRenderTargetsToBackBuffer();
     g_theRenderer->ClearDepthStencilBuffer();
@@ -74,18 +177,100 @@ void Game::Render() const {
     _camera2D.SetupView(ui_leftBottom, ui_rightTop, ui_nearFar, MathUtils::M_16_BY_9_RATIO);
     g_theRenderer->SetCamera(_camera2D);
 
-    if(!GameOver()) {
-        RenderBackground(ui_view_half_extents);
-        RenderEntities();
-        if(_debug_render) {
-            DebugRenderEntities();
-        }
-        RenderStatus(ui_cam_pos, ui_view_half_extents);
-    } else {
-        const auto* font = g_theRenderer->GetFont("System32");
-        g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(ui_view_half_extents));
-        g_theRenderer->DrawTextLine(font, "GAME OVER");
+    const auto* font = g_theRenderer->GetFont("System32");
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(ui_view_half_extents));
+    g_theRenderer->DrawTextLine(font, "ASTEROIDS");
+}
+
+void Game::Render_Main() const noexcept {
+    g_theRenderer->ResetModelViewProjection();
+    g_theRenderer->SetRenderTargetsToBackBuffer();
+    g_theRenderer->ClearDepthStencilBuffer();
+
+    g_theRenderer->ClearColor(Rgba::Black);
+
+    g_theRenderer->SetViewportAsPercent();
+
+    //2D View / HUD
+    const float ui_view_height = currentGraphicsOptions.WindowHeight;
+    const float ui_view_width = ui_view_height * _camera2D.GetAspectRatio();
+    const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
+    const auto ui_view_half_extents = ui_view_extents * 0.5f;
+    auto ui_leftBottom = Vector2{-ui_view_half_extents.x, ui_view_half_extents.y};
+    auto ui_rightTop = Vector2{ui_view_half_extents.x, -ui_view_half_extents.y};
+    auto ui_nearFar = Vector2{0.0f, 1.0f};
+    auto ui_cam_pos = ui_view_half_extents;
+    _camera2D.position = ui_cam_pos;
+    _camera2D.orientation_degrees = 0.0f;
+    _camera2D.SetupView(ui_leftBottom, ui_rightTop, ui_nearFar, MathUtils::M_16_BY_9_RATIO);
+    g_theRenderer->SetCamera(_camera2D);
+
+    RenderBackground(ui_view_half_extents);
+    RenderEntities();
+    if(_debug_render) {
+        DebugRenderEntities();
     }
+    RenderStatus(ui_cam_pos, ui_view_half_extents);
+
+}
+
+void Game::Render_GameOver() const noexcept {
+    g_theRenderer->ResetModelViewProjection();
+    g_theRenderer->SetRenderTargetsToBackBuffer();
+    g_theRenderer->ClearDepthStencilBuffer();
+
+    g_theRenderer->ClearColor(Rgba::Black);
+
+    g_theRenderer->SetViewportAsPercent();
+
+    //2D View / HUD
+    const float ui_view_height = currentGraphicsOptions.WindowHeight;
+    const float ui_view_width = ui_view_height * _camera2D.GetAspectRatio();
+    const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
+    const auto ui_view_half_extents = ui_view_extents * 0.5f;
+    auto ui_leftBottom = Vector2{-ui_view_half_extents.x, ui_view_half_extents.y};
+    auto ui_rightTop = Vector2{ui_view_half_extents.x, -ui_view_half_extents.y};
+    auto ui_nearFar = Vector2{0.0f, 1.0f};
+    auto ui_cam_pos = ui_view_half_extents;
+    _camera2D.position = ui_cam_pos;
+    _camera2D.orientation_degrees = 0.0f;
+    _camera2D.SetupView(ui_leftBottom, ui_rightTop, ui_nearFar, MathUtils::M_16_BY_9_RATIO);
+    g_theRenderer->SetCamera(_camera2D);
+
+    const auto* font = g_theRenderer->GetFont("System32");
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(ui_view_half_extents));
+    g_theRenderer->DrawTextLine(font, "GAME OVER");
+}
+
+void Game::EndFrame_Title() noexcept {
+    /* DO NOTHING */
+}
+
+void Game::EndFrame_Main() noexcept {
+    for(auto& entity : _entities) {
+        if(entity) {
+            entity->EndFrame();
+        }
+    }
+    for(auto& entity : _entities) {
+        if(entity && entity->IsDead()) {
+            entity->OnDestroy();
+            entity.reset();
+        }
+    }
+    explosions.erase(std::remove_if(std::begin(explosions), std::end(explosions), [&](Explosion* e) { return !e; }), std::end(explosions));
+    bullets.erase(std::remove_if(std::begin(bullets), std::end(bullets), [&](Bullet* e) { return !e; }), std::end(bullets));
+    asteroids.erase(std::remove_if(std::begin(asteroids), std::end(asteroids), [&](Asteroid* e) { return !e; }), std::end(asteroids));
+    _entities.erase(std::remove_if(std::begin(_entities) + 1, std::end(_entities), [&](std::unique_ptr<Entity>& e) { return !e; }), std::end(_entities));
+
+    for(auto&& pending : _pending_entities) {
+        _entities.emplace_back(std::move(pending));
+    }
+    _pending_entities.clear();
+}
+
+void Game::EndFrame_GameOver() noexcept {
+    /* DO NOTHING */
 }
 
 void Game::RenderStatus(const Vector2 camPos, const Vector2 viewHalfExtents) const noexcept {
@@ -93,7 +278,7 @@ void Game::RenderStatus(const Vector2 camPos, const Vector2 viewHalfExtents) con
     const auto* font = g_theRenderer->GetFont("System32");
     const auto font_position = camPos - viewHalfExtents + Vector2{5.0f, font->GetLineHeight() * 0.0f};
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(font_position));
-    g_theRenderer->DrawMultilineText(g_theRenderer->GetFont("System32"), "Score: " + std::to_string(player.GetScore()) + "\n      x" + std::to_string(player.lives));
+    g_theRenderer->DrawMultilineText(g_theRenderer->GetFont("System32"), "Score: " + std::to_string(player.GetScore()) + "\n      x" + std::to_string(player.GetLives()));
 
     const auto uvs = AABB2::ZERO_TO_ONE;
     const auto mat = g_theRenderer->GetMaterial("ship");
@@ -116,8 +301,8 @@ void Game::Respawn() noexcept {
     MakeShip();
 }
 
-bool Game::GameOver() const noexcept {
-    return player.lives == 0;
+bool Game::IsGameOver() const noexcept {
+    return player.desc.lives == 0;
 }
 
 void Game::RenderBackground(const Vector2& ui_view_half_extents) const noexcept {
@@ -138,28 +323,6 @@ void Game::StartNewWave(unsigned int wave_number) noexcept {
 
 void Game::DecrementLives() noexcept {
     player.DecrementLives();
-}
-
-void Game::EndFrame() {
-    for(auto& entity : _entities) {
-        if(entity) {
-            entity->EndFrame();
-        }
-    }
-    for(auto& entity : _entities) {
-        if(entity && entity->IsDead()) {
-            entity->OnDestroy();
-            entity.reset();
-        }
-    }
-    bullets.erase(std::remove_if(std::begin(bullets), std::end(bullets), [&](Bullet* e) { return !e; }), std::end(bullets));
-    asteroids.erase(std::remove_if(std::begin(asteroids), std::end(asteroids), [&](Asteroid* e) { return !e; }), std::end(asteroids));
-    _entities.erase(std::remove_if(std::begin(_entities) + 1, std::end(_entities), [&](std::unique_ptr<Entity>& e) { return !e; }), std::end(_entities));
-
-    for(auto&& pending : _pending_entities) {
-        _entities.emplace_back(std::move(pending));
-    }
-    _pending_entities.clear();
 }
 
 void Game::MakeBullet(const Entity* parent, Vector2 pos, Vector2 vel) noexcept {
@@ -240,6 +403,27 @@ void Game::MakeShip() noexcept {
     }
 }
 
+void Game::KillAll() noexcept {
+    for(auto* asteroid : asteroids) {
+        if(asteroid) {
+            asteroid->Kill();
+        }
+    }
+    for(auto* bullet : bullets) {
+        if(bullet) {
+            bullet->Kill();
+        }
+    }
+    for(auto* explosion : explosions) {
+        if(explosion) {
+            explosion->Kill();
+        }
+    }
+    if(ship) {
+        ship->Kill();
+    }
+}
+
 void Game::MakeExplosion(Vector2 position) noexcept {
     if(!explosion_sheet) {
         explosion_sheet = g_theRenderer->CreateSpriteSheet("Data/Images/explosion.png", 5, 5);
@@ -259,11 +443,6 @@ void Game::HandlePlayerInput(Camera2D& baseCamera, TimeUtils::FPSeconds deltaSec
 }
 
 void Game::HandleKeyboardInput(Camera2D& /*baseCamera*/, TimeUtils::FPSeconds deltaSeconds) {
-    if(g_theInputSystem->WasAnyKeyPressed()) {
-        _keyboard_control_active = true;
-        _mouse_control_active = false;
-        _controller_control_active = false;
-    }
     if(!_keyboard_control_active) {
         return;
     }
@@ -283,11 +462,6 @@ void Game::HandleKeyboardInput(Camera2D& /*baseCamera*/, TimeUtils::FPSeconds de
 }
 
 void Game::HandleMouseInput(Camera2D& baseCamera, TimeUtils::FPSeconds /*deltaSeconds*/) {
-    if(g_theInputSystem->WasMouseJustUsed()) {
-        _keyboard_control_active = false;
-        _mouse_control_active = true;
-        _controller_control_active = false;
-    }
     if(!_mouse_control_active) {
         return;
     }
@@ -308,11 +482,6 @@ void Game::HandleMouseInput(Camera2D& baseCamera, TimeUtils::FPSeconds /*deltaSe
 }
 
 void Game::HandleControllerInput(Camera2D& /*baseCamera*/, TimeUtils::FPSeconds /*deltaSeconds*/) {
-    if(g_theInputSystem->WasAnyControllerJustUsed()) {
-        _keyboard_control_active = false;
-        _mouse_control_active = false;
-        _controller_control_active = true;
-    }
     if(!_controller_control_active) {
         return;
     }
@@ -368,6 +537,45 @@ void Game::HandleShipAsteroidCollision() const noexcept {
             asteroid->OnCollision(asteroid, ship);
         }
     }
+}
+
+void Game::OnEnter_Title() noexcept {
+    /* DO NOTHING */
+}
+
+void Game::OnEnter_Main() noexcept {
+    explosions.clear();
+    explosions.shrink_to_fit();
+    asteroids.clear();
+    asteroids.shrink_to_fit();
+    bullets.clear();
+    bullets.shrink_to_fit();
+    ship = nullptr;
+    _entities.clear();
+    _entities.shrink_to_fit();
+
+    world_bounds = AABB2{Vector2::ZERO, Vector2{g_theRenderer->GetOutput()->GetDimensions()}};
+
+    player = Player{};
+    _current_wave = 1u;
+    _entities.emplace_back(std::move(std::make_unique<Ship>(world_bounds.CalcCenter())));
+    ship = reinterpret_cast<Ship*>(_entities.back().get());
+}
+
+void Game::OnEnter_GameOver() noexcept {
+    /* DO NOTHING */
+}
+
+void Game::OnExit_Title() noexcept {
+    /* DO NOTHING */
+}
+
+void Game::OnExit_Main() noexcept {
+    /* DO NOTHING */
+}
+
+void Game::OnExit_GameOver() noexcept {
+    /* DO NOTHING */
 }
 
 void Game::RenderEntities() const noexcept {
