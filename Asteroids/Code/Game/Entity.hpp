@@ -53,6 +53,7 @@ protected:
     void SetHealth(int newHealth) noexcept;
 
     Vector2 GetForward() const noexcept;
+    Vector2 GetForce() const noexcept;
     void AddForce(const Vector2& force) noexcept;
 
     void SetPosition(Vector2 newPosition) noexcept;

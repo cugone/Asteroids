@@ -29,7 +29,9 @@ Ship::Ship(Vector2 position)
 
 void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     Entity::Update(deltaSeconds);
-    
+    if(GetForce().CalcLengthSquared() == 0.0f) {
+        SetVelocity(GetVelocity() * 0.99f * deltaSeconds.count());
+    }
     const auto uvs = AABB2::ZERO_TO_ONE;
     const auto tex = material->GetTexture(Material::TextureID::Diffuse);
     const auto frameWidth = static_cast<float>(tex->GetDimensions().x);
@@ -111,4 +113,3 @@ const Vector2 Ship::CalcNewBulletVelocity() const noexcept {
 const Vector2 Ship::CalcNewBulletPosition() const noexcept {
     return GetPosition() + GetForward() * GetCosmeticRadius();
 }
-

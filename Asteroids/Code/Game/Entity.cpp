@@ -149,6 +149,10 @@ Vector2 Entity::CalcAcceleration() noexcept {
     return acceleration_force.GetZW() * inv_mass;
 }
 
+Vector2 Entity::GetForce() const noexcept {
+    return Vector2{acceleration_force.z, acceleration_force.w};
+}
+
 void Entity::AddForce(const Vector2& force) noexcept {
     acceleration_force.z += force.x;
     acceleration_force.w += force.y;
