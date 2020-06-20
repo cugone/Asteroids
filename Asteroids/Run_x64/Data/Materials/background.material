@@ -1,5 +1,5 @@
 <material name="background">
-    <shader src="__2D" />
+    <shader src="Data/Shaders/background.shader" />
     <textures>
         <diffuse src="Data/Images/bkgd_0.png" />
     </textures>

@@ -150,5 +150,8 @@
     <None Include="..\..\Run_x64\Data\Shaders\ship.shader">
       <Filter>Data\Shaders</Filter>
     </None>
+    <None Include="..\..\Run_x64\Data\Shaders\background.shader">
+      <Filter>Data\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

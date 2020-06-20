@@ -183,6 +183,7 @@
     <None Include="..\..\Run_x64\Data\ShaderPrograms\entity_PS.cso" />
     <None Include="..\..\Run_x64\Data\ShaderPrograms\entity_VS.cso" />
     <None Include="..\..\Run_x64\Data\Shaders\asteroid.shader" />
+    <None Include="..\..\Run_x64\Data\Shaders\background.shader" />
     <None Include="..\..\Run_x64\Data\Shaders\bullet.shader" />
     <None Include="..\..\Run_x64\Data\Shaders\explosion.shader" />
     <None Include="..\..\Run_x64\Data\Shaders\ship.shader" />
