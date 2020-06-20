@@ -32,6 +32,7 @@ void Game::BeginFrame() {
 
     switch(_current_state) {
     case GameState::Title: BeginFrame_Title(); return;
+    case GameState::Options: BeginFrame_Options(); return;
     case GameState::Main: BeginFrame_Main(); return;
     case GameState::GameOver: BeginFrame_GameOver(); return;
     default: ERROR_AND_DIE("BeginFrame Undefined Game State.");
@@ -45,6 +46,7 @@ void Game::ChangeState(GameState newState) noexcept {
 void Game::OnEnterState(GameState state) noexcept {
     switch(state) {
     case GameState::Title: OnEnter_Title(); return;
+    case GameState::Options: OnEnter_Options(); return;
     case GameState::Main: OnEnter_Main(); return;
     case GameState::GameOver: OnEnter_GameOver(); return;
     default: ERROR_AND_DIE("OnEnterState: Undefined state");
@@ -54,6 +56,7 @@ void Game::OnEnterState(GameState state) noexcept {
 void Game::OnExitState(GameState state) noexcept {
     switch(state) {
     case GameState::Title: OnExit_Title(); return;
+    case GameState::Options: OnExit_Options(); return;
     case GameState::Main: OnExit_Main(); return;
     case GameState::GameOver: OnExit_GameOver(); return;
     }
@@ -61,6 +64,10 @@ void Game::OnExitState(GameState state) noexcept {
 
 void Game::BeginFrame_Title() noexcept {
     SetControlType();
+}
+
+void Game::BeginFrame_Options() noexcept {
+    /* DO NOTHING */
 }
 
 void Game::BeginFrame_Main() noexcept {
@@ -94,9 +101,19 @@ void Game::SetControlType() noexcept {
     }
 }
 
+long long Game::GetLivesFromDifficulty() const noexcept {
+    switch(_current_options.difficulty) {
+    case Difficulty::Easy: return 5LL;
+    case Difficulty::Normal: return 4LL;
+    case Difficulty::Hard: return 3LL;
+    default: return 4;
+    }
+}
+
 void Game::Update(TimeUtils::FPSeconds deltaSeconds) {
     switch(_current_state) {
     case GameState::Title: Update_Title(deltaSeconds); return;
+    case GameState::Options: Update_Options(deltaSeconds); return;
     case GameState::Main: Update_Main(deltaSeconds); return;
     case GameState::GameOver: Update_GameOver(deltaSeconds); return;
     default: ERROR_AND_DIE("Update Undefined Game State.");
@@ -105,8 +122,9 @@ void Game::Update(TimeUtils::FPSeconds deltaSeconds) {
 
 void Game::Render() const {
     switch(_current_state) {
-    case GameState::Title:    Render_Title(); return;
-    case GameState::Main:     Render_Main(); return;
+    case GameState::Title: Render_Title(); return;
+    case GameState::Options: Render_Options(); return;
+    case GameState::Main: Render_Main(); return;
     case GameState::GameOver: Render_GameOver(); return;
     default: ERROR_AND_DIE("Render Undefined Game State.");
     }
@@ -114,22 +132,40 @@ void Game::Render() const {
 
 void Game::EndFrame() {
     switch(_current_state) {
-    case GameState::Title:    EndFrame_Title(); return;
-    case GameState::Main:     EndFrame_Main(); return;
+    case GameState::Title: EndFrame_Title(); return;
+    case GameState::Options: EndFrame_Options(); return;
+    case GameState::Main: EndFrame_Main(); return;
     case GameState::GameOver: EndFrame_GameOver(); return;
     default: ERROR_AND_DIE("EndFrame Undefined Game State.");
     }
 }
 
 void Game::Update_Title([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
+    if(g_theInputSystem->WasKeyJustPressed(KeyCode::Esc)) {
+        g_theApp->SetIsQuitting(true);
+        return;
+    }
+    if(g_theInputSystem->WasKeyJustPressed(KeyCode::E)) {
+        _current_options.difficulty = Difficulty::Easy;
+    } else
+    if(g_theInputSystem->WasKeyJustPressed(KeyCode::N)) {
+        _current_options.difficulty = Difficulty::Normal;
+    } else
+    if(g_theInputSystem->WasKeyJustPressed(KeyCode::H)) {
+        _current_options.difficulty = Difficulty::Hard;
+    }
     if(g_theInputSystem->WasAnyKeyPressed()) {
         ChangeState(GameState::Main);
     }
 }
 
+void Game::Update_Options([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
+    /* DO NOTHING */
+}
+
 void Game::Update_Main([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::Esc)) {
-        g_theApp->SetIsQuitting(true);
+        ChangeState(GameState::Title);
         return;
     }
     if(IsGameOver()) {
@@ -143,7 +179,6 @@ void Game::Update_Main([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexc
     UpdateEntities(deltaSeconds);
 
     if(IsGameOver()) {
-        KillAll();
         ChangeState(GameState::GameOver);
     }
 }
@@ -180,6 +215,10 @@ void Game::Render_Title() const noexcept {
     const auto* font = g_theRenderer->GetFont("System32");
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(ui_view_half_extents));
     g_theRenderer->DrawTextLine(font, "ASTEROIDS");
+}
+
+void Game::Render_Options() const noexcept {
+    /* DO NOTHING */
 }
 
 void Game::Render_Main() const noexcept {
@@ -243,6 +282,10 @@ void Game::Render_GameOver() const noexcept {
 }
 
 void Game::EndFrame_Title() noexcept {
+    /* DO NOTHING */
+}
+
+void Game::EndFrame_Options() noexcept {
     /* DO NOTHING */
 }
 
@@ -503,13 +546,13 @@ void Game::UpdateEntities(TimeUtils::FPSeconds deltaSeconds) noexcept {
     if(asteroids.empty()) {
         StartNewWave(_current_wave++);
     }
-    HandleBulletAsteroidCollision();
-    HandleShipAsteroidCollision();
     for(auto& entity : _entities) {
         if(entity) {
             entity->Update(deltaSeconds);
         }
     }
+    HandleBulletAsteroidCollision();
+    HandleShipAsteroidCollision();
 }
 
 void Game::HandleBulletAsteroidCollision() const noexcept {
@@ -543,6 +586,10 @@ void Game::OnEnter_Title() noexcept {
     /* DO NOTHING */
 }
 
+void Game::OnEnter_Options() noexcept {
+    /* DO NOTHING */
+}
+
 void Game::OnEnter_Main() noexcept {
     explosions.clear();
     explosions.shrink_to_fit();
@@ -556,7 +603,9 @@ void Game::OnEnter_Main() noexcept {
 
     world_bounds = AABB2{Vector2::ZERO, Vector2{g_theRenderer->GetOutput()->GetDimensions()}};
 
-    player = Player{};
+    PlayerDesc playerDesc{};
+    playerDesc.lives = GetLivesFromDifficulty();
+    player = Player{playerDesc};
     _current_wave = 1u;
     _entities.emplace_back(std::move(std::make_unique<Ship>(world_bounds.CalcCenter())));
     ship = reinterpret_cast<Ship*>(_entities.back().get());
@@ -567,6 +616,10 @@ void Game::OnEnter_GameOver() noexcept {
 }
 
 void Game::OnExit_Title() noexcept {
+    /* DO NOTHING */
+}
+
+void Game::OnExit_Options() noexcept {
     /* DO NOTHING */
 }
 

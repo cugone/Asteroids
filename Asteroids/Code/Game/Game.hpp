@@ -30,8 +30,13 @@ enum class Difficulty {
     Hard
 };
 
+struct GameOptions {
+    Difficulty difficulty{Difficulty::Normal};
+};
+
 enum class GameState {
     Title,
+    Options,
     Main,
     GameOver,
 };
@@ -69,6 +74,8 @@ public:
 
 protected:
 private:
+    long long GetLivesFromDifficulty() const noexcept;
+
     void HandleDebugInput(Camera2D& baseCamera, TimeUtils::FPSeconds deltaSeconds);
     void HandleDebugKeyboardInput(Camera2D& baseCamera, TimeUtils::FPSeconds deltaSeconds);
     void HandleDebugMouseInput(Camera2D& baseCamera, TimeUtils::FPSeconds deltaSeconds);
@@ -93,26 +100,32 @@ private:
     void OnExitState(GameState state) noexcept;
 
     void OnEnter_Title() noexcept;
+    void OnEnter_Options() noexcept;
     void OnEnter_Main() noexcept;
     void OnEnter_GameOver() noexcept;
 
     void OnExit_Title() noexcept;
+    void OnExit_Options() noexcept;
     void OnExit_Main() noexcept;
     void OnExit_GameOver() noexcept;
 
     void BeginFrame_Title() noexcept;
+    void BeginFrame_Options() noexcept;
     void BeginFrame_Main() noexcept;
     void BeginFrame_GameOver() noexcept;
 
     void Update_Title([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept;
+    void Update_Options([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept;
     void Update_Main([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept;
     void Update_GameOver([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept;
     
     void Render_Title() const noexcept;
+    void Render_Options() const noexcept;
     void Render_Main() const noexcept;
     void Render_GameOver() const noexcept;
     
     void EndFrame_Title() noexcept;
+    void EndFrame_Options() noexcept;
     void EndFrame_Main() noexcept;
     void EndFrame_GameOver() noexcept;
 
@@ -132,7 +145,7 @@ private:
     std::vector<std::unique_ptr<Entity>> _pending_entities{};
     float _thrust_force{100.0f};
     unsigned int _current_wave{1};
-    Difficulty _difficulty{Difficulty::Normal};
+    GameOptions _current_options{};
     GameState _current_state{GameState::Title};
     GameState _next_state{GameState::Title};
     bool _debug_render{false};
