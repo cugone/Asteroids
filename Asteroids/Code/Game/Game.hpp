@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Engine/Core/TimeUtils.hpp"
+#include "Engine/Core/OrthographicCameraController.hpp"
 #include "Engine/Core/Vertex3D.hpp"
 #include "Engine/Core/Stopwatch.hpp"
 
@@ -81,14 +82,14 @@ protected:
 private:
     long long GetLivesFromDifficulty() const noexcept;
 
-    void HandleDebugInput(Camera2D& baseCamera, TimeUtils::FPSeconds deltaSeconds);
-    void HandleDebugKeyboardInput(Camera2D& baseCamera, TimeUtils::FPSeconds deltaSeconds);
-    void HandleDebugMouseInput(Camera2D& baseCamera, TimeUtils::FPSeconds deltaSeconds);
+    void HandleDebugInput(TimeUtils::FPSeconds deltaSeconds);
+    void HandleDebugKeyboardInput(TimeUtils::FPSeconds deltaSeconds);
+    void HandleDebugMouseInput(TimeUtils::FPSeconds deltaSeconds);
 
-    void HandlePlayerInput(Camera2D& baseCamera, TimeUtils::FPSeconds deltaSeconds);
-    void HandleKeyboardInput(Camera2D& baseCamera, TimeUtils::FPSeconds deltaSeconds);
-    void HandleMouseInput(Camera2D& baseCamera, TimeUtils::FPSeconds deltaSeconds);
-    void HandleControllerInput(Camera2D& baseCamera, TimeUtils::FPSeconds deltaSeconds);
+    void HandlePlayerInput(TimeUtils::FPSeconds deltaSeconds);
+    void HandleKeyboardInput(TimeUtils::FPSeconds deltaSeconds);
+    void HandleMouseInput(TimeUtils::FPSeconds deltaSeconds);
+    void HandleControllerInput(TimeUtils::FPSeconds deltaSeconds);
 
     void UpdateEntities(TimeUtils::FPSeconds deltaSeconds) noexcept;
 
@@ -134,10 +135,10 @@ private:
     void EndFrame_Main() noexcept;
     void EndFrame_GameOver() noexcept;
 
-    void RenderBackground(const Vector2& ui_view_half_extents) const noexcept;
+    void RenderBackground() const noexcept;
     void RenderEntities() const noexcept;
     void DebugRenderEntities() const noexcept;
-    void RenderStatus(const Vector2 cameraPos, const  Vector2 viewHalfExtents) const noexcept;
+    void RenderStatus() const noexcept;
 
     void StartNewWave(unsigned int wave_number) noexcept;
     void Respawn() noexcept;
@@ -145,7 +146,8 @@ private:
 
     void SetControlType() noexcept;
 
-    mutable Camera2D _camera2D{};
+    mutable Camera2D _ui_camera{};
+    OrthographicCameraController _cameraController{};
     std::vector<std::unique_ptr<Entity>> _entities{};
     std::vector<std::unique_ptr<Entity>> _pending_entities{};
     float _thrust_force{100.0f};
@@ -157,5 +159,6 @@ private:
     bool _keyboard_control_active{false};
     bool _mouse_control_active{false};
     bool _controller_control_active{false};
+    bool _controlling_camera{false};
 };
 

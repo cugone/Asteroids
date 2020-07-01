@@ -171,6 +171,7 @@ void Game::Update_Options([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) no
 }
 
 void Game::Update_Main([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
+    g_theRenderer->UpdateGameTime(deltaSeconds);
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::Esc)) {
         ChangeState(GameState::Title);
         return;
@@ -178,16 +179,16 @@ void Game::Update_Main([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexc
     if(IsGameOver()) {
         return;
     }
-    Camera2D& base_camera = _camera2D;
-    HandleDebugInput(base_camera, deltaSeconds);
-    HandlePlayerInput(base_camera, deltaSeconds);
-    base_camera.Update(deltaSeconds);
-
+    HandleDebugInput(deltaSeconds);
+    HandlePlayerInput(deltaSeconds);
     UpdateEntities(deltaSeconds);
 
     if(IsGameOver()) {
         ChangeState(GameState::GameOver);
     }
+
+    _cameraController.Update(deltaSeconds);
+
 }
 
 void Game::Update_GameOver([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
@@ -207,17 +208,17 @@ void Game::Render_Title() const noexcept {
 
     //2D View / HUD
     const float ui_view_height = currentGraphicsOptions.WindowHeight;
-    const float ui_view_width = ui_view_height * _camera2D.GetAspectRatio();
+    const float ui_view_width = ui_view_height * _ui_camera.GetAspectRatio();
     const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
     const auto ui_view_half_extents = ui_view_extents * 0.5f;
-    auto ui_leftBottom = Vector2{-ui_view_half_extents.x, ui_view_half_extents.y};
-    auto ui_rightTop = Vector2{ui_view_half_extents.x, -ui_view_half_extents.y};
-    auto ui_nearFar = Vector2{0.0f, 1.0f};
-    auto ui_cam_pos = ui_view_half_extents;
-    _camera2D.position = ui_cam_pos;
-    _camera2D.orientation_degrees = 0.0f;
-    _camera2D.SetupView(ui_leftBottom, ui_rightTop, ui_nearFar, MathUtils::M_16_BY_9_RATIO);
-    g_theRenderer->SetCamera(_camera2D);
+    const auto ui_leftBottom = Vector2{-ui_view_half_extents.x, ui_view_half_extents.y};
+    const auto ui_rightTop = Vector2{ui_view_half_extents.x, -ui_view_half_extents.y};
+    const auto ui_nearFar = Vector2{0.0f, 1.0f};
+    const auto ui_cam_pos = ui_view_half_extents;
+    _ui_camera.position = ui_cam_pos;
+    _ui_camera.orientation_degrees = 0.0f;
+    _ui_camera.SetupView(ui_leftBottom, ui_rightTop, ui_nearFar, MathUtils::M_16_BY_9_RATIO);
+    g_theRenderer->SetCamera(_ui_camera);
 
     const auto* font = g_theRenderer->GetFont("System32");
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(ui_view_half_extents));
@@ -229,7 +230,6 @@ void Game::Render_Options() const noexcept {
 }
 
 void Game::Render_Main() const noexcept {
-    g_theRenderer->ResetModelViewProjection();
     g_theRenderer->SetRenderTargetsToBackBuffer();
     g_theRenderer->ClearDepthStencilBuffer();
 
@@ -237,26 +237,12 @@ void Game::Render_Main() const noexcept {
 
     g_theRenderer->SetViewportAsPercent();
 
-    //2D View / HUD
-    const float ui_view_height = currentGraphicsOptions.WindowHeight;
-    const float ui_view_width = ui_view_height * _camera2D.GetAspectRatio();
-    const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
-    const auto ui_view_half_extents = ui_view_extents * 0.5f;
-    auto ui_leftBottom = Vector2{-ui_view_half_extents.x, ui_view_half_extents.y};
-    auto ui_rightTop = Vector2{ui_view_half_extents.x, -ui_view_half_extents.y};
-    auto ui_nearFar = Vector2{0.0f, 1.0f};
-    auto ui_cam_pos = ui_view_half_extents;
-    _camera2D.position = ui_cam_pos;
-    _camera2D.orientation_degrees = 0.0f;
-    _camera2D.SetupView(ui_leftBottom, ui_rightTop, ui_nearFar, MathUtils::M_16_BY_9_RATIO);
-    g_theRenderer->SetCamera(_camera2D);
-
-    RenderBackground(ui_view_half_extents);
+    RenderBackground();
     RenderEntities();
     if(_debug_render) {
         DebugRenderEntities();
     }
-    RenderStatus(ui_cam_pos, ui_view_half_extents);
+    RenderStatus();
 
 }
 
@@ -271,17 +257,17 @@ void Game::Render_GameOver() const noexcept {
 
     //2D View / HUD
     const float ui_view_height = currentGraphicsOptions.WindowHeight;
-    const float ui_view_width = ui_view_height * _camera2D.GetAspectRatio();
+    const float ui_view_width = ui_view_height * _ui_camera.GetAspectRatio();
     const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
     const auto ui_view_half_extents = ui_view_extents * 0.5f;
     auto ui_leftBottom = Vector2{-ui_view_half_extents.x, ui_view_half_extents.y};
     auto ui_rightTop = Vector2{ui_view_half_extents.x, -ui_view_half_extents.y};
     auto ui_nearFar = Vector2{0.0f, 1.0f};
     auto ui_cam_pos = ui_view_half_extents;
-    _camera2D.position = ui_cam_pos;
-    _camera2D.orientation_degrees = 0.0f;
-    _camera2D.SetupView(ui_leftBottom, ui_rightTop, ui_nearFar, MathUtils::M_16_BY_9_RATIO);
-    g_theRenderer->SetCamera(_camera2D);
+    _ui_camera.position = ui_cam_pos;
+    _ui_camera.orientation_degrees = 0.0f;
+    _ui_camera.SetupView(ui_leftBottom, ui_rightTop, ui_nearFar, MathUtils::M_16_BY_9_RATIO);
+    g_theRenderer->SetCamera(_ui_camera);
 
     const auto* font = g_theRenderer->GetFont("System32");
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(ui_view_half_extents));
@@ -323,10 +309,23 @@ void Game::EndFrame_GameOver() noexcept {
     /* DO NOTHING */
 }
 
-void Game::RenderStatus(const Vector2 camPos, const Vector2 viewHalfExtents) const noexcept {
+void Game::RenderStatus() const noexcept {
+    const float ui_view_height = _ui_camera.GetViewHeight();
+    const float ui_view_width = ui_view_height * _ui_camera.GetAspectRatio();
+    const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
+    const auto ui_view_half_extents = ui_view_extents * 0.5f;
+    const auto ui_leftBottom = Vector2{-ui_view_half_extents.x, ui_view_half_extents.y};
+    const auto ui_rightTop = Vector2{ui_view_half_extents.x, -ui_view_half_extents.y};
+    const auto ui_nearFar = Vector2{0.0f, 1.0f};
+    const auto ui_cam_pos = ui_view_half_extents;
+    _ui_camera.position = ui_cam_pos;
+    _ui_camera.orientation_degrees = 0.0f;
+    _ui_camera.SetupView(ui_leftBottom, ui_rightTop, ui_nearFar, MathUtils::M_16_BY_9_RATIO);
+    g_theRenderer->SetCamera(_ui_camera);
+
     g_theRenderer->SetModelMatrix(Matrix4::I);
     const auto* font = g_theRenderer->GetFont("System32");
-    const auto font_position = camPos - viewHalfExtents + Vector2{5.0f, font->GetLineHeight() * 0.0f};
+    const auto font_position = ui_cam_pos - ui_view_half_extents + Vector2{5.0f, font->GetLineHeight() * 0.0f};
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(font_position));
     g_theRenderer->DrawMultilineText(g_theRenderer->GetFont("System32"), "Score: " + std::to_string(player.GetScore()) + "\n      x" + std::to_string(player.GetLives()));
 
@@ -355,7 +354,11 @@ bool Game::IsGameOver() const noexcept {
     return player.desc.lives == 0;
 }
 
-void Game::RenderBackground(const Vector2& ui_view_half_extents) const noexcept {
+void Game::RenderBackground() const noexcept {
+    const float ui_view_height = currentGraphicsOptions.WindowHeight;
+    const float ui_view_width = ui_view_height * _cameraController.GetAspectRatio();
+    const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
+    const auto ui_view_half_extents = ui_view_extents * 0.5f;
     const auto S = Matrix4::CreateScaleMatrix(ui_view_half_extents * 2.0f);
     const auto R = Matrix4::I;
     const auto T = Matrix4::CreateTranslationMatrix(ui_view_half_extents);
@@ -486,21 +489,26 @@ void Game::MakeExplosion(Vector2 position) noexcept {
     asExplosion->OnCreate();
 }
 
-void Game::HandlePlayerInput(Camera2D& baseCamera, TimeUtils::FPSeconds deltaSeconds) {
-    HandleKeyboardInput(baseCamera, deltaSeconds);
-    HandleMouseInput(baseCamera, deltaSeconds);
-    HandleControllerInput(baseCamera, deltaSeconds);
+void Game::HandlePlayerInput(TimeUtils::FPSeconds deltaSeconds) {
+    HandleKeyboardInput(deltaSeconds);
+    HandleMouseInput(deltaSeconds);
+    HandleControllerInput(deltaSeconds);
 }
 
-void Game::HandleKeyboardInput(Camera2D& /*baseCamera*/, TimeUtils::FPSeconds deltaSeconds) {
+void Game::HandleKeyboardInput(TimeUtils::FPSeconds deltaSeconds) {
+    _controlling_camera = false;
+    if(g_theInputSystem->IsKeyDown(KeyCode::LShift)) {
+        _controlling_camera = true;
+        return;
+    }
     if(!_keyboard_control_active) {
         return;
     }
     if(ship) {
         if(g_theInputSystem->IsKeyDown(KeyCode::A)) {
-            ship->RotateCounterClockwise(ship->GetRotationSpeed() * deltaSeconds.count());
-        } else if(g_theInputSystem->IsKeyDown(KeyCode::D)) {
             ship->RotateClockwise(ship->GetRotationSpeed() * deltaSeconds.count());
+        } else if(g_theInputSystem->IsKeyDown(KeyCode::D)) {
+            ship->RotateCounterClockwise(ship->GetRotationSpeed() * deltaSeconds.count());
         }
         if(g_theInputSystem->IsKeyDown(KeyCode::W)) {
             ship->Thrust(_thrust_force);
@@ -511,13 +519,17 @@ void Game::HandleKeyboardInput(Camera2D& /*baseCamera*/, TimeUtils::FPSeconds de
     }
 }
 
-void Game::HandleMouseInput(Camera2D& baseCamera, TimeUtils::FPSeconds /*deltaSeconds*/) {
+void Game::HandleMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
+    if(_controlling_camera) {
+        return;
+    }
     if(!_mouse_control_active) {
         return;
     }
     if(ship) {
         if(g_theInputSystem->GetMouseDelta().CalcLengthSquared() > 0.0f) {
-            auto mouseWorldCoords = g_theRenderer->ConvertScreenToWorldCoords(baseCamera, g_theInputSystem->GetCursorScreenPosition());
+            const auto& camera = _cameraController.GetCamera();
+            auto mouseWorldCoords = g_theRenderer->ConvertScreenToWorldCoords(camera, g_theInputSystem->GetCursorScreenPosition());
             const auto newFacing = (mouseWorldCoords - ship->GetPosition()).CalcHeadingDegrees();
             ship->SetOrientationDegrees(newFacing);
         }
@@ -531,7 +543,7 @@ void Game::HandleMouseInput(Camera2D& baseCamera, TimeUtils::FPSeconds /*deltaSe
     }
 }
 
-void Game::HandleControllerInput(Camera2D& /*baseCamera*/, TimeUtils::FPSeconds /*deltaSeconds*/) {
+void Game::HandleControllerInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
     if(!_controller_control_active) {
         return;
     }
@@ -608,6 +620,11 @@ void Game::OnEnter_Main() noexcept {
     _entities.clear();
     _entities.shrink_to_fit();
 
+    _cameraController = OrthographicCameraController{g_theRenderer, g_theInputSystem};
+    _cameraController.SetPosition(Vector2{currentGraphicsOptions.WindowWidth, currentGraphicsOptions.WindowHeight} *0.5f);
+    _cameraController.SetMaxZoomLevel(450.0f);
+    _cameraController.SetZoomLevel(450.0f);
+
     world_bounds = AABB2{Vector2::ZERO, Vector2{g_theRenderer->GetOutput()->GetDimensions()}};
 
     PlayerDesc playerDesc{};
@@ -669,12 +686,12 @@ void Game::DebugRenderEntities() const noexcept {
     }
 }
 
-void Game::HandleDebugInput(Camera2D& baseCamera, TimeUtils::FPSeconds deltaSeconds) {
-    HandleDebugKeyboardInput(baseCamera, deltaSeconds);
-    HandleDebugMouseInput(baseCamera, deltaSeconds);
+void Game::HandleDebugInput(TimeUtils::FPSeconds deltaSeconds) {
+    HandleDebugKeyboardInput(deltaSeconds);
+    HandleDebugMouseInput(deltaSeconds);
 }
 
-void Game::HandleDebugKeyboardInput(Camera2D& baseCamera, TimeUtils::FPSeconds /*deltaSeconds*/) {
+void Game::HandleDebugKeyboardInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
     if(g_theUISystem->GetIO().WantCaptureKeyboard) {
         return;
     }
@@ -685,7 +702,8 @@ void Game::HandleDebugKeyboardInput(Camera2D& baseCamera, TimeUtils::FPSeconds /
         g_theUISystem->ToggleImguiDemoWindow();
     }
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::I)) {
-        const auto mouseWorldCoords = g_theRenderer->ConvertScreenToWorldCoords(baseCamera, g_theInputSystem->GetCursorScreenPosition());
+        const auto& camera = _cameraController.GetCamera();
+        const auto mouseWorldCoords = g_theRenderer->ConvertScreenToWorldCoords(camera, g_theInputSystem->GetCursorScreenPosition());
         const auto vx = MathUtils::GetRandomFloatNegOneToOne();
         const auto vy = MathUtils::GetRandomFloatNegOneToOne();
         const auto s = MathUtils::GetRandomFloatInRange(20.0f, 100.0f);
@@ -701,7 +719,7 @@ void Game::HandleDebugKeyboardInput(Camera2D& baseCamera, TimeUtils::FPSeconds /
     }
 }
 
-void Game::HandleDebugMouseInput(Camera2D& /*baseCamera*/, TimeUtils::FPSeconds /*deltaSeconds*/) {
+void Game::HandleDebugMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
     if(g_theUISystem->GetIO().WantCaptureMouse) {
         return;
     }
