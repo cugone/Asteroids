@@ -1,14 +1,20 @@
 #include "Game/Game.hpp"
 
+#include "Engine/Audio/AudioSystem.hpp"
+
 #include "Engine/Core/KerningFont.hpp"
 
 #include "Engine/Math/Disc2.hpp"
 
+#include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/Material.hpp"
+
+#include "Engine/UI/UISystem.hpp"
 
 #include "Game/GameCommon.hpp"
 #include "Game/GameConfig.hpp"
 
+#include "Game/App.hpp"
 #include "Game/Entity.hpp"
 #include "Game/Asteroid.hpp"
 #include "Game/Bullet.hpp"
@@ -16,6 +22,7 @@
 #include "Game/Ship.hpp"
 
 #include <algorithm>
+#include <cmath>
 
 void Game::Initialize() {
     g_theRenderer->SetWindowTitle("Asteroids");

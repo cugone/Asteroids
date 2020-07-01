@@ -1,15 +1,28 @@
 #pragma once
 
-#include "Engine/Core/JobSystem.hpp"
-#include "Engine/Core/FileLogger.hpp"
-#include "Engine/Renderer/Renderer.hpp"
-#include "Engine/Core/Console.hpp"
-#include "Engine/Core/Config.hpp"
-#include "Engine/UI/UISystem.hpp"
-#include "Engine/Audio/AudioSystem.hpp"
-#include "Engine/Input/InputSystem.hpp"
-#include "Game/App.hpp"
-#include "Game/Game.hpp"
+//#include "Engine/Core/JobSystem.hpp"
+//#include "Engine/Core/FileLogger.hpp"
+//#include "Engine/Renderer/Renderer.hpp"
+//#include "Engine/Core/Console.hpp"
+//#include "Engine/Core/Config.hpp"
+//#include "Engine/UI/UISystem.hpp"
+//#include "Engine/Audio/AudioSystem.hpp"
+//#include "Engine/Input/InputSystem.hpp"
+//#include "Game/App.hpp"
+//#include "Game/Game.hpp"
+
+class JobSystem;
+class FileLogger;
+class Renderer;
+class Console;
+class Config;
+class UISystem;
+class InputSystem;
+class AudioSystem;
+class App;
+class Game;
+class EngineSubsystem;
+
 
 extern JobSystem* g_theJobSystem;
 extern FileLogger* g_theFileLogger;

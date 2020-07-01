@@ -1,13 +1,16 @@
 #include "Game/Bullet.hpp"
 
+#include "Engine/Audio/AudioSystem.hpp"
+
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/Material.hpp"
 
 #include "Game/GameCommon.hpp"
-
-#include <algorithm>
+#include "Game/Game.hpp"
 
 #include "Game/Asteroid.hpp"
+
+#include <algorithm>
 
 Bullet::Bullet(const Entity* parent, Vector2 position, Vector2 velocity) noexcept
 : Entity()

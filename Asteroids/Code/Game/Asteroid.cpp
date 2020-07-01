@@ -1,5 +1,7 @@
 #include "Game/Asteroid.hpp"
 
+#include "Engine/Audio/AudioSystem.hpp"
+
 #include "Engine/Math/Disc2.hpp"
 
 #include "Engine/Renderer/Renderer.hpp"
@@ -8,6 +10,7 @@
 #include "Engine/Renderer/ConstantBuffer.hpp"
 
 #include "Game/GameCommon.hpp"
+#include "Game/Game.hpp"
 
 #include "Game/Bullet.hpp"
 

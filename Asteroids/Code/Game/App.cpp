@@ -1,10 +1,17 @@
 #include "Game/App.hpp"
 
+#include "Engine/Audio/AudioSystem.hpp"
+
 #include "Engine/Core/Config.hpp"
+#include "Engine/Core/Console.hpp"
 #include "Engine/Core/FileLogger.hpp"
 #include "Engine/Core/JobSystem.hpp"
 #include "Engine/Core/KeyValueParser.hpp"
 #include "Engine/Core/StringUtils.hpp"
+
+#include "Engine/Core/EngineSubsystem.hpp"
+
+#include "Engine/Input/InputSystem.hpp"
 
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/Window.hpp"
@@ -13,6 +20,7 @@
 
 #include "Engine/System/System.hpp"
 
+#include "Game/Game.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/GameConfig.hpp"
 

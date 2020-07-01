@@ -1,11 +1,14 @@
 #include "Game/Explosion.hpp"
 
+#include "Engine/Audio/AudioSystem.hpp"
+
 #include "Engine/Math/Disc2.hpp"
 
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/Material.hpp"
 
 #include "Game/GameCommon.hpp"
+#include "Game/Game.hpp"
 
 #include <algorithm>
 

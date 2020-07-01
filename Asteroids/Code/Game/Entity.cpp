@@ -3,7 +3,7 @@
 #include "Engine/Math/MathUtils.hpp"
 
 #include "Game/GameCommon.hpp"
-
+#include "Game/Game.hpp"
 
 void Entity::BeginFrame() noexcept {
     mesh_builder.Clear();

@@ -9,6 +9,7 @@
 #include "Engine/Renderer/Material.hpp"
 
 #include "Game/GameCommon.hpp"
+#include "Game/Game.hpp"
 
 #include "Game/Asteroid.hpp"
 

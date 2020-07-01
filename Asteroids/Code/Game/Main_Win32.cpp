@@ -9,6 +9,7 @@
 #include "Engine/Memory/MemoryPool.hpp"
 
 #include "Game/GameCommon.hpp"
+#include "Game/App.hpp"
 
 #include <sstream>
 #include <memory>
