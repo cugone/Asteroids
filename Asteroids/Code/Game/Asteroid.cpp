@@ -3,6 +3,7 @@
 #include "Engine/Audio/AudioSystem.hpp"
 
 #include "Engine/Math/Disc2.hpp"
+#include "Engine/Math/MathUtils.hpp"
 
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/Material.hpp"
@@ -131,8 +132,8 @@ void Asteroid::OnDestroy() noexcept {
     switch(_type) {
     case Type::Large:
     {
-        const auto heading1 = MathUtils::GetRandomFloatZeroToOne() * 360.0f;
-        const auto heading2 = MathUtils::GetRandomFloatZeroToOne() * 360.0f;
+        const auto heading1 = CalcChildHeadingFromDifficulty();
+        const auto heading2 = CalcChildHeadingFromDifficulty();
         auto v1 = GetVelocity() * MathUtils::GetRandomFloatInRange(1.5f, 3.0f);
         v1.SetHeadingDegrees(heading1);
         auto v2 = GetVelocity() * MathUtils::GetRandomFloatInRange(1.5f, 3.0f);
@@ -147,10 +148,10 @@ void Asteroid::OnDestroy() noexcept {
     }
     case Type::Medium:
     {
-        const auto heading1 = MathUtils::GetRandomFloatZeroToOne() * 360.0f;
-        const auto heading2 = MathUtils::GetRandomFloatZeroToOne() * 360.0f;
-        const auto heading3 = MathUtils::GetRandomFloatZeroToOne() * 360.0f;
-        const auto heading4 = MathUtils::GetRandomFloatZeroToOne() * 360.0f;
+        const auto heading1 = CalcChildHeadingFromDifficulty();
+        const auto heading2 = CalcChildHeadingFromDifficulty();
+        const auto heading3 = CalcChildHeadingFromDifficulty();
+        const auto heading4 = CalcChildHeadingFromDifficulty();
         auto v1 = GetVelocity() * MathUtils::GetRandomFloatInRange(2.5f, 4.0f);
         v1.SetHeadingDegrees(heading1);
         auto v2 = GetVelocity() * MathUtils::GetRandomFloatInRange(2.5f, 4.0f);
@@ -223,5 +224,19 @@ int Asteroid::GetHealthFromType(Type type) const noexcept {
         return 1;
     default:
         return 1;
+    }
+}
+
+float Asteroid::CalcChildHeadingFromDifficulty() {
+    const auto currentHeading = GetVelocity().CalcHeadingDegrees();
+    switch(g_theGame->GetGameOptions().difficulty) {
+    case Difficulty::Easy:
+        return MathUtils::GetRandomFloatZeroToOne() * 360.0f;
+    case Difficulty::Normal:
+        return currentHeading + MathUtils::GetRandomFloatNegOneToOne() * 90.0f;
+    case Difficulty::Hard:
+        return currentHeading + MathUtils::GetRandomFloatNegOneToOne() * 45.0f;
+    default:
+        return currentHeading;
     }
 }
