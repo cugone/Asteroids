@@ -69,6 +69,8 @@ public:
     void MakeMediumAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
     void MakeSmallAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
 
+    const GameOptions& GetGameOptions() const noexcept;
+
     Player player{};
     Ship* ship{nullptr};
     AABB2 world_bounds = AABB2::NEG_ONE_TO_ONE;

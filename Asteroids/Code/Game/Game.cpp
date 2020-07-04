@@ -448,6 +448,10 @@ void Game::MakeSmallAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noex
     asteroids.push_back(asAsteroid);
 }
 
+const GameOptions& Game::GetGameOptions() const noexcept {
+    return _current_options;
+}
+
 void Game::MakeShip() noexcept {
     if(!ship) {
         auto iter = _entities.begin();
