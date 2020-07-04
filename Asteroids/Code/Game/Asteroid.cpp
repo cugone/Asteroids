@@ -103,12 +103,15 @@ void Asteroid::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 
     builder.AddIndicies(Mesh::Builder::Primitive::Quad);
     builder.End(material);
-
-    asteroid_state.wasHit = WasHit();
-    asteroid_state_cb->Update(*g_theRenderer->GetDeviceContext(), &asteroid_state);
 }
 
-Vector4 Asteroid::WasHit() noexcept {
+void Asteroid::Render(Renderer& renderer) const noexcept {
+    asteroid_state.wasHit = WasHit();
+    asteroid_state_cb->Update(*renderer.GetDeviceContext(), &asteroid_state);
+    Entity::Render(renderer);
+}
+
+Vector4 Asteroid::WasHit() const noexcept {
     return _timeSinceLastHit.count() == 0.0f ? Vector4::X_AXIS : Vector4::ZERO;
 }
 
@@ -189,7 +192,7 @@ void Asteroid::OnCollision(Entity* a, Entity* b) noexcept {
         }
         a->DecrementHealth();
         g_theAudioSystem->Play("Data/Audio/Hit.wav");
-        //asteroid_state.wasHit = WasHit();
+        asteroid_state.wasHit = WasHit();
     }
 }
 
