@@ -133,9 +133,9 @@ void Asteroid::OnDestroy() noexcept {
     {
         const auto heading1 = MathUtils::GetRandomFloatZeroToOne() * 360.0f;
         const auto heading2 = MathUtils::GetRandomFloatZeroToOne() * 360.0f;
-        auto v1 = GetVelocity() * MathUtils::GetRandomFloatInRange(1.5f, 5.0f);
+        auto v1 = GetVelocity() * MathUtils::GetRandomFloatInRange(1.5f, 3.0f);
         v1.SetHeadingDegrees(heading1);
-        auto v2 = GetVelocity() * MathUtils::GetRandomFloatInRange(1.5f, 5.0f);
+        auto v2 = GetVelocity() * MathUtils::GetRandomFloatInRange(1.5f, 3.0f);
         v2.SetHeadingDegrees(heading2);
         const auto rotSpeed1 = MathUtils::GetRandomFloatZeroToOne() * 360.0f;
         const auto rotSpeed2 = MathUtils::GetRandomFloatZeroToOne() * 360.0f;
@@ -151,13 +151,13 @@ void Asteroid::OnDestroy() noexcept {
         const auto heading2 = MathUtils::GetRandomFloatZeroToOne() * 360.0f;
         const auto heading3 = MathUtils::GetRandomFloatZeroToOne() * 360.0f;
         const auto heading4 = MathUtils::GetRandomFloatZeroToOne() * 360.0f;
-        auto v1 = GetVelocity() * MathUtils::GetRandomFloatInRange(2.5f, 5.0f);
+        auto v1 = GetVelocity() * MathUtils::GetRandomFloatInRange(2.5f, 4.0f);
         v1.SetHeadingDegrees(heading1);
-        auto v2 = GetVelocity() * MathUtils::GetRandomFloatInRange(2.5f, 5.0f);
+        auto v2 = GetVelocity() * MathUtils::GetRandomFloatInRange(2.5f, 4.0f);
         v2.SetHeadingDegrees(heading2);
-        auto v3 = GetVelocity() * MathUtils::GetRandomFloatInRange(2.5f, 5.0f);
+        auto v3 = GetVelocity() * MathUtils::GetRandomFloatInRange(2.5f, 4.0f);
         v3.SetHeadingDegrees(heading3);
-        auto v4 = GetVelocity() * MathUtils::GetRandomFloatInRange(2.5f, 5.0f);
+        auto v4 = GetVelocity() * MathUtils::GetRandomFloatInRange(2.5f, 4.0f);
         v4.SetHeadingDegrees(heading4);
         const auto rotSpeed1 = MathUtils::GetRandomFloatZeroToOne() * 360.0f;
         const auto rotSpeed2 = MathUtils::GetRandomFloatZeroToOne() * 360.0f;
