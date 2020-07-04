@@ -38,7 +38,8 @@ private:
     std::pair<float, float> GetRadiiFromType(Type type) const noexcept;
     int GetHealthFromType(Type type) const noexcept;
     float CalcChildHeadingFromDifficulty();
-
+    float CalcChildSpeedFromSizeAndDifficulty();
+    float CalcChildSpeedFromSize();
     struct asteroid_state_t {
         Vector4 wasHit = Vector4::ZERO;
     };
