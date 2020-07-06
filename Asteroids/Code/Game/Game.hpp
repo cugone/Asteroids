@@ -36,6 +36,19 @@ enum class Difficulty {
     Hard
 };
 
+enum class TitleMenu : uint8_t {
+    First_,
+    Start = First_,
+    Options,
+    Exit,
+    Last_,
+};
+
+TitleMenu& operator++(TitleMenu& mode) noexcept;
+TitleMenu operator++(TitleMenu& mode, int) noexcept;
+TitleMenu& operator--(TitleMenu& mode) noexcept;
+TitleMenu operator--(TitleMenu& mode, int) noexcept;
+
 struct GameOptions {
     Difficulty difficulty{Difficulty::Normal};
 };
@@ -83,6 +96,10 @@ public:
 protected:
 private:
     long long GetLivesFromDifficulty() const noexcept;
+
+    void HandleTitleInput() noexcept;
+    void HandleTitleKeyboardInput() noexcept;
+    void HandleTitleControllerInput() noexcept;
 
     void HandleDebugInput(TimeUtils::FPSeconds deltaSeconds);
     void HandleDebugKeyboardInput(TimeUtils::FPSeconds deltaSeconds);
@@ -155,8 +172,13 @@ private:
     float _thrust_force{100.0f};
     unsigned int _current_wave{1};
     GameOptions _current_options{};
+    GameOptions _temp_options{};
     GameState _current_state{GameState::Title};
     GameState _next_state{GameState::Title};
+    int _options_selected_item{0};
+    TitleMenu _title_selected_item = TitleMenu::Start;
+    Stopwatch _selected_text_blink_rate{TimeUtils::FPSeconds{0.33f}};
+    bool _selected_text_blink{false};
     bool _debug_render{false};
     bool _keyboard_control_active{false};
     bool _mouse_control_active{false};
