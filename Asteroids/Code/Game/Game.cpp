@@ -542,10 +542,13 @@ void Game::MakeBullet(const Entity* parent, Vector2 pos, Vector2 vel) noexcept {
 
 void Game::MakeLargeAsteroidOffScreen() noexcept {
     const auto pos = [this]()->const Vector2 {
-        const auto left = Vector2{world_bounds.mins.x, MathUtils::GetRandomFloatNegOneToOne() * world_bounds.CalcDimensions().y};
-        const auto right = Vector2{world_bounds.maxs.x, MathUtils::GetRandomFloatNegOneToOne() * world_bounds.CalcDimensions().y};
-        const auto top = Vector2{MathUtils::GetRandomFloatNegOneToOne() * world_bounds.CalcDimensions().x, world_bounds.mins.y};
-        const auto bottom = Vector2{MathUtils::GetRandomFloatNegOneToOne() * world_bounds.CalcDimensions().x, world_bounds.maxs.y};
+        const auto world_dims = world_bounds.CalcDimensions();
+        const auto world_width = world_dims.x;
+        const auto world_height = world_dims.y;
+        const auto left = Vector2{world_bounds.mins.x, MathUtils::GetRandomFloatNegOneToOne() * world_height};
+        const auto right = Vector2{world_bounds.maxs.x, MathUtils::GetRandomFloatNegOneToOne() * world_height};
+        const auto top = Vector2{MathUtils::GetRandomFloatNegOneToOne() * world_width, world_bounds.mins.y};
+        const auto bottom = Vector2{MathUtils::GetRandomFloatNegOneToOne() * world_width, world_bounds.maxs.y};
         const auto i = MathUtils::GetRandomIntLessThan(4);
         switch(i) {
         case 0:
