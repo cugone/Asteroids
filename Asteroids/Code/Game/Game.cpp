@@ -763,7 +763,7 @@ void Game::OnEnter_Title() noexcept {
 }
 
 void Game::OnEnter_Options() noexcept {
-    _options_selected_item = 0;
+    _options_selected_item = OptionsMenu::First_;
     _temp_options = _current_options;
 }
 
