@@ -3,7 +3,6 @@
 #include "Engine/Core/TimeUtils.hpp"
 #include "Engine/Core/OrthographicCameraController.hpp"
 #include "Engine/Core/Vertex3D.hpp"
-#include "Engine/Core/Stopwatch.hpp"
 
 #include "Engine/Input/InputSystem.hpp"
 
@@ -23,6 +22,7 @@
 #include "Game/Player.hpp"
 
 #include <memory>
+#include <string>
 #include <vector>
 
 class Asteroid;
@@ -49,9 +49,32 @@ TitleMenu operator++(TitleMenu& mode, int) noexcept;
 TitleMenu& operator--(TitleMenu& mode) noexcept;
 TitleMenu operator--(TitleMenu& mode, int) noexcept;
 
+enum class ControlPreference {
+    Keyboard,
+    Mouse,
+    XboxController,
+};
+
 struct GameOptions {
     Difficulty difficulty{Difficulty::Normal};
+    ControlPreference controlPref{ControlPreference::Mouse};
+    uint8_t soundVolume{5};
 };
+
+enum class OptionsMenu {
+    First_,
+    DifficultySelection = First_,
+    ControlSelection,
+    SoundVolume,
+    Cancel,
+    Accept,
+    Last_
+};
+
+OptionsMenu& operator++(OptionsMenu& mode) noexcept;
+OptionsMenu operator++(OptionsMenu& mode, int) noexcept;
+OptionsMenu& operator--(OptionsMenu& mode) noexcept;
+OptionsMenu operator--(OptionsMenu& mode, int) noexcept;
 
 enum class GameState {
     Title,
@@ -100,6 +123,10 @@ private:
     void HandleTitleInput() noexcept;
     void HandleTitleKeyboardInput() noexcept;
     void HandleTitleControllerInput() noexcept;
+
+    void HandleOptionsInput() noexcept;
+    void HandleOptionsKeyboardInput() noexcept;
+    void HandleOptionsControllerInput() noexcept;
 
     void HandleDebugInput(TimeUtils::FPSeconds deltaSeconds);
     void HandleDebugKeyboardInput(TimeUtils::FPSeconds deltaSeconds);
@@ -165,20 +192,26 @@ private:
 
     void SetControlType() noexcept;
 
+    std::string DifficultyToString(Difficulty difficulty) const noexcept;
+    std::string ControlPreferenceToString(ControlPreference preference) const noexcept;
+    
+    void CycleSelectedOptionDown(OptionsMenu selectedItem) noexcept;
+    void CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept;
+
     mutable Camera2D _ui_camera{};
     OrthographicCameraController _cameraController{};
     std::vector<std::unique_ptr<Entity>> _entities{};
     std::vector<std::unique_ptr<Entity>> _pending_entities{};
     float _thrust_force{100.0f};
     unsigned int _current_wave{1};
+    uint8_t _max_sound_volume = 10u;
+    uint8_t _min_sound_volume = 0u;
     GameOptions _current_options{};
     GameOptions _temp_options{};
     GameState _current_state{GameState::Title};
     GameState _next_state{GameState::Title};
-    int _options_selected_item{0};
-    TitleMenu _title_selected_item = TitleMenu::Start;
-    Stopwatch _selected_text_blink_rate{TimeUtils::FPSeconds{0.33f}};
-    bool _selected_text_blink{false};
+    TitleMenu _title_selected_item = TitleMenu::First_;
+    OptionsMenu _options_selected_item = OptionsMenu::First_;
     bool _debug_render{false};
     bool _keyboard_control_active{false};
     bool _mouse_control_active{false};

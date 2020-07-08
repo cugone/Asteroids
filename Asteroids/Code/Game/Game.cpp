@@ -54,6 +54,38 @@ TitleMenu operator--(TitleMenu& mode, int) noexcept {
     return result;
 }
 
+
+OptionsMenu& operator++(OptionsMenu& mode) noexcept {
+    using underlying = std::underlying_type_t<TitleMenu>;
+    mode = static_cast<OptionsMenu>(static_cast<underlying>(mode) + 1);
+    if(mode == OptionsMenu::Last_) {
+        mode = OptionsMenu::First_;
+    }
+    return mode;
+}
+
+OptionsMenu operator++(OptionsMenu& mode, int) noexcept {
+    OptionsMenu result = mode;
+    ++mode;
+    return result;
+}
+
+OptionsMenu& operator--(OptionsMenu& mode) noexcept {
+    if(mode == OptionsMenu::First_) {
+        mode = OptionsMenu::Last_;
+    }
+    using underlying = std::underlying_type_t<OptionsMenu>;
+    mode = static_cast<OptionsMenu>(static_cast<underlying>(mode) - 1);
+    return mode;
+}
+
+OptionsMenu operator--(OptionsMenu& mode, int) noexcept {
+    OptionsMenu result = mode;
+    --mode;
+    return result;
+}
+
+
 void Game::Initialize() {
     g_theRenderer->SetWindowTitle("Asteroids");
     g_theAudioSystem->RegisterWavFilesFromFolder("Data/Audio/");
@@ -138,6 +170,110 @@ void Game::SetControlType() noexcept {
     }
 }
 
+std::string Game::DifficultyToString(Difficulty difficulty) const noexcept {
+    switch(difficulty) {
+    case Difficulty::Easy: return "Easy";
+    case Difficulty::Normal: return "Normal";
+    case Difficulty::Hard: return "Hard";
+    default: return "";
+    }
+}
+
+std::string Game::ControlPreferenceToString(ControlPreference preference) const noexcept {
+    switch(preference) {
+    case ControlPreference::Keyboard: return "Keyboard";
+    case ControlPreference::Mouse: return "Mouse";
+    case ControlPreference::XboxController: return "Xbox Controller";
+    default: return "";
+    }
+}
+
+void Game::CycleSelectedOptionDown(OptionsMenu selectedItem) noexcept {
+    switch(selectedItem) {
+    case OptionsMenu::DifficultySelection:
+    {
+        switch(_temp_options.difficulty) {
+        case Difficulty::Easy:
+            _temp_options.difficulty = Difficulty::Hard;
+            break;
+        case Difficulty::Normal:
+            _temp_options.difficulty = Difficulty::Easy;
+            break;
+        case Difficulty::Hard:
+            _temp_options.difficulty = Difficulty::Normal;
+            break;
+        default: /* DO NOTHING */;
+        }
+        break;
+    }
+    case OptionsMenu::ControlSelection:
+    {
+        switch(_temp_options.controlPref) {
+        case ControlPreference::Keyboard:
+            _temp_options.controlPref = ControlPreference::XboxController;
+            break;
+        case ControlPreference::Mouse:
+            _temp_options.controlPref = ControlPreference::Keyboard;
+            break;
+        case ControlPreference::XboxController:
+            _temp_options.controlPref = ControlPreference::Mouse;
+            break;
+        default:
+            break;
+        }
+        break;
+    }
+    case OptionsMenu::SoundVolume:
+        --_temp_options.soundVolume;
+        _temp_options.soundVolume = (std::min)(static_cast<uint8_t>(_max_sound_volume), _temp_options.soundVolume);
+        break;
+    default: /* DO NOTHING */;
+    }
+}
+
+void Game::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
+    switch(selectedItem) {
+    case OptionsMenu::DifficultySelection:
+    {
+        switch(_temp_options.difficulty) {
+        case Difficulty::Easy:
+            _temp_options.difficulty = Difficulty::Normal;
+            break;
+        case Difficulty::Normal:
+            _temp_options.difficulty = Difficulty::Hard;
+            break;
+        case Difficulty::Hard:
+            _temp_options.difficulty = Difficulty::Easy;
+            break;
+        default: /* DO NOTHING */;
+        }
+        break;
+    }
+    case OptionsMenu::ControlSelection:
+    {
+        switch(_temp_options.controlPref) {
+        case ControlPreference::Keyboard:
+            _temp_options.controlPref = ControlPreference::Mouse;
+            break;
+        case ControlPreference::Mouse:
+            _temp_options.controlPref = ControlPreference::XboxController;
+            break;
+        case ControlPreference::XboxController:
+            _temp_options.controlPref = ControlPreference::Keyboard;
+            break;
+        default:
+            break;
+        }
+        break;
+    }
+    case OptionsMenu::SoundVolume:
+        ++_temp_options.soundVolume;
+        _temp_options.soundVolume = (std::min)(static_cast<uint8_t>(_max_sound_volume), _temp_options.soundVolume);
+        break;
+    default: /* DO NOTHING */;
+    }
+}
+
 void Game::HandleTitleInput() noexcept {
     HandleTitleKeyboardInput();
     HandleTitleControllerInput();
@@ -210,6 +346,83 @@ void Game::HandleTitleControllerInput() noexcept {
     }
 }
 
+void Game::HandleOptionsInput() noexcept {
+    HandleOptionsKeyboardInput();
+    HandleOptionsControllerInput();
+}
+
+void Game::HandleOptionsKeyboardInput() noexcept {
+    if(!_keyboard_control_active) {
+        return;
+    }
+    const bool up = g_theInputSystem->WasKeyJustPressed(KeyCode::W) || g_theInputSystem->WasKeyJustPressed(KeyCode::Up);
+    const bool down = g_theInputSystem->WasKeyJustPressed(KeyCode::S) || g_theInputSystem->WasKeyJustPressed(KeyCode::Down);
+    const bool left = g_theInputSystem->WasKeyJustPressed(KeyCode::A) || g_theInputSystem->WasKeyJustPressed(KeyCode::Left);
+    const bool right = g_theInputSystem->WasKeyJustPressed(KeyCode::D) || g_theInputSystem->WasKeyJustPressed(KeyCode::Right);
+    const bool select = g_theInputSystem->WasKeyJustPressed(KeyCode::Enter) || g_theInputSystem->WasKeyJustPressed(KeyCode::NumPadEnter);
+    const bool cancel = g_theInputSystem->WasKeyJustPressed(KeyCode::Esc);
+    if(up) {
+        --_options_selected_item;
+    } else if(down) {
+        ++_options_selected_item;
+    }
+    if(left) {
+        CycleSelectedOptionDown(_options_selected_item);
+    } else if(right) {
+        CycleSelectedOptionUp(_options_selected_item);
+    }
+    if(cancel) {
+        ChangeState(GameState::Title);
+        return;
+    }
+    if(select) {
+        switch(_options_selected_item) {
+        case OptionsMenu::Cancel:
+            ChangeState(GameState::Title);
+            break;
+        case OptionsMenu::Accept:
+            _current_options = _temp_options;
+            ChangeState(GameState::Title);
+            break;
+        default:
+            ERROR_AND_DIE("OPTIONS MENU ENUM HAS CHANGED.");
+        }
+    }
+}
+
+void Game::HandleOptionsControllerInput() noexcept {
+    if(const auto controller = g_theInputSystem->GetXboxController(0); _controller_control_active && controller.IsConnected()) {
+        const bool up = controller.WasButtonJustPressed(XboxController::Button::Up) || MathUtils::IsEquivalent(1.0f, controller.GetLeftThumbPosition().y);
+        const bool down = controller.WasButtonJustPressed(XboxController::Button::Down) || MathUtils::IsEquivalent(-1.0f, controller.GetLeftThumbPosition().y);
+        const bool select = g_theInputSystem->WasKeyJustPressed(KeyCode::Enter) || g_theInputSystem->WasKeyJustPressed(KeyCode::NumPadEnter);
+        const bool cancel = g_theInputSystem->WasKeyJustPressed(KeyCode::Esc);
+        if(up) {
+            --_title_selected_item;
+
+        } else if(down) {
+            ++_title_selected_item;
+        }
+        if(cancel) {
+            _title_selected_item = TitleMenu::Exit;
+        }
+        if(select) {
+            switch(_title_selected_item) {
+            case TitleMenu::Start:
+                ChangeState(GameState::Main);
+                break;
+            case TitleMenu::Options:
+                ChangeState(GameState::Options);
+                break;
+            case TitleMenu::Exit:
+                g_theApp->SetIsQuitting(true);
+                break;
+            default:
+                ERROR_AND_DIE("OPTIONS MENU ENUM HAS CHANGED.");
+            }
+        }
+    }
+}
+
 long long Game::GetLivesFromDifficulty() const noexcept {
     switch(_current_options.difficulty) {
     case Difficulty::Easy: return 5LL;
@@ -251,25 +464,10 @@ void Game::EndFrame() {
 
 void Game::Update_Title([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
     HandleTitleInput();
-    if(_selected_text_blink_rate.CheckAndReset()) {
-        _selected_text_blink = !_selected_text_blink;
-    }
 }
 
 void Game::Update_Options([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
-    if(_selected_text_blink_rate.CheckAndReset()) {
-        _selected_text_blink = !_selected_text_blink;
-    }
-    if(g_theInputSystem->WasKeyJustPressed(KeyCode::Esc)) {
-        ChangeState(GameState::Title);
-        return;
-    }
-    const auto old_selected_item = _options_selected_item;
-    _options_selected_item = MathUtils::Wrap(_options_selected_item, 0, 3);
-    if(old_selected_item != _options_selected_item) {
-        _selected_text_blink_rate.Reset();
-    }
-
+    HandleOptionsInput();
 }
 
 void Game::Update_Main([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
@@ -328,29 +526,14 @@ void Game::Render_Title() const noexcept {
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x, ui_view_half_extents.y + line_height * 0.0f}));
     g_theRenderer->DrawTextLine(font, "ASTEROIDS");
 
-    if(_selected_text_blink && _title_selected_item == TitleMenu::Start) {
-        g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x, ui_view_half_extents.y + line_height * 2.0f}));
-        g_theRenderer->DrawTextLine(font, "START");
-    } else if(_title_selected_item != TitleMenu::Start) {
-        g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x, ui_view_half_extents.y + line_height * 2.0f}));
-        g_theRenderer->DrawTextLine(font, "START");
-    }
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x, ui_view_half_extents.y + line_height * 2.0f}));
+    g_theRenderer->DrawTextLine(font, "START", _title_selected_item == TitleMenu::Start ? Rgba::Yellow : Rgba::White);
 
-    if(_selected_text_blink && _title_selected_item == TitleMenu::Options) {
-        g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x, ui_view_half_extents.y + line_height * 4.0f}));
-        g_theRenderer->DrawTextLine(font, "OPTIONS");
-    } else if(_title_selected_item != TitleMenu::Options) {
-        g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x, ui_view_half_extents.y + line_height * 4.0f}));
-        g_theRenderer->DrawTextLine(font, "OPTIONS");
-    }
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x, ui_view_half_extents.y + line_height * 4.0f}));
+    g_theRenderer->DrawTextLine(font, "OPTIONS", _title_selected_item == TitleMenu::Options ? Rgba::Yellow : Rgba::White);
 
-    if(_selected_text_blink && _title_selected_item == TitleMenu::Exit) {
-        g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x, ui_view_half_extents.y + line_height * 6.0f}));
-        g_theRenderer->DrawTextLine(font, "EXIT");
-    } else if(_title_selected_item != TitleMenu::Exit) {
-        g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x, ui_view_half_extents.y + line_height * 6.0f}));
-        g_theRenderer->DrawTextLine(font, "EXIT");
-    }
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x, ui_view_half_extents.y + line_height * 6.0f}));
+    g_theRenderer->DrawTextLine(font, "EXIT", _title_selected_item == TitleMenu::Exit ? Rgba::Yellow : Rgba::White);
 
 }
 
@@ -380,6 +563,31 @@ void Game::Render_Options() const noexcept {
     const auto* font = g_theRenderer->GetFont("System32");
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x, ui_view_half_extents.y * 0.25f}));
     g_theRenderer->DrawTextLine(font, "OPTIONS");
+
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.35f}));
+    g_theRenderer->DrawTextLine(font, "Difficulty:", _options_selected_item == OptionsMenu::DifficultySelection ? Rgba::Yellow : Rgba::White);
+
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.35f}));
+    g_theRenderer->DrawTextLine(font, DifficultyToString(_temp_options.difficulty), _options_selected_item == OptionsMenu::DifficultySelection ? Rgba::Yellow : Rgba::White);
+
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.45f}));
+    g_theRenderer->DrawTextLine(font, "Control Preference:", _options_selected_item == OptionsMenu::ControlSelection ? Rgba::Yellow : Rgba::White);
+
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.45f}));
+    g_theRenderer->DrawTextLine(font, ControlPreferenceToString(_temp_options.controlPref), _options_selected_item == OptionsMenu::ControlSelection ? Rgba::Yellow : Rgba::White);
+    
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.55f}));
+    g_theRenderer->DrawTextLine(font, "Sound Volume:", _options_selected_item == OptionsMenu::SoundVolume ? Rgba::Yellow : Rgba::White);
+
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.55f}));
+    g_theRenderer->DrawTextLine(font, std::to_string(_temp_options.soundVolume), _options_selected_item == OptionsMenu::SoundVolume ? Rgba::Yellow : Rgba::White);
+
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.75f}));
+    g_theRenderer->DrawTextLine(font, "Back", _options_selected_item == OptionsMenu::Cancel ? Rgba::Yellow : Rgba::White);
+
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.85f}));
+    g_theRenderer->DrawTextLine(font, "Accept", _options_selected_item == OptionsMenu::Accept ? Rgba::Yellow : Rgba::White);
+
 }
 
 void Game::Render_Main() const noexcept {
