@@ -87,6 +87,9 @@ OptionsMenu operator--(OptionsMenu& mode, int) noexcept {
 
 
 void Game::Initialize() {
+    currentGraphicsOptions.MaxShakeOffsetHorizontal = 10.0f;
+    currentGraphicsOptions.MaxShakeOffsetVertical = 10.0f;
+    currentGraphicsOptions.MaxShakeAngle = 45.0f;
     g_theRenderer->SetWindowTitle("Asteroids");
     g_theAudioSystem->RegisterWavFilesFromFolder("Data/Audio/");
     g_theRenderer->RegisterMaterialsFromFolder("Data/Materials/");
@@ -810,6 +813,15 @@ void Game::MakeSmallAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noex
     _pending_entities.emplace_back(std::move(newAsteroid));
     auto* asAsteroid = reinterpret_cast<Asteroid*>(last_entity);
     asteroids.push_back(asAsteroid);
+}
+
+void Game::DoCameraShake() {
+    _cameraController.DoCameraShake([this]()->float {
+        float x = MathUtils::GetRandomFloatNegOneToOne() * currentGraphicsOptions.MaxShakeOffsetHorizontal;
+        float y = MathUtils::GetRandomFloatNegOneToOne() * currentGraphicsOptions.MaxShakeOffsetVertical;
+        float a = MathUtils::GetRandomFloatNegOneToOne() * currentGraphicsOptions.MaxShakeAngle;
+        auto shakycam = _cameraController.GetCamera();
+    });
 }
 
 const GameOptions& Game::GetGameOptions() const noexcept {

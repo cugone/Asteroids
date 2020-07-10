@@ -98,8 +98,11 @@ void Ship::Thrust(float force) noexcept {
 void Ship::OnCollision(Entity* a, Entity* b) noexcept {
     const auto* asAsteroid = dynamic_cast<Asteroid*>(b);
     if(asAsteroid) {
-        a->Kill();
-        g_theGame->DecrementLives();
+        a->DecrementHealth();
+        if(a->IsDead()) {
+            g_theGame->DecrementLives();
+            g_theGame->DoCameraShake();
+        }
     }
 }
 

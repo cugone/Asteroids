@@ -105,6 +105,8 @@ public:
     void MakeMediumAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
     void MakeSmallAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
 
+    void DoCameraShake();
+
     const GameOptions& GetGameOptions() const noexcept;
 
     Player player{};
