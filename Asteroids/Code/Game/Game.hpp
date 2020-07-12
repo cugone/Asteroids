@@ -59,6 +59,7 @@ struct GameOptions {
     Difficulty difficulty{Difficulty::Normal};
     ControlPreference controlPref{ControlPreference::Mouse};
     uint8_t soundVolume{5};
+    bool rotateCameraWithShip{false};
 };
 
 enum class OptionsMenu {
@@ -135,9 +136,11 @@ private:
     void HandleDebugMouseInput(TimeUtils::FPSeconds deltaSeconds);
 
     void HandlePlayerInput(TimeUtils::FPSeconds deltaSeconds);
+
     void HandleKeyboardInput(TimeUtils::FPSeconds deltaSeconds);
     void HandleMouseInput(TimeUtils::FPSeconds deltaSeconds);
     void HandleControllerInput(TimeUtils::FPSeconds deltaSeconds);
+    void LockCameraRotationToShip(TimeUtils::FPSeconds deltaSeconds);
 
     void UpdateEntities(TimeUtils::FPSeconds deltaSeconds) noexcept;
 

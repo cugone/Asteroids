@@ -95,11 +95,11 @@ float Entity::GetSpeed() const noexcept {
 }
 
 void Entity::Kill() noexcept {
-    health = 0;
+    invmass_rotationspeed_health_padding.z = 0;
 }
 
 bool Entity::IsDead() const noexcept {
-    return health <= 0;
+    return invmass_rotationspeed_health_padding.z <= 0;
 }
 
 const Matrix4& Entity::GetTransform() const noexcept {
@@ -111,15 +111,15 @@ Material* Entity::GetMaterial() const noexcept {
 }
 
 void Entity::DecrementHealth() noexcept {
-    if(health) {
-        --health;
+    if(!IsDead()) {
+        --invmass_rotationspeed_health_padding.z;
     } else {
         Kill();
     }
 }
 
 void Entity::SetHealth(int newHealth) noexcept {
-    health = newHealth;
+    invmass_rotationspeed_health_padding.z = static_cast<float>(newHealth);
 }
 
 void Entity::SetPosition(Vector2 newPosition) noexcept {
@@ -146,7 +146,7 @@ Vector2 Entity::GetAcceleration() const noexcept {
 }
 
 Vector2 Entity::CalcAcceleration() noexcept {
-    return acceleration_force.GetZW() * inv_mass;
+    return acceleration_force.GetZW() * GetInvMass();
 }
 
 Vector2 Entity::GetForce() const noexcept {
@@ -164,11 +164,11 @@ void Entity::ClearForce() noexcept {
 }
 
 float Entity::GetMass() const noexcept {
-    return 1.0f / inv_mass;
+    return 1.0f / GetInvMass();
 }
 
 float Entity::GetInvMass() const noexcept {
-    return inv_mass;
+    return invmass_rotationspeed_health_padding.x;
 }
 
 void Entity::SetOrientationDegrees(float newDegrees) noexcept {
@@ -205,11 +205,11 @@ void Entity::AdjustOrientation(float value) noexcept {
 }
 
 float Entity::GetRotationSpeed() const noexcept {
-    return rotation_speed;
+    return invmass_rotationspeed_health_padding.y;
 }
 
 void Entity::SetRotationSpeed(float speed) noexcept {
-    rotation_speed = speed;
+    invmass_rotationspeed_health_padding.y = speed;
 }
 
 void Entity::SetCosmeticRadius(float value) noexcept {

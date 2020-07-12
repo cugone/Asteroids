@@ -86,9 +86,7 @@ private:
     Vector4 position_orientation_speed{};
     Vector4 cosmeticphysicalradius_velocitydirection{};
     Vector4 acceleration_force{};
-    float inv_mass = 1.0f;
-    float rotation_speed = 90.0f;
-    int health = 1;
+    Vector4 invmass_rotationspeed_health_padding{1.0f, 90.0f, 1.0f, 0.0f};
 };
 
 

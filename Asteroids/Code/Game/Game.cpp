@@ -2,6 +2,7 @@
 
 #include "Engine/Audio/AudioSystem.hpp"
 
+#include "Engine/Core/FileUtils.hpp
 #include "Engine/Core/KerningFont.hpp"
 
 #include "Engine/Math/Disc2.hpp"
@@ -385,6 +386,11 @@ void Game::HandleOptionsKeyboardInput() noexcept {
             break;
         case OptionsMenu::Accept:
             _current_options = _temp_options;
+            g_theConfig->SetValue("difficulty", DifficultyToString(_current_options.difficulty));
+            g_theConfig->SetValue("controlpref", ControlPreferenceToString(_current_options.controlPref));
+            g_theConfig->SetValue("sound", _current_options.soundVolume);
+            FileUtils::WriteStringBufferFromFile();
+            std::cout << *g_theConfig;
             ChangeState(GameState::Title);
             break;
         default:
@@ -733,6 +739,7 @@ void Game::RenderBackground() const noexcept {
 }
 
 void Game::StartNewWave(unsigned int wave_number) noexcept {
+    //TODO: Adjust wave multiplier based on difficulty
     for(unsigned int i = 0; i < wave_number * 5; ++i) {
         MakeLargeAsteroidOffScreen();
     }
@@ -816,12 +823,16 @@ void Game::MakeSmallAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noex
 }
 
 void Game::DoCameraShake() {
-    _cameraController.DoCameraShake([this]()->float {
-        float x = MathUtils::GetRandomFloatNegOneToOne() * currentGraphicsOptions.MaxShakeOffsetHorizontal;
-        float y = MathUtils::GetRandomFloatNegOneToOne() * currentGraphicsOptions.MaxShakeOffsetVertical;
-        float a = MathUtils::GetRandomFloatNegOneToOne() * currentGraphicsOptions.MaxShakeAngle;
-        auto shakycam = _cameraController.GetCamera();
-    });
+    _cameraController.DoCameraShake([](){return 1.0f;});
+    auto& cam = _cameraController.GetCamera();
+    float x = cam.GetShake() * MathUtils::GetRandomFloatNegOneToOne() * currentGraphicsOptions.MaxShakeOffsetHorizontal;
+    float y = cam.GetShake() * MathUtils::GetRandomFloatNegOneToOne() * currentGraphicsOptions.MaxShakeOffsetVertical;
+    float a = cam.GetShake() * MathUtils::GetRandomFloatNegOneToOne() * currentGraphicsOptions.MaxShakeAngle;
+    Camera2D shakycam = _cameraController.GetCamera();
+    shakycam.position.x += x;
+    shakycam.position.y += y;
+    shakycam.orientation_degrees += a;
+    g_theRenderer->SetCamera(shakycam);
 }
 
 const GameOptions& Game::GetGameOptions() const noexcept {
@@ -873,6 +884,11 @@ void Game::HandlePlayerInput(TimeUtils::FPSeconds deltaSeconds) {
     HandleKeyboardInput(deltaSeconds);
     HandleMouseInput(deltaSeconds);
     HandleControllerInput(deltaSeconds);
+    LockCameraRotationToShip(deltaSeconds);
+}
+
+void Game::LockCameraRotationToShip(TimeUtils::FPSeconds /*deltaSeconds*/) {
+    /* DO NOTHING */
 }
 
 void Game::HandleKeyboardInput(TimeUtils::FPSeconds deltaSeconds) {
