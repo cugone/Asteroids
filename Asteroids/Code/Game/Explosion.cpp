@@ -15,7 +15,6 @@
 Explosion::Explosion(Vector2 position)
 : Entity()
 {
-    SetPosition(position);
     AnimatedSpriteDesc desc{};
     desc.material = g_theRenderer->GetMaterial("explosion");
     desc.spriteSheet = g_theGame->explosion_sheet;
@@ -25,6 +24,13 @@ Explosion::Explosion(Vector2 position)
     desc.startSpriteIndex = 0;
     material = desc.material;
     _sprite = g_theRenderer->CreateAnimatedSprite(desc);
+
+    SetPosition(position);
+    const auto half_frameWidth = static_cast<float>(_sprite->GetFrameDimensions().x) * 0.5f;
+    const auto half_frameHeight = static_cast<float>(_sprite->GetFrameDimensions().y) * 0.5f;
+    SetCosmeticRadius((std::max)(half_frameWidth, half_frameHeight));
+    SetPhysicalRadius(GetCosmeticRadius() * 0.8f);
+
 }
 
 void Explosion::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
@@ -42,24 +48,26 @@ void Explosion::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
         transform = Matrix4::MakeSRT(S, R, T);
     }
 
-    auto& builder = mesh_builder;
-    builder.Begin(PrimitiveType::Triangles);
-    builder.SetColor(Rgba::White);
+    if(g_theGame->IsEntityInView(this)) {
+        auto& builder = mesh_builder;
+        builder.Begin(PrimitiveType::Triangles);
+        builder.SetColor(Rgba::White);
 
-    builder.SetUV(Vector2{uvs.maxs.x, uvs.maxs.y});
-    builder.AddVertex(Vector2{+0.5f, +0.5f});
+        builder.SetUV(Vector2{uvs.maxs.x, uvs.maxs.y});
+        builder.AddVertex(Vector2{+0.5f, +0.5f});
 
-    builder.SetUV(Vector2{uvs.mins.x, uvs.maxs.y});
-    builder.AddVertex(Vector2{-0.5f, +0.5f});
+        builder.SetUV(Vector2{uvs.mins.x, uvs.maxs.y});
+        builder.AddVertex(Vector2{-0.5f, +0.5f});
 
-    builder.SetUV(Vector2{uvs.mins.x, uvs.mins.y});
-    builder.AddVertex(Vector2{-0.5f, -0.5f});
+        builder.SetUV(Vector2{uvs.mins.x, uvs.mins.y});
+        builder.AddVertex(Vector2{-0.5f, -0.5f});
 
-    builder.SetUV(Vector2{uvs.maxs.x, uvs.mins.y});
-    builder.AddVertex(Vector2{+0.5f, -0.5f});
+        builder.SetUV(Vector2{uvs.maxs.x, uvs.mins.y});
+        builder.AddVertex(Vector2{+0.5f, -0.5f});
 
-    builder.AddIndicies(Mesh::Builder::Primitive::Quad);
-    builder.End(material);
+        builder.AddIndicies(Mesh::Builder::Primitive::Quad);
+        builder.End(material);
+    }
 }
 
 void Explosion::EndFrame() noexcept {

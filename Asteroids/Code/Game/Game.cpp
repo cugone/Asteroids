@@ -295,13 +295,13 @@ AABB2 Game::CalcViewBounds(const Vector2& cam_pos) const noexcept {
 
 AABB2 Game::CalcCullBounds(const Vector2& cam_pos) const noexcept {
     AABB2 cullBounds = CalcViewBounds(cam_pos);
-    cullBounds.AddPaddingToSides(1.0f, 1.0f);
+    cullBounds.AddPaddingToSides(-1.0f, -1.0f);
     return cullBounds;
 }
 
 AABB2 Game::CalcCullBoundsFromOrthoBounds() const noexcept {
     AABB2 cullBounds = CalcOrthoBounds();
-    cullBounds.AddPaddingToSides(1.0f, 1.0f);
+    cullBounds.AddPaddingToSides(-1.0f, -1.0f);
     return cullBounds;
 }
 
@@ -1132,6 +1132,7 @@ void Game::DebugRenderEntities() const noexcept {
     g_theRenderer->DrawAABB2(world_bounds, Rgba::Green, Rgba::NoAlpha);
     g_theRenderer->DrawAABB2(CalcOrthoBounds(), Rgba::White, Rgba::NoAlpha);
     g_theRenderer->DrawAABB2(CalcViewBounds(_cameraController.GetCamera().GetPosition()), Rgba::Red, Rgba::NoAlpha);
+    g_theRenderer->DrawAABB2(CalcCullBounds(_cameraController.GetCamera().GetPosition()), Rgba::White, Rgba::NoAlpha);
     g_theRenderer->DrawCircle2D(_cameraController.GetCamera().GetPosition(), 25.0f, Rgba::Pink);
 }
 

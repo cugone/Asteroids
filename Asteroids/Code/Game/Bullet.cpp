@@ -45,24 +45,26 @@ void Bullet::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
         transform = Matrix4::MakeSRT(S, R, T);
     }
 
-    auto& builder = mesh_builder;
-    builder.Begin(PrimitiveType::Triangles);
-    builder.SetColor(Rgba::White);
+    if(g_theGame->IsEntityInView(this)) {
+        auto& builder = mesh_builder;
+        builder.Begin(PrimitiveType::Triangles);
+        builder.SetColor(Rgba::White);
 
-    builder.SetUV(Vector2{uvs.maxs.x, uvs.maxs.y});
-    builder.AddVertex(Vector2{+0.5f, +0.5f});
+        builder.SetUV(Vector2{uvs.maxs.x, uvs.maxs.y});
+        builder.AddVertex(Vector2{+0.5f, +0.5f});
 
-    builder.SetUV(Vector2{uvs.mins.x, uvs.maxs.y});
-    builder.AddVertex(Vector2{-0.5f, +0.5f});
+        builder.SetUV(Vector2{uvs.mins.x, uvs.maxs.y});
+        builder.AddVertex(Vector2{-0.5f, +0.5f});
 
-    builder.SetUV(Vector2{uvs.mins.x, uvs.mins.y});
-    builder.AddVertex(Vector2{-0.5f, -0.5f});
+        builder.SetUV(Vector2{uvs.mins.x, uvs.mins.y});
+        builder.AddVertex(Vector2{-0.5f, -0.5f});
 
-    builder.SetUV(Vector2{uvs.maxs.x, uvs.mins.y});
-    builder.AddVertex(Vector2{+0.5f, -0.5f});
+        builder.SetUV(Vector2{uvs.maxs.x, uvs.mins.y});
+        builder.AddVertex(Vector2{+0.5f, -0.5f});
 
-    builder.AddIndicies(Mesh::Builder::Primitive::Quad);
-    builder.End(mat);
+        builder.AddIndicies(Mesh::Builder::Primitive::Quad);
+        builder.End(mat);
+    }
 }
 
 void Bullet::EndFrame() noexcept {
