@@ -132,6 +132,7 @@ private:
     void CreateOptionsFile() const noexcept;
     void LoadOptionsFile() const noexcept;
 
+    unsigned int GetWaveMultiplierFromDifficulty() const noexcept;
     long long GetLivesFromDifficulty() const noexcept;
 
     void HandleTitleInput() noexcept;

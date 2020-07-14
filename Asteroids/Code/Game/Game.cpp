@@ -279,6 +279,15 @@ void Game::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
     }
 }
 
+unsigned int Game::GetWaveMultiplierFromDifficulty() const noexcept {
+    switch(_current_options.difficulty) {
+    case Difficulty::Easy: return 3u;
+    case Difficulty::Normal: return 5u;
+    case Difficulty::Hard: return 7u;
+    default: return 5u;
+    }
+}
+
 AABB2 Game::CalcOrthoBounds() const noexcept {
     float half_view_height = _cameraController.GetCamera().GetViewHeight() * 0.5f;
     float half_view_width = half_view_height * _cameraController.GetAspectRatio();
@@ -791,7 +800,7 @@ void Game::RenderBackground() const noexcept {
 
 void Game::StartNewWave(unsigned int wave_number) noexcept {
     //TODO: Adjust wave multiplier based on difficulty
-    for(unsigned int i = 0; i < wave_number * 5; ++i) {
+    for(unsigned int i = 0; i < wave_number * GetWaveMultiplierFromDifficulty(); ++i) {
         MakeLargeAsteroidOffScreen();
     }
 }
