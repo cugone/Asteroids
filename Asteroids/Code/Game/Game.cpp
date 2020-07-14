@@ -279,6 +279,32 @@ void Game::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
     }
 }
 
+AABB2 Game::CalcOrthoBounds() const noexcept {
+    float half_view_height = _cameraController.GetCamera().GetViewHeight() * 0.5f;
+    float half_view_width = half_view_height * _cameraController.GetAspectRatio();
+    auto ortho_mins = Vector2{-half_view_width, -half_view_height};
+    auto ortho_maxs = Vector2{half_view_width, half_view_height};
+    return AABB2{ortho_mins, ortho_maxs};
+}
+
+AABB2 Game::CalcViewBounds(const Vector2& cam_pos) const noexcept {
+    auto view_bounds = CalcOrthoBounds();
+    view_bounds.Translate(cam_pos);
+    return view_bounds;
+}
+
+AABB2 Game::CalcCullBounds(const Vector2& cam_pos) const noexcept {
+    AABB2 cullBounds = CalcViewBounds(cam_pos);
+    cullBounds.AddPaddingToSides(1.0f, 1.0f);
+    return cullBounds;
+}
+
+AABB2 Game::CalcCullBoundsFromOrthoBounds() const noexcept {
+    AABB2 cullBounds = CalcOrthoBounds();
+    cullBounds.AddPaddingToSides(1.0f, 1.0f);
+    return cullBounds;
+}
+
 void Game::CreateOptionsFile() const noexcept {
     GUARANTEE_OR_DIE(FileUtils::WriteBufferToFile(g_options_str, g_options_filepath), "Could not create options file.");
 }
@@ -854,6 +880,11 @@ void Game::DoCameraShake() {
 
 const GameOptions& Game::GetGameOptions() const noexcept {
     return _current_options;
+}
+
+bool Game::IsEntityInView(const Entity* e) const noexcept {
+    const auto cull = CalcCullBounds(_cameraController.GetCamera().GetPosition());
+    return MathUtils::DoDiscsOverlap(Disc2{e->GetPosition(), e->GetCosmeticRadius()}, cull);
 }
 
 void Game::MakeShip() noexcept {

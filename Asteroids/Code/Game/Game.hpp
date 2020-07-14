@@ -119,8 +119,15 @@ public:
     std::shared_ptr<SpriteSheet> asteroid_sheet{};
     std::shared_ptr<SpriteSheet> explosion_sheet{};
 
+    bool IsEntityInView(const Entity* e) const noexcept;
 protected:
 private:
+
+    AABB2 CalcOrthoBounds() const noexcept;
+    AABB2 CalcViewBounds(const Vector2& cam_pos) const noexcept;
+    AABB2 CalcCullBounds(const Vector2& cam_pos) const noexcept;
+    AABB2 CalcCullBoundsFromOrthoBounds() const noexcept;
+
     void CreateOrLoadOptionsFile() const noexcept;
     void CreateOptionsFile() const noexcept;
     void LoadOptionsFile() const noexcept;
