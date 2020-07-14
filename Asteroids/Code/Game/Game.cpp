@@ -799,7 +799,6 @@ void Game::RenderBackground() const noexcept {
 }
 
 void Game::StartNewWave(unsigned int wave_number) noexcept {
-    //TODO: Adjust wave multiplier based on difficulty
     for(unsigned int i = 0; i < wave_number * GetWaveMultiplierFromDifficulty(); ++i) {
         MakeLargeAsteroidOffScreen();
     }
@@ -910,6 +909,7 @@ void Game::MakeShip() noexcept {
         auto iter = _entities.begin();
         *iter = std::move(std::make_unique<Ship>(world_bounds.CalcCenter()));
         ship = reinterpret_cast<Ship*>(iter->get());
+        ship->OnCreate();
     }
 }
 

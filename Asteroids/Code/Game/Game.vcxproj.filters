@@ -156,8 +156,5 @@
     <None Include="..\..\Run_x64\Data\Shaders\background.shader">
       <Filter>Data\Shaders</Filter>
     </None>
-    <None Include="..\..\Run_x64\Data\Config\options.config">
-      <Filter>Data\Config</Filter>
-    </None>
   </ItemGroup>
 </Project>
