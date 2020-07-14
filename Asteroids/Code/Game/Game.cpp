@@ -88,6 +88,7 @@ OptionsMenu operator--(OptionsMenu& mode, int) noexcept {
 
 void Game::Initialize() {
     CreateOrLoadOptionsFile();
+    g_theConfig->GetValue("cameraShakeStrength", _current_options.cameraShakeStrength);
     g_theConfig->GetValue("maxShakeOffsetHorizontal", currentGraphicsOptions.MaxShakeOffsetHorizontal);
     g_theConfig->GetValue("maxShakeOffsetVertical", currentGraphicsOptions.MaxShakeOffsetVertical);
     g_theConfig->GetValue("maxShakeAngle", currentGraphicsOptions.MaxShakeAngle);
@@ -847,16 +848,7 @@ void Game::MakeSmallAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noex
 }
 
 void Game::DoCameraShake() {
-    _cameraController.DoCameraShake([](){return 1.0f;});
-    auto& cam = _cameraController.GetCamera();
-    float x = cam.GetShake() * MathUtils::GetRandomFloatNegOneToOne() * currentGraphicsOptions.MaxShakeOffsetHorizontal;
-    float y = cam.GetShake() * MathUtils::GetRandomFloatNegOneToOne() * currentGraphicsOptions.MaxShakeOffsetVertical;
-    float a = cam.GetShake() * MathUtils::GetRandomFloatNegOneToOne() * currentGraphicsOptions.MaxShakeAngle;
-    Camera2D shakycam = _cameraController.GetCamera();
-    shakycam.position.x += x;
-    shakycam.position.y += y;
-    shakycam.orientation_degrees += a;
-    g_theRenderer->SetCamera(shakycam);
+    _cameraController.DoCameraShake([this]() { return this->GetGameOptions().cameraShakeStrength; });
 }
 
 const GameOptions& Game::GetGameOptions() const noexcept {

@@ -23,9 +23,10 @@ R"(#Auto-generated file.
 difficulty=normal
 controlpref=mouse
 sound=5
-maxShakeOffsetHorizontal=10.0
-maxShakeOffsetVertical=10.0
-maxShakeAngle=45.0
+cameraShakeStrength=1.0
+maxShakeOffsetHorizontal=5.0
+maxShakeOffsetVertical=5.0
+maxShakeAngle=0.0
 )"
 };
 static std::string g_title_str{"Asteroids"};

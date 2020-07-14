@@ -59,7 +59,7 @@ struct GameOptions {
     Difficulty difficulty{Difficulty::Normal};
     ControlPreference controlPref{ControlPreference::Mouse};
     uint8_t soundVolume{5};
-    bool rotateCameraWithShip{false};
+    float cameraShakeStrength{1.0f};
 };
 
 enum class OptionsMenu {
