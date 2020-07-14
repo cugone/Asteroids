@@ -19,14 +19,13 @@ static GraphicsOptions currentGraphicsOptions{};
 
 static std::string g_options_filepath{"Data/Config/options.config"};
 static std::string g_options_str{
-R"(#Auto-generated file.
-difficulty=normal
+R"(difficulty=normal
 controlpref=mouse
 sound=5
 cameraShakeStrength=1.0
-maxShakeOffsetHorizontal=5.0
-maxShakeOffsetVertical=5.0
-maxShakeAngle=0.0
+maxShakeOffsetHorizontal=25.0
+maxShakeOffsetVertical=25.0
+maxShakeAngle=2.5
 )"
 };
 static std::string g_title_str{"Asteroids"};
