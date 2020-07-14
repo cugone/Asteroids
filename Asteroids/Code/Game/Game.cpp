@@ -841,45 +841,54 @@ void Game::MakeLargeAsteroidOffScreen() noexcept {
             return left;
         }
     }();
-    const auto vx = MathUtils::GetRandomFloatNegOneToOne() * 100.0f;
-    const auto vy = MathUtils::GetRandomFloatNegOneToOne() * 100.0f;
+    MakeLargeAsteroidAt(pos);
+}
+
+void Game::MakeLargeAsteroidAt(Vector2 pos) noexcept {
+    const auto vx = MathUtils::GetRandomFloatNegOneToOne();
+    const auto vy = MathUtils::GetRandomFloatNegOneToOne();
     const auto s = MathUtils::GetRandomFloatInRange(20.0f, 100.0f);
     const auto vel = Vector2{vx, vy};
     const auto rot = MathUtils::GetRandomFloatNegOneToOne() * 180.0f;
     MakeLargeAsteroid(pos, vel, rot);
 }
 
+void Game::MakeLargeAsteroidAtMouse() noexcept {
+    const auto& camera = _cameraController.GetCamera();
+    const auto mouseWorldCoords = g_theRenderer->ConvertScreenToWorldCoords(camera, g_theInputSystem->GetCursorScreenPosition());
+    MakeLargeAsteroidAt(mouseWorldCoords);
+}
+
 void Game::MakeLargeAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept {
-    if(!asteroid_sheet) {
-        asteroid_sheet = g_theRenderer->CreateSpriteSheet("Data/Images/asteroid.png", 6, 5);
-    }
+    SetAsteroidSpriteSheet();
     auto newAsteroid = std::make_unique<Asteroid>(Asteroid::Type::Large, pos, vel, rotationSpeed);
+    AddNewAsteroidToWorld(std::move(newAsteroid));
+}
+
+void Game::AddNewAsteroidToWorld(std::unique_ptr<Asteroid> newAsteroid) {
     auto* last_entity = newAsteroid.get();
     _pending_entities.emplace_back(std::move(newAsteroid));
     auto* asAsteroid = reinterpret_cast<Asteroid*>(last_entity);
     asteroids.push_back(asAsteroid);
+    asAsteroid->OnCreate();
+}
+
+void Game::SetAsteroidSpriteSheet() noexcept {
+    if(!asteroid_sheet) {
+        asteroid_sheet = g_theRenderer->CreateSpriteSheet("Data/Images/asteroid.png", 6, 5);
+    }
 }
 
 void Game::MakeMediumAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept {
-    if(!asteroid_sheet) {
-        asteroid_sheet = g_theRenderer->CreateSpriteSheet("Data/Images/asteroid.png", 6, 5);
-    }
+    SetAsteroidSpriteSheet();
     auto newAsteroid = std::make_unique<Asteroid>(Asteroid::Type::Medium, pos, vel, rotationSpeed);
-    auto* last_entity = newAsteroid.get();
-    _pending_entities.emplace_back(std::move(newAsteroid));
-    auto* asAsteroid = reinterpret_cast<Asteroid*>(last_entity);
-    asteroids.push_back(asAsteroid);
+    AddNewAsteroidToWorld(std::move(newAsteroid));
 }
 
 void Game::MakeSmallAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept {
-    if(!asteroid_sheet) {
-        asteroid_sheet = g_theRenderer->CreateSpriteSheet("Data/Images/asteroid.png", 6, 5);
-    }
+    SetAsteroidSpriteSheet();
     auto newAsteroid = std::make_unique<Asteroid>(Asteroid::Type::Small, pos, vel, rotationSpeed);
-    auto* last_entity = newAsteroid.get();
-    _pending_entities.emplace_back(std::move(newAsteroid));
-    auto* asAsteroid = reinterpret_cast<Asteroid*>(last_entity);
-    asteroids.push_back(asAsteroid);
+    AddNewAsteroidToWorld(std::move(newAsteroid));
 }
 
 void Game::DoCameraShake() {
@@ -1163,14 +1172,7 @@ void Game::HandleDebugKeyboardInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
         g_theUISystem->ToggleImguiDemoWindow();
     }
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::I)) {
-        const auto& camera = _cameraController.GetCamera();
-        const auto mouseWorldCoords = g_theRenderer->ConvertScreenToWorldCoords(camera, g_theInputSystem->GetCursorScreenPosition());
-        const auto vx = MathUtils::GetRandomFloatNegOneToOne();
-        const auto vy = MathUtils::GetRandomFloatNegOneToOne();
-        const auto s = MathUtils::GetRandomFloatInRange(20.0f, 100.0f);
-        const auto vel = Vector2{vx, vy};
-        const auto rot = MathUtils::GetRandomFloatNegOneToOne() * 180.0f;
-        MakeLargeAsteroid(mouseWorldCoords, vel, rot);
+        MakeLargeAsteroidAtMouse();
     }
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::N)) {
         MakeShip();

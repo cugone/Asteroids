@@ -158,6 +158,12 @@ private:
 
     void MakeLargeAsteroidOffScreen() noexcept;
     void MakeLargeAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
+
+    void AddNewAsteroidToWorld(std::unique_ptr<Asteroid> newAsteroid);
+
+    void MakeLargeAsteroidAt(Vector2 pos) noexcept;
+    void MakeLargeAsteroidAtMouse() noexcept;
+
     void MakeShip() noexcept;
 
     void KillAll() noexcept;
@@ -207,6 +213,7 @@ private:
     void Respawn() noexcept;
     bool IsGameOver() const noexcept;
 
+    void SetAsteroidSpriteSheet() noexcept;
     void SetControlType() noexcept;
 
     std::string DifficultyToString(Difficulty difficulty) const noexcept;
