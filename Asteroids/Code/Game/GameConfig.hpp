@@ -16,3 +16,20 @@ struct GraphicsOptions {
 
 static GraphicsOptions defaultGraphicsOptions{};
 static GraphicsOptions currentGraphicsOptions{};
+
+static std::string g_options_filepath{"Data/Config/options.config"};
+static std::string g_options_str{
+R"(#Auto-generated file.
+difficulty=normal
+controlpref=mouse
+sound=5
+maxShakeOffsetHorizontal=10.0
+maxShakeOffsetVertical=10.0
+maxShakeAngle=45.0
+)"
+};
+static std::string g_title_str{"Asteroids"};
+static std::string g_sound_folderpath{"Data/Audio/"};
+static std::string g_material_folderpath{"Data/Materials/"};
+
+

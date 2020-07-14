@@ -2,7 +2,7 @@
 
 #include "Engine/Audio/AudioSystem.hpp"
 
-#include "Engine/Core/FileUtils.hpp
+#include "Engine/Core/FileUtils.hpp"
 #include "Engine/Core/KerningFont.hpp"
 
 #include "Engine/Math/Disc2.hpp"
@@ -86,14 +86,14 @@ OptionsMenu operator--(OptionsMenu& mode, int) noexcept {
     return result;
 }
 
-
 void Game::Initialize() {
-    currentGraphicsOptions.MaxShakeOffsetHorizontal = 10.0f;
-    currentGraphicsOptions.MaxShakeOffsetVertical = 10.0f;
-    currentGraphicsOptions.MaxShakeAngle = 45.0f;
-    g_theRenderer->SetWindowTitle("Asteroids");
-    g_theAudioSystem->RegisterWavFilesFromFolder("Data/Audio/");
-    g_theRenderer->RegisterMaterialsFromFolder("Data/Materials/");
+    CreateOrLoadOptionsFile();
+    g_theConfig->GetValue("maxShakeOffsetHorizontal", currentGraphicsOptions.MaxShakeOffsetHorizontal);
+    g_theConfig->GetValue("maxShakeOffsetVertical", currentGraphicsOptions.MaxShakeOffsetVertical);
+    g_theConfig->GetValue("maxShakeAngle", currentGraphicsOptions.MaxShakeAngle);
+    g_theRenderer->SetWindowTitle(g_title_str);
+    g_theAudioSystem->RegisterWavFilesFromFolder(g_sound_folderpath);
+    g_theRenderer->RegisterMaterialsFromFolder(g_material_folderpath);
 }
 
 void Game::BeginFrame() {
@@ -278,6 +278,23 @@ void Game::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
     }
 }
 
+void Game::CreateOptionsFile() const noexcept {
+    GUARANTEE_OR_DIE(FileUtils::WriteBufferToFile(g_options_str, g_options_filepath), "Could not create options file.");
+}
+
+void Game::LoadOptionsFile() const noexcept {
+    g_theConfig->AppendFromFile(g_options_filepath);
+}
+
+void Game::CreateOrLoadOptionsFile() const noexcept {
+    if(std::filesystem::exists(g_options_filepath)) {
+        LoadOptionsFile();
+    } else {
+        CreateOptionsFile();
+        LoadOptionsFile();
+    }
+}
+
 void Game::HandleTitleInput() noexcept {
     HandleTitleKeyboardInput();
     HandleTitleControllerInput();
@@ -382,19 +399,26 @@ void Game::HandleOptionsKeyboardInput() noexcept {
     if(select) {
         switch(_options_selected_item) {
         case OptionsMenu::Cancel:
+        {
             ChangeState(GameState::Title);
             break;
+        }
         case OptionsMenu::Accept:
+        {
             _current_options = _temp_options;
             g_theConfig->SetValue("difficulty", DifficultyToString(_current_options.difficulty));
             g_theConfig->SetValue("controlpref", ControlPreferenceToString(_current_options.controlPref));
             g_theConfig->SetValue("sound", _current_options.soundVolume);
-            FileUtils::WriteStringBufferFromFile();
-            std::cout << *g_theConfig;
+            std::ofstream ofs(g_options_filepath);
+            ofs << *g_theConfig;
+            ofs.close();
             ChangeState(GameState::Title);
             break;
+        }
         default:
+        {
             ERROR_AND_DIE("OPTIONS MENU ENUM HAS CHANGED.");
+        }
         }
     }
 }

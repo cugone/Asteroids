@@ -121,6 +121,10 @@ public:
 
 protected:
 private:
+    void CreateOrLoadOptionsFile() const noexcept;
+    void CreateOptionsFile() const noexcept;
+    void LoadOptionsFile() const noexcept;
+
     long long GetLivesFromDifficulty() const noexcept;
 
     void HandleTitleInput() noexcept;
