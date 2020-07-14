@@ -1069,7 +1069,9 @@ void Game::OnEnter_Main() noexcept {
     _cameraController.SetMaxZoomLevel(450.0f);
     _cameraController.SetZoomLevel(450.0f);
 
-    world_bounds.ScalePadding(g_theRenderer->GetOutput()->GetDimensions().x * 0.5f, g_theRenderer->GetOutput()->GetDimensions().y * 0.5f);
+    world_bounds = AABB2::ZERO_TO_ONE;
+    const auto dims = Vector2{g_theRenderer->GetOutput()->GetDimensions()};
+    world_bounds.ScalePadding(dims.x, dims.y);
     world_bounds.Translate(-world_bounds.CalcCenter());
 
     PlayerDesc playerDesc{};

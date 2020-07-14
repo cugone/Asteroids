@@ -112,7 +112,7 @@ public:
 
     Player player{};
     Ship* ship{nullptr};
-    AABB2 world_bounds = AABB2::NEG_ONE_TO_ONE;
+    AABB2 world_bounds = AABB2::ZERO_TO_ONE;
     std::vector<Asteroid*> asteroids{};
     std::vector<Bullet*> bullets{};
     std::vector<Explosion*> explosions{};
