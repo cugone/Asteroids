@@ -26,6 +26,9 @@
     <Filter Include="Data\ShaderPrograms">
       <UniqueIdentifier>{0bd323b2-9848-40b7-9f0b-34f3dc5d135b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Data\Config">
+      <UniqueIdentifier>{c1bd03c1-5b55-4cff-af6e-a33237d36824}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main_Win32.cpp">
@@ -152,6 +155,9 @@
     </None>
     <None Include="..\..\Run_x64\Data\Shaders\background.shader">
       <Filter>Data\Shaders</Filter>
+    </None>
+    <None Include="..\..\Run_x64\Data\Config\options.config">
+      <Filter>Data\Config</Filter>
     </None>
   </ItemGroup>
 </Project>

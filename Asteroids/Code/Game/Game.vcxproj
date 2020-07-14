@@ -186,6 +186,7 @@
     <Media Include="..\..\Run_x64\Data\Audio\Laser_Shoot.wav" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\Run_x64\Data\Config\options.config" />
     <None Include="..\..\Run_x64\Data\Materials\asteroid.material" />
     <None Include="..\..\Run_x64\Data\Materials\background.material" />
     <None Include="..\..\Run_x64\Data\Materials\bullet.material" />
