@@ -754,7 +754,7 @@ void Game::RenderBackground() const noexcept {
     const float ui_view_width = ui_view_height * _cameraController.GetAspectRatio();
     const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
     const auto ui_view_half_extents = ui_view_extents * 0.5f;
-    const auto S = Matrix4::CreateScaleMatrix(ui_view_half_extents * 2.0f);
+    const auto S = Matrix4::CreateScaleMatrix(ui_view_half_extents * 2.5f);
     const auto R = Matrix4::I;
     const auto T = Matrix4::I;
     const auto M = Matrix4::MakeSRT(S, R, T);
