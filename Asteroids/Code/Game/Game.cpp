@@ -1098,6 +1098,8 @@ void Game::DebugRenderEntities() const noexcept {
         g_theRenderer->DrawLine2D(center, velocity_end, Rgba::Green);
         g_theRenderer->DrawLine2D(center, acceleration_end, Rgba::Orange);
     }
+    g_theRenderer->DrawAABB2(world_bounds, Rgba::Green, Rgba::NoAlpha);
+    g_theRenderer->DrawCircle2D(_cameraController.GetCamera().GetPosition(), 25.0f, Rgba::Pink);
 }
 
 void Game::HandleDebugInput(TimeUtils::FPSeconds deltaSeconds) {
