@@ -7,6 +7,7 @@
 #include "Game/Entity.hpp"
 
 #include <memory>
+#include <tuple>
 #include <utility>
 
 class Renderer;
@@ -34,12 +35,15 @@ public:
 
 private:
     Vector4 WasHit() const noexcept;
+    void MakeChildAsteroid() const noexcept;
     long long GetScoreFromType(Type type);
     std::pair<float, float> GetRadiiFromType(Type type) const noexcept;
     int GetHealthFromType(Type type) const noexcept;
-    float CalcChildHeadingFromDifficulty();
-    float CalcChildSpeedFromSizeAndDifficulty();
-    float CalcChildSpeedFromSize();
+    float CalcChildHeadingFromDifficulty() const noexcept;
+    float CalcChildSpeedFromSizeAndDifficulty() const noexcept;
+    float CalcChildSpeedFromSize() const noexcept;
+    std::tuple<Vector2, Vector2, float> CalcChildPhysicsParameters() const noexcept;
+
     struct asteroid_state_t {
         Vector4 wasHit = Vector4::ZERO;
     };

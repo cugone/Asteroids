@@ -132,58 +132,38 @@ void Asteroid::OnDestroy() noexcept {
     switch(_type) {
     case Type::Large:
     {
-        const auto heading1 = CalcChildHeadingFromDifficulty();
-        const auto speed1 = CalcChildSpeedFromSizeAndDifficulty();
-        auto v1 = GetVelocity();
-        v1.SetLengthAndHeadingDegrees(heading1, speed1);
-        const auto heading2 = CalcChildHeadingFromDifficulty();
-        const auto speed2 = CalcChildSpeedFromSizeAndDifficulty();
-        auto v2 = GetVelocity();
-        v2.SetLengthAndHeadingDegrees(heading2, speed2);
-        const auto rotSpeed1 = MathUtils::GetRandomFloatZeroToOne() * 360.0f;
-        const auto rotSpeed2 = MathUtils::GetRandomFloatZeroToOne() * 360.0f;
-        const auto p1 = MathUtils::GetRandomPointInside(Disc2{GetPosition(), GetCosmeticRadius()});
-        const auto p2 = MathUtils::GetRandomPointInside(Disc2{GetPosition(), GetCosmeticRadius()});
-        g_theGame->MakeMediumAsteroid(p1, v1, rotSpeed1);
-        g_theGame->MakeMediumAsteroid(p2, v2, rotSpeed2);
+        MakeChildAsteroid();
+        MakeChildAsteroid();
         break;
     }
     case Type::Medium:
     {
-        const auto heading1 = CalcChildHeadingFromDifficulty();
-        const auto speed1 = CalcChildSpeedFromSizeAndDifficulty();
-        auto v1 = GetVelocity();
-        v1.SetLengthAndHeadingDegrees(heading1, speed1);
-        const auto heading2 = CalcChildHeadingFromDifficulty();
-        const auto speed2 = CalcChildSpeedFromSizeAndDifficulty();
-        auto v2 = GetVelocity();
-        v2.SetLengthAndHeadingDegrees(heading2, speed2);
-        const auto heading3 = CalcChildHeadingFromDifficulty();
-        const auto speed3 = CalcChildSpeedFromSizeAndDifficulty();
-        auto v3 = GetVelocity();
-        v3.SetLengthAndHeadingDegrees(heading3, speed3);
-        const auto heading4 = CalcChildHeadingFromDifficulty();
-        const auto speed4 = CalcChildSpeedFromSizeAndDifficulty();
-        auto v4 = GetVelocity();
-        v4.SetLengthAndHeadingDegrees(heading4, speed4);
-        const auto rotSpeed1 = MathUtils::GetRandomFloatZeroToOne() * 360.0f;
-        const auto rotSpeed2 = MathUtils::GetRandomFloatZeroToOne() * 360.0f;
-        const auto rotSpeed3 = MathUtils::GetRandomFloatZeroToOne() * 360.0f;
-        const auto rotSpeed4 = MathUtils::GetRandomFloatZeroToOne() * 360.0f;
-        const auto p1 = MathUtils::GetRandomPointInside(Disc2{GetPosition(), GetCosmeticRadius()});
-        const auto p2 = MathUtils::GetRandomPointInside(Disc2{GetPosition(), GetCosmeticRadius()});
-        const auto p3 = MathUtils::GetRandomPointInside(Disc2{GetPosition(), GetCosmeticRadius()});
-        const auto p4 = MathUtils::GetRandomPointInside(Disc2{GetPosition(), GetCosmeticRadius()});
-        g_theGame->MakeSmallAsteroid(p1, v1, rotSpeed1);
-        g_theGame->MakeSmallAsteroid(p2, v2, rotSpeed2);
-        g_theGame->MakeSmallAsteroid(p3, v3, rotSpeed3);
-        g_theGame->MakeSmallAsteroid(p4, v4, rotSpeed4);
+        MakeChildAsteroid();
+        MakeChildAsteroid();
+        MakeChildAsteroid();
+        MakeChildAsteroid();
         break;
     }
     case Type::Small:
         /* DO NOTHING */
         break;
     default: /* DO NOTHING */;
+    }
+}
+
+void Asteroid::MakeChildAsteroid() const noexcept {
+    const auto [position, velocity, rotation] = CalcChildPhysicsParameters();
+    switch(_type) {
+    case Type::Large:
+        g_theGame->MakeMediumAsteroid(position, velocity, rotation);
+        break;
+    case Type::Medium:
+        g_theGame->MakeSmallAsteroid(position, velocity, rotation);
+        break;
+    case Type::Small:
+        break;
+    default:
+        break;
     }
 }
 
@@ -233,7 +213,7 @@ int Asteroid::GetHealthFromType(Type type) const noexcept {
     }
 }
 
-float Asteroid::CalcChildHeadingFromDifficulty() {
+float Asteroid::CalcChildHeadingFromDifficulty() const noexcept {
     const auto currentHeading = GetVelocity().CalcHeadingDegrees();
     switch(g_theGame->GetGameOptions().difficulty) {
     case Difficulty::Easy:
@@ -247,7 +227,7 @@ float Asteroid::CalcChildHeadingFromDifficulty() {
     }
 }
 
-float Asteroid::CalcChildSpeedFromSizeAndDifficulty() {
+float Asteroid::CalcChildSpeedFromSizeAndDifficulty() const noexcept{
     const auto currentSpeed = CalcChildSpeedFromSize();
     switch(g_theGame->GetGameOptions().difficulty) {
     case Difficulty::Easy:
@@ -261,7 +241,7 @@ float Asteroid::CalcChildSpeedFromSizeAndDifficulty() {
     }
 }
 
-float Asteroid::CalcChildSpeedFromSize() {
+float Asteroid::CalcChildSpeedFromSize() const noexcept {
     const auto currentSpeed = GetVelocity().CalcLength();
     switch(_type) {
     case Type::Large:
@@ -273,4 +253,14 @@ float Asteroid::CalcChildSpeedFromSize() {
     default:
         return currentSpeed;
     }
+}
+
+std::tuple<Vector2, Vector2, float> Asteroid::CalcChildPhysicsParameters() const noexcept {
+    const auto heading = CalcChildHeadingFromDifficulty();
+    const auto speed = CalcChildSpeedFromSizeAndDifficulty();
+    auto v = GetVelocity();
+    v.SetLengthAndHeadingDegrees(heading, speed);
+    const auto r = MathUtils::GetRandomFloatZeroToOne() * 360.0f;
+    const auto p = MathUtils::GetRandomPointInside(Disc2{GetPosition(), GetCosmeticRadius()});
+    return std::make_tuple(p,v,r);
 }
