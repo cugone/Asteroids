@@ -756,7 +756,7 @@ void Game::RenderBackground() const noexcept {
     const auto ui_view_half_extents = ui_view_extents * 0.5f;
     const auto S = Matrix4::CreateScaleMatrix(ui_view_half_extents * 2.0f);
     const auto R = Matrix4::I;
-    const auto T = Matrix4::CreateTranslationMatrix(ui_view_half_extents);
+    const auto T = Matrix4::I;
     const auto M = Matrix4::MakeSRT(S, R, T);
     g_theRenderer->SetModelMatrix(M);
     g_theRenderer->SetMaterial("background");
@@ -848,6 +848,7 @@ void Game::MakeSmallAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noex
 }
 
 void Game::DoCameraShake() {
+    _cameraController.SetupCameraShake(currentGraphicsOptions.MaxShakeOffsetHorizontal, currentGraphicsOptions.MaxShakeOffsetVertical, currentGraphicsOptions.MaxShakeAngle);
     _cameraController.DoCameraShake([this]() { return this->GetGameOptions().cameraShakeStrength; });
 }
 
@@ -1034,11 +1035,11 @@ void Game::OnEnter_Main() noexcept {
     _entities.shrink_to_fit();
 
     _cameraController = OrthographicCameraController{g_theRenderer, g_theInputSystem};
-    _cameraController.SetPosition(Vector2{currentGraphicsOptions.WindowWidth, currentGraphicsOptions.WindowHeight} *0.5f);
     _cameraController.SetMaxZoomLevel(450.0f);
     _cameraController.SetZoomLevel(450.0f);
 
-    world_bounds = AABB2{Vector2::ZERO, Vector2{g_theRenderer->GetOutput()->GetDimensions()}};
+    world_bounds.ScalePadding(g_theRenderer->GetOutput()->GetDimensions().x * 0.5f, g_theRenderer->GetOutput()->GetDimensions().y * 0.5f);
+    world_bounds.Translate(-world_bounds.CalcCenter());
 
     PlayerDesc playerDesc{};
     playerDesc.lives = GetLivesFromDifficulty();
