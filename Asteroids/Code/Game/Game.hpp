@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Engine/Core/TimeUtils.hpp"
+#include "Engine/Core/TypeUtils.hpp"
 #include "Engine/Core/OrthographicCameraController.hpp"
 #include "Engine/Core/Vertex3D.hpp"
 
@@ -44,10 +45,11 @@ enum class TitleMenu : uint8_t {
     Last_,
 };
 
-TitleMenu& operator++(TitleMenu& mode) noexcept;
-TitleMenu operator++(TitleMenu& mode, int) noexcept;
-TitleMenu& operator--(TitleMenu& mode) noexcept;
-TitleMenu operator--(TitleMenu& mode, int) noexcept;
+template<>
+struct TypeUtils::is_incrementable_enum_type<TitleMenu> : std::true_type {};
+
+template<>
+struct TypeUtils::is_decrementable_enum_type<TitleMenu> : std::true_type {};
 
 enum class ControlPreference {
     Keyboard,
@@ -75,10 +77,11 @@ enum class OptionsMenu {
     Last_
 };
 
-OptionsMenu& operator++(OptionsMenu& mode) noexcept;
-OptionsMenu operator++(OptionsMenu& mode, int) noexcept;
-OptionsMenu& operator--(OptionsMenu& mode) noexcept;
-OptionsMenu operator--(OptionsMenu& mode, int) noexcept;
+template<>
+struct TypeUtils::is_incrementable_enum_type<OptionsMenu> : std::true_type {};
+
+template<>
+struct TypeUtils::is_decrementable_enum_type<OptionsMenu> : std::true_type {};
 
 enum class GameState {
     Title,

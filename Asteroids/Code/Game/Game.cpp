@@ -25,67 +25,6 @@
 #include <algorithm>
 #include <cmath>
 
-TitleMenu& operator++(TitleMenu& mode) noexcept {
-    using underlying = std::underlying_type_t<TitleMenu>;
-    mode = static_cast<TitleMenu>(static_cast<underlying>(mode) + 1);
-    if(mode == TitleMenu::Last_) {
-        mode = TitleMenu::First_;
-    }
-    return mode;
-}
-
-TitleMenu operator++(TitleMenu& mode, int) noexcept {
-    TitleMenu result = mode;
-    ++mode;
-    return result;
-}
-
-TitleMenu& operator--(TitleMenu& mode) noexcept {
-    if(mode == TitleMenu::First_) {
-        mode = TitleMenu::Last_;
-    }
-    using underlying = std::underlying_type_t<TitleMenu>;
-    mode = static_cast<TitleMenu>(static_cast<underlying>(mode) - 1);
-    return mode;
-}
-
-TitleMenu operator--(TitleMenu& mode, int) noexcept {
-    TitleMenu result = mode;
-    --mode;
-    return result;
-}
-
-
-OptionsMenu& operator++(OptionsMenu& mode) noexcept {
-    using underlying = std::underlying_type_t<TitleMenu>;
-    mode = static_cast<OptionsMenu>(static_cast<underlying>(mode) + 1);
-    if(mode == OptionsMenu::Last_) {
-        mode = OptionsMenu::First_;
-    }
-    return mode;
-}
-
-OptionsMenu operator++(OptionsMenu& mode, int) noexcept {
-    OptionsMenu result = mode;
-    ++mode;
-    return result;
-}
-
-OptionsMenu& operator--(OptionsMenu& mode) noexcept {
-    if(mode == OptionsMenu::First_) {
-        mode = OptionsMenu::Last_;
-    }
-    using underlying = std::underlying_type_t<OptionsMenu>;
-    mode = static_cast<OptionsMenu>(static_cast<underlying>(mode) - 1);
-    return mode;
-}
-
-OptionsMenu operator--(OptionsMenu& mode, int) noexcept {
-    OptionsMenu result = mode;
-    --mode;
-    return result;
-}
-
 void Game::Initialize() {
     CreateOrLoadOptionsFile();
     g_theRenderer->RegisterMaterialsFromFolder(g_material_folderpath);
