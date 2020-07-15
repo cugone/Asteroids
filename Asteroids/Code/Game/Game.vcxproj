@@ -181,11 +181,6 @@
     <Image Include="..\..\Run_x64\Data\Images\ship.png" />
   </ItemGroup>
   <ItemGroup>
-    <Media Include="..\..\Run_x64\Data\Audio\Explosion.wav" />
-    <Media Include="..\..\Run_x64\Data\Audio\Hit.wav" />
-    <Media Include="..\..\Run_x64\Data\Audio\Laser_Shoot.wav" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\..\Run_x64\Data\Materials\asteroid.material" />
     <None Include="..\..\Run_x64\Data\Materials\background.material" />
     <None Include="..\..\Run_x64\Data\Materials\bullet.material" />
@@ -198,6 +193,11 @@
     <None Include="..\..\Run_x64\Data\Shaders\bullet.shader" />
     <None Include="..\..\Run_x64\Data\Shaders\explosion.shader" />
     <None Include="..\..\Run_x64\Data\Shaders\ship.shader" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\..\Run_x64\Data\Audio\Sound\Explosion.wav" />
+    <Media Include="..\..\Run_x64\Data\Audio\Sound\Hit.wav" />
+    <Media Include="..\..\Run_x64\Data\Audio\Sound\Laser_Shoot.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

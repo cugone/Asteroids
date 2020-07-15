@@ -22,6 +22,7 @@ static std::string g_options_str{
 R"(difficulty=normal
 controlpref=mouse
 sound=5
+music=5
 cameraShakeStrength=1.0
 maxShakeOffsetHorizontal=25.0
 maxShakeOffsetVertical=25.0
@@ -29,7 +30,8 @@ maxShakeAngle=2.5
 )"
 };
 static std::string g_title_str{"Asteroids"};
-static std::string g_sound_folderpath{"Data/Audio/"};
+static std::string g_sound_folderpath{"Data/Audio/Sound/"};
+static std::string g_music_folderpath{"Data/Audio/Music/"};
 static std::string g_material_folderpath{"Data/Materials/"};
 
 

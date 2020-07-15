@@ -29,6 +29,12 @@
     <Filter Include="Data\Config">
       <UniqueIdentifier>{c1bd03c1-5b55-4cff-af6e-a33237d36824}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Data\Audio\Sound">
+      <UniqueIdentifier>{ebf26a08-19b8-41e5-b25f-c48046a22cea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\Audio\Music">
+      <UniqueIdentifier>{5bf49722-054b-4365-856e-8376f44dcbbd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main_Win32.cpp">
@@ -109,17 +115,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <Media Include="..\..\Run_x64\Data\Audio\Explosion.wav">
-      <Filter>Data\Audio</Filter>
-    </Media>
-    <Media Include="..\..\Run_x64\Data\Audio\Laser_Shoot.wav">
-      <Filter>Data\Audio</Filter>
-    </Media>
-    <Media Include="..\..\Run_x64\Data\Audio\Hit.wav">
-      <Filter>Data\Audio</Filter>
-    </Media>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\..\Run_x64\Data\Materials\asteroid.material">
       <Filter>Data\Materials</Filter>
     </None>
@@ -156,5 +151,16 @@
     <None Include="..\..\Run_x64\Data\Shaders\background.shader">
       <Filter>Data\Shaders</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\..\Run_x64\Data\Audio\Sound\Explosion.wav">
+      <Filter>Data\Audio\Sound</Filter>
+    </Media>
+    <Media Include="..\..\Run_x64\Data\Audio\Sound\Hit.wav">
+      <Filter>Data\Audio\Sound</Filter>
+    </Media>
+    <Media Include="..\..\Run_x64\Data\Audio\Sound\Laser_Shoot.wav">
+      <Filter>Data\Audio\Sound</Filter>
+    </Media>
   </ItemGroup>
 </Project>

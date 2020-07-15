@@ -59,6 +59,7 @@ struct GameOptions {
     Difficulty difficulty{Difficulty::Normal};
     ControlPreference controlPref{ControlPreference::Mouse};
     uint8_t soundVolume{5};
+    uint8_t musicVolume{5};
     float cameraShakeStrength{1.0f};
 };
 
@@ -66,7 +67,9 @@ enum class OptionsMenu {
     First_,
     DifficultySelection = First_,
     ControlSelection,
+    CameraShake,
     SoundVolume,
+    MusicVolume,
     Cancel,
     Accept,
     Last_
@@ -122,13 +125,16 @@ public:
     bool IsEntityInView(const Entity* e) const noexcept;
 protected:
 private:
+    void InitializeAudio() noexcept;
+    void InitializeSounds() noexcept;
+    void InitializeMusic() noexcept;
 
     AABB2 CalcOrthoBounds() const noexcept;
     AABB2 CalcViewBounds(const Vector2& cam_pos) const noexcept;
     AABB2 CalcCullBounds(const Vector2& cam_pos) const noexcept;
     AABB2 CalcCullBoundsFromOrthoBounds() const noexcept;
 
-    void CreateOrLoadOptionsFile() const noexcept;
+    void CreateOrLoadOptionsFile() noexcept;
     void CreateOptionsFile() const noexcept;
     void LoadOptionsFile() const noexcept;
 
@@ -142,6 +148,7 @@ private:
     void HandleOptionsInput() noexcept;
     void HandleOptionsKeyboardInput() noexcept;
     void HandleOptionsControllerInput() noexcept;
+    void HandleOptionsMenuState(const bool up, const bool down, const bool left, const bool right, const bool cancel, const bool select) noexcept;
 
     void HandleDebugInput(TimeUtils::FPSeconds deltaSeconds);
     void HandleDebugKeyboardInput(TimeUtils::FPSeconds deltaSeconds);
@@ -228,8 +235,12 @@ private:
     std::vector<std::unique_ptr<Entity>> _pending_entities{};
     float _thrust_force{100.0f};
     unsigned int _current_wave{1u};
+    float _min_camera_shake{0.0f};
+    float _max_camera_shake{1.0f};
     uint8_t _max_sound_volume{10u};
     uint8_t _min_sound_volume{0u};
+    uint8_t _max_music_volume{10u};
+    uint8_t _min_music_volume{0u};
     GameOptions _current_options{};
     GameOptions _temp_options{};
     GameState _current_state{GameState::Title};

@@ -180,7 +180,7 @@ void Asteroid::OnCollision(Entity* a, Entity* b) noexcept {
             _timeSinceLastHit = _timeSinceLastHit.zero();
         }
         a->DecrementHealth();
-        g_theAudioSystem->Play("Data/Audio/Hit.wav");
+        g_theAudioSystem->Play("Data/Audio/Sound/Hit.wav");
         asteroid_state.wasHit = WasHit();
     }
 }

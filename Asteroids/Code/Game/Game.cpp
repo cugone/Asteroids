@@ -88,13 +88,33 @@ OptionsMenu operator--(OptionsMenu& mode, int) noexcept {
 
 void Game::Initialize() {
     CreateOrLoadOptionsFile();
-    g_theConfig->GetValue("cameraShakeStrength", _current_options.cameraShakeStrength);
-    g_theConfig->GetValue("maxShakeOffsetHorizontal", currentGraphicsOptions.MaxShakeOffsetHorizontal);
-    g_theConfig->GetValue("maxShakeOffsetVertical", currentGraphicsOptions.MaxShakeOffsetVertical);
-    g_theConfig->GetValue("maxShakeAngle", currentGraphicsOptions.MaxShakeAngle);
-    g_theRenderer->SetWindowTitle(g_title_str);
-    g_theAudioSystem->RegisterWavFilesFromFolder(g_sound_folderpath);
     g_theRenderer->RegisterMaterialsFromFolder(g_material_folderpath);
+    g_theRenderer->SetWindowTitle(g_title_str);
+    InitializeAudio();
+}
+
+void Game::InitializeAudio() noexcept {
+    InitializeSounds();
+    InitializeMusic();
+}
+
+void Game::InitializeSounds() noexcept {
+    g_theAudioSystem->RegisterWavFilesFromFolder(g_sound_folderpath);
+    g_theAudioSystem->AddChannelGroup("sound");
+    for(const auto filepath : FileUtils::GetAllPathsInFolders(g_sound_folderpath)) {
+        g_theAudioSystem->AddSoundToChannelGroup("sound", filepath);
+    }
+    if(auto* sound_group = g_theAudioSystem->GetChannelGroup("sound")) {
+        sound_group->SetVolume(_current_options.soundVolume / static_cast<float>(_max_sound_volume));
+    }
+}
+
+void Game::InitializeMusic() noexcept {
+    g_theAudioSystem->RegisterWavFilesFromFolder(g_music_folderpath);
+    g_theAudioSystem->AddChannelGroup("music");
+    if(auto* music_group = g_theAudioSystem->GetChannelGroup("music")) {
+        music_group->SetVolume(_current_options.musicVolume / static_cast<float>(_max_music_volume));
+    }
 }
 
 void Game::BeginFrame() {
@@ -230,7 +250,15 @@ void Game::CycleSelectedOptionDown(OptionsMenu selectedItem) noexcept {
     }
     case OptionsMenu::SoundVolume:
         --_temp_options.soundVolume;
-        _temp_options.soundVolume = (std::min)(static_cast<uint8_t>(_max_sound_volume), _temp_options.soundVolume);
+        _temp_options.soundVolume = std::clamp(_temp_options.soundVolume, _min_sound_volume, _max_sound_volume);
+        break;
+    case OptionsMenu::MusicVolume:
+        --_temp_options.musicVolume;
+        _temp_options.musicVolume = std::clamp(_temp_options.musicVolume, _min_music_volume, _max_music_volume);
+        break;
+    case OptionsMenu::CameraShake:
+        _temp_options.cameraShakeStrength -= 0.1f;
+        _temp_options.cameraShakeStrength = std::clamp(_temp_options.cameraShakeStrength, _min_camera_shake, _max_camera_shake);
         break;
     default: /* DO NOTHING */;
     }
@@ -273,7 +301,15 @@ void Game::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
     }
     case OptionsMenu::SoundVolume:
         ++_temp_options.soundVolume;
-        _temp_options.soundVolume = (std::min)(static_cast<uint8_t>(_max_sound_volume), _temp_options.soundVolume);
+        _temp_options.soundVolume = std::clamp(_temp_options.soundVolume, _min_sound_volume, _max_sound_volume);
+        break;
+    case OptionsMenu::MusicVolume:
+        ++_temp_options.musicVolume;
+        _temp_options.musicVolume = std::clamp(_temp_options.musicVolume, _min_music_volume, _max_music_volume);
+        break;
+    case OptionsMenu::CameraShake:
+        _temp_options.cameraShakeStrength += 0.1f;
+        _temp_options.cameraShakeStrength = std::clamp(_temp_options.cameraShakeStrength, _min_camera_shake, _max_camera_shake);
         break;
     default: /* DO NOTHING */;
     }
@@ -322,13 +358,20 @@ void Game::LoadOptionsFile() const noexcept {
     g_theConfig->AppendFromFile(g_options_filepath);
 }
 
-void Game::CreateOrLoadOptionsFile() const noexcept {
+void Game::CreateOrLoadOptionsFile() noexcept {
     if(std::filesystem::exists(g_options_filepath)) {
         LoadOptionsFile();
     } else {
         CreateOptionsFile();
         LoadOptionsFile();
     }
+    g_theConfig->GetValue("cameraShakeStrength", _current_options.cameraShakeStrength);
+    g_theConfig->GetValue("maxShakeOffsetHorizontal", currentGraphicsOptions.MaxShakeOffsetHorizontal);
+    g_theConfig->GetValue("maxShakeOffsetVertical", currentGraphicsOptions.MaxShakeOffsetVertical);
+    g_theConfig->GetValue("maxShakeAngle", currentGraphicsOptions.MaxShakeAngle);
+    g_theConfig->GetValue("sound", _current_options.soundVolume);
+    g_theConfig->GetValue("music", _current_options.musicVolume);
+
 }
 
 void Game::HandleTitleInput() noexcept {
@@ -418,6 +461,22 @@ void Game::HandleOptionsKeyboardInput() noexcept {
     const bool right = g_theInputSystem->WasKeyJustPressed(KeyCode::D) || g_theInputSystem->WasKeyJustPressed(KeyCode::Right);
     const bool select = g_theInputSystem->WasKeyJustPressed(KeyCode::Enter) || g_theInputSystem->WasKeyJustPressed(KeyCode::NumPadEnter);
     const bool cancel = g_theInputSystem->WasKeyJustPressed(KeyCode::Esc);
+    HandleOptionsMenuState(up, down, left, right, cancel, select);
+}
+
+void Game::HandleOptionsControllerInput() noexcept {
+    if(const auto controller = g_theInputSystem->GetXboxController(0); _controller_control_active && controller.IsConnected()) {
+        const bool up = controller.WasButtonJustPressed(XboxController::Button::Up) || MathUtils::IsEquivalent(1.0f, controller.GetLeftThumbPosition().y);
+        const bool down = controller.WasButtonJustPressed(XboxController::Button::Down) || MathUtils::IsEquivalent(-1.0f, controller.GetLeftThumbPosition().y);
+        const bool left = controller.WasButtonJustPressed(XboxController::Button::Left) || MathUtils::IsEquivalent(-1.0f, controller.GetLeftThumbPosition().x);
+        const bool right = controller.WasButtonJustPressed(XboxController::Button::Right) || MathUtils::IsEquivalent(1.0f, controller.GetLeftThumbPosition().x);
+        const bool select = controller.WasButtonJustPressed(XboxController::Button::A);
+        const bool cancel = controller.WasButtonJustPressed(XboxController::Button::B);
+        HandleOptionsMenuState(up, down, left, right, cancel, select);
+    }
+}
+
+void Game::HandleOptionsMenuState(const bool up, const bool down, const bool left, const bool right, const bool cancel, const bool select) noexcept {
     if(up) {
         --_options_selected_item;
     } else if(down) {
@@ -444,7 +503,9 @@ void Game::HandleOptionsKeyboardInput() noexcept {
             _current_options = _temp_options;
             g_theConfig->SetValue("difficulty", DifficultyToString(_current_options.difficulty));
             g_theConfig->SetValue("controlpref", ControlPreferenceToString(_current_options.controlPref));
-            g_theConfig->SetValue("sound", _current_options.soundVolume);
+            g_theConfig->SetValue("sound", static_cast<int>(_current_options.soundVolume));
+            g_theConfig->SetValue("music", static_cast<int>(_current_options.musicVolume));
+            g_theConfig->SetValue("camerashakestrength", _current_options.cameraShakeStrength);
             std::ofstream ofs(g_options_filepath);
             ofs << *g_theConfig;
             ofs.close();
@@ -455,39 +516,6 @@ void Game::HandleOptionsKeyboardInput() noexcept {
         {
             ERROR_AND_DIE("OPTIONS MENU ENUM HAS CHANGED.");
         }
-        }
-    }
-}
-
-void Game::HandleOptionsControllerInput() noexcept {
-    if(const auto controller = g_theInputSystem->GetXboxController(0); _controller_control_active && controller.IsConnected()) {
-        const bool up = controller.WasButtonJustPressed(XboxController::Button::Up) || MathUtils::IsEquivalent(1.0f, controller.GetLeftThumbPosition().y);
-        const bool down = controller.WasButtonJustPressed(XboxController::Button::Down) || MathUtils::IsEquivalent(-1.0f, controller.GetLeftThumbPosition().y);
-        const bool select = g_theInputSystem->WasKeyJustPressed(KeyCode::Enter) || g_theInputSystem->WasKeyJustPressed(KeyCode::NumPadEnter);
-        const bool cancel = g_theInputSystem->WasKeyJustPressed(KeyCode::Esc);
-        if(up) {
-            --_title_selected_item;
-
-        } else if(down) {
-            ++_title_selected_item;
-        }
-        if(cancel) {
-            _title_selected_item = TitleMenu::Exit;
-        }
-        if(select) {
-            switch(_title_selected_item) {
-            case TitleMenu::Start:
-                ChangeState(GameState::Main);
-                break;
-            case TitleMenu::Options:
-                ChangeState(GameState::Options);
-                break;
-            case TitleMenu::Exit:
-                g_theApp->SetIsQuitting(true);
-                break;
-            default:
-                ERROR_AND_DIE("OPTIONS MENU ENUM HAS CHANGED.");
-            }
         }
     }
 }
@@ -646,15 +674,25 @@ void Game::Render_Options() const noexcept {
     g_theRenderer->DrawTextLine(font, ControlPreferenceToString(_temp_options.controlPref), _options_selected_item == OptionsMenu::ControlSelection ? Rgba::Yellow : Rgba::White);
     
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.55f}));
-    g_theRenderer->DrawTextLine(font, "Sound Volume:", _options_selected_item == OptionsMenu::SoundVolume ? Rgba::Yellow : Rgba::White);
+    g_theRenderer->DrawTextLine(font, "Camera Shake:", _options_selected_item == OptionsMenu::CameraShake ? Rgba::Yellow : Rgba::White);
 
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.55f}));
+    {
+        std::ostringstream ss;
+        ss << std::setprecision(2) << _temp_options.cameraShakeStrength;
+        g_theRenderer->DrawTextLine(font, ss.str(), _options_selected_item == OptionsMenu::CameraShake ? Rgba::Yellow : Rgba::White);
+    }
+    
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.65f}));
+    g_theRenderer->DrawTextLine(font, "Sound Volume:", _options_selected_item == OptionsMenu::SoundVolume ? Rgba::Yellow : Rgba::White);
+
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.65f}));
     g_theRenderer->DrawTextLine(font, std::to_string(_temp_options.soundVolume), _options_selected_item == OptionsMenu::SoundVolume ? Rgba::Yellow : Rgba::White);
 
-    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.75f}));
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.85f}));
     g_theRenderer->DrawTextLine(font, "Back", _options_selected_item == OptionsMenu::Cancel ? Rgba::Yellow : Rgba::White);
 
-    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.85f}));
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.95f}));
     g_theRenderer->DrawTextLine(font, "Accept", _options_selected_item == OptionsMenu::Accept ? Rgba::Yellow : Rgba::White);
 
 }

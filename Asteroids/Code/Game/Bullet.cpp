@@ -93,6 +93,6 @@ void Bullet::OnCollision(Entity* a, Entity* b) noexcept {
 }
 
 void Bullet::OnCreate() noexcept {
-    g_theAudioSystem->Play("Data/Audio/Laser_Shoot.wav");
+    g_theAudioSystem->Play("Data/Audio/Sound/Laser_Shoot.wav");
 }
 
