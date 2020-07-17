@@ -23,6 +23,7 @@ Ship::Ship(Vector2 position)
     material = g_theRenderer->GetMaterial("ship");
     scoreValue = -100LL;
     SetPosition(position);
+    SetOrientationDegrees(-90.0f);
     SetCosmeticRadius(25.0f);
     SetPhysicalRadius(15.0f);
     _fireRate.SetFrequency(3u);
