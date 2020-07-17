@@ -307,11 +307,11 @@ void MainState::HandleShipAsteroidCollision() noexcept {
         if(MathUtils::DoDiscsOverlap(shipCollisionMesh, asteroidCollisionMesh)) {
             ship->OnCollision(ship, asteroid);
             asteroid->OnCollision(asteroid, ship);
+            g_theGame->DoCameraShake(m_cameraController);
             if(ship && ship->IsDead()) {
                 ship = nullptr;
                 break;
             }
-            g_theGame->DoCameraShake(m_cameraController);
         }
     }
 }
