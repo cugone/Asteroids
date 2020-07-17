@@ -23,6 +23,8 @@ public:
     void OnDestroy() noexcept override;
 
 private:
+    float CalculateTtlFromDifficulty() const noexcept;
+
     const Entity* _parent{};
     Stopwatch ttl{};
 };
