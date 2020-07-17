@@ -41,7 +41,16 @@ void MainState::OnEnter() noexcept {
 }
 
 void MainState::OnExit() noexcept {
-    /* DO NOTHING */
+    g_theGame->asteroids.clear();
+    g_theGame->asteroids.shrink_to_fit();
+    g_theGame->bullets.clear();
+    g_theGame->bullets.shrink_to_fit();
+    g_theGame->explosions.clear();
+    g_theGame->explosions.shrink_to_fit();
+    g_theGame->GetEntities().clear();
+    g_theGame->GetEntities().shrink_to_fit();
+    g_theGame->m_current_wave = 1u;
+    ship = nullptr;
 }
 
 void MainState::BeginFrame() noexcept {
