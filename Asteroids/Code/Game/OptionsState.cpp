@@ -90,11 +90,17 @@ void OptionsState::Render() const noexcept {
 
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.65f}));
     g_theRenderer->DrawTextLine(font, std::to_string(m_temp_options.soundVolume), m_selected_item == OptionsMenu::SoundVolume ? Rgba::Yellow : Rgba::White);
+    
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.75f}));
+    g_theRenderer->DrawTextLine(font, "Music Volume:", m_selected_item == OptionsMenu::MusicVolume ? Rgba::Yellow : Rgba::White);
 
-    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.85f}));
-    g_theRenderer->DrawTextLine(font, "Back", m_selected_item == OptionsMenu::Cancel ? Rgba::Yellow : Rgba::White);
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.75f}));
+    g_theRenderer->DrawTextLine(font, std::to_string(m_temp_options.musicVolume), m_selected_item == OptionsMenu::MusicVolume ? Rgba::Yellow : Rgba::White);
 
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.95f}));
+    g_theRenderer->DrawTextLine(font, "Back", m_selected_item == OptionsMenu::Cancel ? Rgba::Yellow : Rgba::White);
+
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 1.05f}));
     g_theRenderer->DrawTextLine(font, "Accept", m_selected_item == OptionsMenu::Accept ? Rgba::Yellow : Rgba::White);
 
 }
