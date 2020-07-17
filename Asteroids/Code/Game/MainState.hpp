@@ -40,7 +40,7 @@ private:
     void HandleDebugInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds);
     void HandleDebugKeyboardInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds);
     void HandlePlayerInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds);
-    void LockCameraRotationToShip([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds);
+    void ClampCameraToWorld() noexcept;
 
     void WrapAroundWorld(Entity* e) noexcept;
     void UpdateEntities(TimeUtils::FPSeconds deltaSeconds) noexcept;
@@ -62,6 +62,8 @@ private:
     void RenderBackground() const noexcept;
     void RenderEntities() const noexcept;
     void DebugRenderEntities() const noexcept;
+
+    AABB2 CalculateCameraBounds() const noexcept;
 
     void RenderStatus() const noexcept;
 

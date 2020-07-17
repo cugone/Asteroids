@@ -73,7 +73,6 @@ void MainState::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) {
     }
 
     m_cameraController.Update(deltaSeconds);
-
 }
 
 void MainState::Render() const noexcept {
@@ -210,14 +209,6 @@ void MainState::HandlePlayerInput([[maybe_unused]] TimeUtils::FPSeconds deltaSec
     if(auto ctrl_state = HandleControllerInput(deltaSeconds)) {
         g_theGame->ChangeState(std::move(ctrl_state));
     }
-    LockCameraRotationToShip(deltaSeconds);
-}
-
-void MainState::LockCameraRotationToShip([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) {
-    //if(ship) {
-    //    const auto orientation = ship->GetOrientationDegrees();
-    //    m_cameraController.SetRotationDegrees(orientation);
-    //}
 }
 
 void MainState::WrapAroundWorld(Entity* e) noexcept {
@@ -261,6 +252,15 @@ void MainState::UpdateEntities(TimeUtils::FPSeconds deltaSeconds) noexcept {
     }
     HandleBulletAsteroidCollision();
     HandleShipAsteroidCollision();
+    static Vector2 previousPos = world_bounds.CalcCenter();
+    if(ship) {
+        Vector2 currentPosition = ship->GetPosition();
+        //TODO: Fix Camera Interpolation
+        //currentPosition = MathUtils::Interpolate(previousPos, currentPosition, g_theRenderer->GetGameTime().count());
+        m_cameraController.SetPosition(currentPosition);
+        previousPos = currentPosition;
+    }
+    ClampCameraToWorld();
 }
 
 void MainState::StartNewWave(unsigned int wave_number) noexcept {
@@ -412,6 +412,16 @@ void MainState::DebugRenderEntities() const noexcept {
     g_theRenderer->DrawAABB2(g_theGame->CalcViewBounds(m_cameraController), Rgba::Red, Rgba::NoAlpha);
     g_theRenderer->DrawAABB2(g_theGame->CalcCullBounds(m_cameraController), Rgba::White, Rgba::NoAlpha);
     g_theRenderer->DrawCircle2D(m_cameraController.GetCamera().GetPosition(), 25.0f, Rgba::Pink);
+    g_theRenderer->DrawAABB2(CalculateCameraBounds(), Rgba::Periwinkle, Rgba::NoAlpha);
+}
+
+AABB2 MainState::CalculateCameraBounds() const noexcept {
+    //TODO: Calculate clamped bounds based on view and world dimensions
+    const auto view_bounds = g_theGame->CalcViewBounds(m_cameraController);
+    auto result = world_bounds;
+    result.ScalePadding(0.25f, 0.25f);
+    result.Translate(world_bounds.CalcCenter());
+    return result;
 }
 
 void MainState::RenderStatus() const noexcept {
@@ -448,5 +458,13 @@ void MainState::RenderStatus() const noexcept {
     g_theRenderer->SetModelMatrix(transform);
     g_theRenderer->SetMaterial(mat);
     g_theRenderer->DrawQuad2D();
+}
+
+void MainState::ClampCameraToWorld() noexcept {
+    const auto camera_limits = CalculateCameraBounds();
+    const auto cameraPos = m_cameraController.GetCamera().GetPosition();
+    const auto clamped_position = MathUtils::CalcClosestPoint(cameraPos, camera_limits);
+    const auto clamped_displacement = cameraPos - clamped_position;
+    m_cameraController.SetPosition(clamped_position);
 }
 
