@@ -1,6 +1,7 @@
 #include "Game/MainState.hpp"
 
 #include "Engine/Core/KerningFont.hpp"
+#include "Engine/Core/Utilities.hpp"
 
 #include "Engine/Input/InputSystem.hpp"
 
@@ -104,6 +105,14 @@ void MainState::EndFrame() noexcept {
         }
     }
     g_theGame->PostFrameCleanup();
+    Utils::DoOnce(
+        [&]() {
+            static bool once = false;
+            if(!once) {
+                once = true;
+                m_ui_camera = m_cameraController.GetCamera();
+            }
+        });
 }
 
 std::unique_ptr<GameState> MainState::HandleInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
@@ -438,9 +447,10 @@ void MainState::RenderStatus() const noexcept {
     m_ui_camera.SetupView(ui_leftBottom, ui_rightTop, ui_nearFar, MathUtils::M_16_BY_9_RATIO);
     g_theRenderer->SetCamera(m_ui_camera);
 
-    g_theRenderer->SetModelMatrix(Matrix4::I);
     const auto* font = g_theRenderer->GetFont("System32");
     const auto font_position = ui_cam_pos - ui_view_half_extents + Vector2{5.0f, font->GetLineHeight() * 0.0f};
+
+    g_theRenderer->SetModelMatrix(Matrix4::I);
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(font_position));
     g_theRenderer->DrawMultilineText(g_theRenderer->GetFont("System32"), "Score: " + std::to_string(g_theGame->player.GetScore()) + "\n      x" + std::to_string(g_theGame->player.GetLives()));
 
