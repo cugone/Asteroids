@@ -192,5 +192,8 @@
     <Media Include="..\..\Run_x64\Data\Audio\Sound\Laser_Shoot.wav">
       <Filter>Data\Audio\Sound</Filter>
     </Media>
+    <Media Include="..\..\Run_x64\Data\Audio\Music\bgm.wav">
+      <Filter>Data\Audio\Music</Filter>
+    </Media>
   </ItemGroup>
 </Project>

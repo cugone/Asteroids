@@ -39,23 +39,27 @@ void Game::Initialize() {
 void Game::InitializeAudio() noexcept {
     InitializeSounds();
     InitializeMusic();
+    g_theAudioSystem->Play(g_music_bgmpath, 1.0f, 2.0f);
 }
 
 void Game::InitializeSounds() noexcept {
     g_theAudioSystem->RegisterWavFilesFromFolder(g_sound_folderpath);
-    g_theAudioSystem->AddChannelGroup("sound");
+    g_theAudioSystem->AddChannelGroup(g_audiogroup_sound);
     for(const auto filepath : FileUtils::GetAllPathsInFolders(g_sound_folderpath)) {
-        g_theAudioSystem->AddSoundToChannelGroup("sound", filepath);
+        g_theAudioSystem->AddSoundToChannelGroup(g_audiogroup_sound, filepath);
     }
-    if(auto* sound_group = g_theAudioSystem->GetChannelGroup("sound")) {
+    if(auto* sound_group = g_theAudioSystem->GetChannelGroup(g_audiogroup_sound)) {
         sound_group->SetVolume(gameOptions.soundVolume / 10.0f);
     }
 }
 
 void Game::InitializeMusic() noexcept {
     g_theAudioSystem->RegisterWavFilesFromFolder(g_music_folderpath);
-    g_theAudioSystem->AddChannelGroup("music");
-    if(auto* music_group = g_theAudioSystem->GetChannelGroup("music")) {
+    g_theAudioSystem->AddChannelGroup(g_audiogroup_music);
+    for(const auto filepath : FileUtils::GetAllPathsInFolders(g_music_folderpath)) {
+        g_theAudioSystem->AddSoundToChannelGroup(g_audiogroup_music, filepath);
+    }
+    if(auto* music_group = g_theAudioSystem->GetChannelGroup(g_audiogroup_music)) {
         music_group->SetVolume(gameOptions.musicVolume / 10.0f);
     }
 }

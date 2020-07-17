@@ -1,5 +1,7 @@
 #include "Game/TitleState.hpp"
 
+#include "Engine/Audio/AudioSystem.hpp"
+
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Core/KerningFont.hpp"
 

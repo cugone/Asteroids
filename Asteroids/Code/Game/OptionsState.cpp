@@ -3,6 +3,8 @@
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Core/KerningFont.hpp"
 
+#include "Engine/Audio/AudioSystem.hpp"
+
 #include "Engine/Renderer/Renderer.hpp"
 
 #include "Game/App.hpp"
@@ -207,13 +209,24 @@ void OptionsState::CycleSelectedOptionDown(OptionsMenu selectedItem) noexcept {
         break;
     }
     case OptionsMenu::SoundVolume:
+    {
         --m_temp_options.soundVolume;
         m_temp_options.soundVolume = std::clamp(m_temp_options.soundVolume, m_min_sound_volume, m_max_sound_volume);
+        auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_sound);
+        const float volumeAsFloat = m_temp_options.soundVolume / static_cast<float>(m_max_sound_volume);
+        group->SetVolume(volumeAsFloat);
+        g_theAudioSystem->Play(g_sound_shootpath);
         break;
+    }
     case OptionsMenu::MusicVolume:
+    {
         --m_temp_options.musicVolume;
         m_temp_options.musicVolume = std::clamp(m_temp_options.musicVolume, m_min_music_volume, m_max_music_volume);
+        auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_music);
+        const float volumeAsFloat = m_temp_options.musicVolume / static_cast<float>(m_max_music_volume);
+        group->SetVolume(volumeAsFloat);
         break;
+    }
     case OptionsMenu::CameraShake:
         m_temp_options.cameraShakeStrength -= 0.1f;
         m_temp_options.cameraShakeStrength = std::clamp(m_temp_options.cameraShakeStrength, m_min_camera_shake, m_max_camera_shake);
@@ -258,13 +271,25 @@ void OptionsState::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
         break;
     }
     case OptionsMenu::SoundVolume:
+    {
         ++m_temp_options.soundVolume;
         m_temp_options.soundVolume = std::clamp(m_temp_options.soundVolume, m_min_sound_volume, m_max_sound_volume);
+        auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_sound);
+        const float volumeAsFloat = m_temp_options.soundVolume / static_cast<float>(m_max_sound_volume);
+        group->SetVolume(volumeAsFloat);
+        g_theAudioSystem->Play(g_sound_shootpath);
         break;
+    }
     case OptionsMenu::MusicVolume:
+    {
         ++m_temp_options.musicVolume;
         m_temp_options.musicVolume = std::clamp(m_temp_options.musicVolume, m_min_music_volume, m_max_music_volume);
+        auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_music);
+        const float volumeAsFloat = m_temp_options.musicVolume / static_cast<float>(m_max_music_volume);
+        group->SetVolume(volumeAsFloat);
+        g_theAudioSystem->Play(g_music_bgmpath);
         break;
+    }
     case OptionsMenu::CameraShake:
         m_temp_options.cameraShakeStrength += 0.1f;
         m_temp_options.cameraShakeStrength = std::clamp(m_temp_options.cameraShakeStrength, m_min_camera_shake, m_max_camera_shake);
