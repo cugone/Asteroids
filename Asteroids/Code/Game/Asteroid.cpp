@@ -86,26 +86,25 @@ void Asteroid::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
         transform = Matrix4::MakeSRT(S, R, T);
     }
 
-    if(g_theGame->IsEntityInView(this)) {
-        auto& builder = mesh_builder;
-        builder.Begin(PrimitiveType::Triangles);
-        builder.SetColor(Rgba::White);
+    auto& builder = mesh_builder;
+    builder.Begin(PrimitiveType::Triangles);
+    builder.SetColor(Rgba::White);
 
-        builder.SetUV(Vector2{uvs.maxs.x, uvs.maxs.y});
-        builder.AddVertex(Vector2{+0.5f, +0.5f});
+    builder.SetUV(Vector2{uvs.maxs.x, uvs.maxs.y});
+    builder.AddVertex(Vector2{+0.5f, +0.5f});
 
-        builder.SetUV(Vector2{uvs.mins.x, uvs.maxs.y});
-        builder.AddVertex(Vector2{-0.5f, +0.5f});
+    builder.SetUV(Vector2{uvs.mins.x, uvs.maxs.y});
+    builder.AddVertex(Vector2{-0.5f, +0.5f});
 
-        builder.SetUV(Vector2{uvs.mins.x, uvs.mins.y});
-        builder.AddVertex(Vector2{-0.5f, -0.5f});
+    builder.SetUV(Vector2{uvs.mins.x, uvs.mins.y});
+    builder.AddVertex(Vector2{-0.5f, -0.5f});
 
-        builder.SetUV(Vector2{uvs.maxs.x, uvs.mins.y});
-        builder.AddVertex(Vector2{+0.5f, -0.5f});
+    builder.SetUV(Vector2{uvs.maxs.x, uvs.mins.y});
+    builder.AddVertex(Vector2{+0.5f, -0.5f});
 
-        builder.AddIndicies(Mesh::Builder::Primitive::Quad);
-        builder.End(material);
-    }
+    builder.AddIndicies(Mesh::Builder::Primitive::Quad);
+    builder.End(material);
+
 }
 
 void Asteroid::Render(Renderer& renderer) const noexcept {
@@ -217,7 +216,7 @@ int Asteroid::GetHealthFromType(Type type) const noexcept {
 
 float Asteroid::CalcChildHeadingFromDifficulty() const noexcept {
     const auto currentHeading = GetVelocity().CalcHeadingDegrees();
-    switch(g_theGame->GetGameOptions().difficulty) {
+    switch(g_theGame->gameOptions.difficulty) {
     case Difficulty::Easy:
         return MathUtils::GetRandomFloatZeroToOne() * 360.0f;
     case Difficulty::Normal:
@@ -231,7 +230,7 @@ float Asteroid::CalcChildHeadingFromDifficulty() const noexcept {
 
 float Asteroid::CalcChildSpeedFromSizeAndDifficulty() const noexcept{
     const auto currentSpeed = CalcChildSpeedFromSize();
-    switch(g_theGame->GetGameOptions().difficulty) {
+    switch(g_theGame->gameOptions.difficulty) {
     case Difficulty::Easy:
         return currentSpeed * 0.5f;
     case Difficulty::Normal:

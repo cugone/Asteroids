@@ -10,7 +10,6 @@ void Entity::BeginFrame() noexcept {
 }
 
 void Entity::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
-    WrapAroundWorld();
     auto accel = CalcAcceleration();
     auto vel = GetVelocity();
     auto pos = GetPosition();
@@ -36,36 +35,6 @@ void Entity::Render(Renderer& renderer) const noexcept {
 
 void Entity::EndFrame() noexcept {
     ClearForce();
-}
-
-void Entity::WrapAroundWorld() noexcept {
-    const auto world_left = g_theGame->world_bounds.mins.x;
-    const auto world_right = g_theGame->world_bounds.maxs.x;
-    const auto world_top = g_theGame->world_bounds.mins.y;
-    const auto world_bottom = g_theGame->world_bounds.maxs.y;
-    const auto r = GetCosmeticRadius();
-    auto pos = GetPosition();
-    const auto ship_right = pos.x + r;
-    const auto ship_left = pos.x - r;
-    const auto ship_top = pos.y - r;
-    const auto ship_bottom = pos.y + r;
-    const auto d = 2.0f * r;
-    const auto world_width = g_theGame->world_bounds.CalcDimensions().x;
-    const auto world_height = g_theGame->world_bounds.CalcDimensions().y;
-    if(ship_right < world_left) {
-        pos.x += d + world_width;
-    }
-    if(ship_left > world_right) {
-        pos.x -= d + world_width;
-    }
-    if(ship_bottom < world_top) {
-        pos.y += d + world_height;
-    }
-    if(ship_top > world_bottom) {
-        pos.y -= d + world_height;
-    }
-    position_orientation_speed.x = pos.x;
-    position_orientation_speed.y = pos.y;
 }
 
 Vector2 Entity::GetForward() const noexcept {

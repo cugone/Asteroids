@@ -28,6 +28,7 @@ public:
     void SetRotationSpeed(float speed) noexcept;
 
     Vector2 GetPosition() const noexcept;
+    void SetPosition(Vector2 newPosition) noexcept;
     Vector2 GetVelocity() const noexcept;
     Vector2 GetAcceleration() const noexcept;
 
@@ -56,7 +57,6 @@ protected:
     Vector2 GetForce() const noexcept;
     void AddForce(const Vector2& force) noexcept;
 
-    void SetPosition(Vector2 newPosition) noexcept;
     void SetVelocity(Vector2 newVelocity) noexcept;
 
     void SetCosmeticRadius(float value) noexcept;
@@ -80,8 +80,6 @@ private:
     float GetOrientationRadians() const noexcept;
 
     void AdjustOrientation(float value) noexcept;
-
-    void WrapAroundWorld() noexcept;
 
     Vector4 position_orientation_speed{};
     Vector4 cosmeticphysicalradius_velocitydirection{};

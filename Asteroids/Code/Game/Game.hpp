@@ -19,6 +19,7 @@
 
 #include "Game/GameCommon.hpp"
 
+#include "Game/GameState.hpp"
 #include "Game/Entity.hpp"
 #include "Game/Player.hpp"
 
@@ -37,20 +38,6 @@ enum class Difficulty {
     Hard
 };
 
-enum class TitleMenu : uint8_t {
-    First_,
-    Start = First_,
-    Options,
-    Exit,
-    Last_,
-};
-
-template<>
-struct TypeUtils::is_incrementable_enum_type<TitleMenu> : std::true_type {};
-
-template<>
-struct TypeUtils::is_decrementable_enum_type<TitleMenu> : std::true_type {};
-
 enum class ControlPreference {
     Keyboard,
     Mouse,
@@ -63,31 +50,6 @@ struct GameOptions {
     uint8_t soundVolume{5};
     uint8_t musicVolume{5};
     float cameraShakeStrength{1.0f};
-};
-
-enum class OptionsMenu {
-    First_,
-    DifficultySelection = First_,
-    ControlSelection,
-    CameraShake,
-    SoundVolume,
-    MusicVolume,
-    Cancel,
-    Accept,
-    Last_
-};
-
-template<>
-struct TypeUtils::is_incrementable_enum_type<OptionsMenu> : std::true_type {};
-
-template<>
-struct TypeUtils::is_decrementable_enum_type<OptionsMenu> : std::true_type {};
-
-enum class GameState {
-    Title,
-    Options,
-    Main,
-    GameOver,
 };
 
 class Game {
@@ -104,153 +66,60 @@ public:
     void Update(TimeUtils::FPSeconds deltaSeconds);
     void Render() const;
     void EndFrame();
+    void PostFrameCleanup() noexcept;
 
-    void DecrementLives() noexcept;
+    std::vector<std::unique_ptr<Entity>>& GetEntities() noexcept;
 
     void MakeExplosion(Vector2 position) noexcept;
     void MakeBullet(const Entity* parent, Vector2 pos, Vector2 vel) noexcept;
+
+    void AddNewAsteroidToWorld(std::unique_ptr<Asteroid> newAsteroid);
+    void MakeLargeAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
+    void MakeLargeAsteroidAt(Vector2 pos) noexcept;
+    void MakeLargeAsteroidOffScreen(AABB2 world_bounds) noexcept;
     void MakeMediumAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
     void MakeSmallAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
 
-    void DoCameraShake();
+    void DoCameraShake(OrthographicCameraController& cameraController) const noexcept;
 
-    const GameOptions& GetGameOptions() const noexcept;
+    void SetControlType() noexcept;
+    bool IsControllerActive() const noexcept;
+    bool IsKeyboardActive() const noexcept;
+    bool IsMouseActive() const noexcept;
 
+    void ChangeState(std::unique_ptr<GameState> newState) noexcept;
+    void DecrementLives() noexcept;
+    bool IsGameOver() const noexcept;
+    void SetAsteroidSpriteSheet() noexcept;
+
+    AABB2 CalcOrthoBounds(const OrthographicCameraController& cameraController) const noexcept;
+    AABB2 CalcViewBounds(const OrthographicCameraController& cameraController) const noexcept;
+    AABB2 CalcCullBounds(const OrthographicCameraController& cameraController) const noexcept;
+    AABB2 CalcCullBoundsFromOrthoBounds(const OrthographicCameraController& cameraController) const noexcept;
+
+    GameOptions gameOptions{};
     Player player{};
-    Ship* ship{nullptr};
-    AABB2 world_bounds = AABB2::ZERO_TO_ONE;
+    unsigned int m_current_wave{1u};
     std::vector<Asteroid*> asteroids{};
     std::vector<Bullet*> bullets{};
     std::vector<Explosion*> explosions{};
     std::shared_ptr<SpriteSheet> asteroid_sheet{};
     std::shared_ptr<SpriteSheet> explosion_sheet{};
 
-    bool IsEntityInView(const Entity* e) const noexcept;
 protected:
 private:
     void InitializeAudio() noexcept;
     void InitializeSounds() noexcept;
     void InitializeMusic() noexcept;
 
-    AABB2 CalcOrthoBounds() const noexcept;
-    AABB2 CalcViewBounds(const Vector2& cam_pos) const noexcept;
-    AABB2 CalcCullBounds(const Vector2& cam_pos) const noexcept;
-    AABB2 CalcCullBoundsFromOrthoBounds() const noexcept;
-
     void CreateOrLoadOptionsFile() noexcept;
     void CreateOptionsFile() const noexcept;
     void LoadOptionsFile() const noexcept;
 
-    unsigned int GetWaveMultiplierFromDifficulty() const noexcept;
-    long long GetLivesFromDifficulty() const noexcept;
-
-    void HandleTitleInput() noexcept;
-    void HandleTitleKeyboardInput() noexcept;
-    void HandleTitleControllerInput() noexcept;
-
-    void HandleOptionsInput() noexcept;
-    void HandleOptionsKeyboardInput() noexcept;
-    void HandleOptionsControllerInput() noexcept;
-    void HandleOptionsMenuState(const bool up, const bool down, const bool left, const bool right, const bool cancel, const bool select) noexcept;
-
-    void HandleDebugInput(TimeUtils::FPSeconds deltaSeconds);
-    void HandleDebugKeyboardInput(TimeUtils::FPSeconds deltaSeconds);
-    void HandleDebugMouseInput(TimeUtils::FPSeconds deltaSeconds);
-
-    void HandlePlayerInput(TimeUtils::FPSeconds deltaSeconds);
-
-    void HandleKeyboardInput(TimeUtils::FPSeconds deltaSeconds);
-    void HandleMouseInput(TimeUtils::FPSeconds deltaSeconds);
-    void HandleControllerInput(TimeUtils::FPSeconds deltaSeconds);
-    void LockCameraRotationToShip(TimeUtils::FPSeconds deltaSeconds);
-
-    void UpdateEntities(TimeUtils::FPSeconds deltaSeconds) noexcept;
-
-    void MakeLargeAsteroidOffScreen() noexcept;
-    void MakeLargeAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
-
-    void AddNewAsteroidToWorld(std::unique_ptr<Asteroid> newAsteroid);
-
-    void MakeLargeAsteroidAt(Vector2 pos) noexcept;
-    void MakeLargeAsteroidAtMouse() noexcept;
-
-    void MakeShip() noexcept;
-
-    void KillAll() noexcept;
-    void HandleBulletAsteroidCollision() const noexcept;
-    void HandleShipAsteroidCollision() const noexcept;
-
-    void ChangeState(GameState newState) noexcept;
-    void OnEnterState(GameState state) noexcept;
-    void OnExitState(GameState state) noexcept;
-
-    void OnEnter_Title() noexcept;
-    void OnEnter_Options() noexcept;
-    void OnEnter_Main() noexcept;
-    void OnEnter_GameOver() noexcept;
-
-    void OnExit_Title() noexcept;
-    void OnExit_Options() noexcept;
-    void OnExit_Main() noexcept;
-    void OnExit_GameOver() noexcept;
-
-    void BeginFrame_Title() noexcept;
-    void BeginFrame_Options() noexcept;
-    void BeginFrame_Main() noexcept;
-    void BeginFrame_GameOver() noexcept;
-
-    void Update_Title([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept;
-    void Update_Options([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept;
-    void Update_Main([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept;
-    void Update_GameOver([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept;
-    
-    void Render_Title() const noexcept;
-    void Render_Options() const noexcept;
-    void Render_Main() const noexcept;
-    void Render_GameOver() const noexcept;
-    
-    void EndFrame_Title() noexcept;
-    void EndFrame_Options() noexcept;
-    void EndFrame_Main() noexcept;
-    void EndFrame_GameOver() noexcept;
-
-    void RenderBackground() const noexcept;
-    void RenderEntities() const noexcept;
-    void DebugRenderEntities() const noexcept;
-    void RenderStatus() const noexcept;
-
-    void StartNewWave(unsigned int wave_number) noexcept;
-    void Respawn() noexcept;
-    bool IsGameOver() const noexcept;
-
-    void SetAsteroidSpriteSheet() noexcept;
-    void SetControlType() noexcept;
-
-    std::string DifficultyToString(Difficulty difficulty) const noexcept;
-    std::string ControlPreferenceToString(ControlPreference preference) const noexcept;
-    
-    void CycleSelectedOptionDown(OptionsMenu selectedItem) noexcept;
-    void CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept;
-
-    mutable Camera2D _ui_camera{};
-    OrthographicCameraController _cameraController{};
-    std::vector<std::unique_ptr<Entity>> _entities{};
-    std::vector<std::unique_ptr<Entity>> _pending_entities{};
-    float _thrust_force{100.0f};
-    unsigned int _current_wave{1u};
-    float _min_camera_shake{0.0f};
-    float _max_camera_shake{1.0f};
-    uint8_t _max_sound_volume{10u};
-    uint8_t _min_sound_volume{0u};
-    uint8_t _max_music_volume{10u};
-    uint8_t _min_music_volume{0u};
-    GameOptions _current_options{};
-    GameOptions _temp_options{};
-    GameState _current_state{GameState::Title};
-    GameState _next_state{GameState::Title};
-    TitleMenu _title_selected_item{TitleMenu::First_};
-    OptionsMenu _options_selected_item{OptionsMenu::First_};
-    bool _debug_render{false};
+    std::unique_ptr<GameState> _current_state{nullptr};
+    std::unique_ptr<GameState> _next_state{nullptr};
+    std::vector<std::unique_ptr<Entity>> m_entities{};
+    std::vector<std::unique_ptr<Entity>> m_pending_entities{};
     bool _keyboard_control_active{false};
     bool _mouse_control_active{false};
     bool _controller_control_active{false};

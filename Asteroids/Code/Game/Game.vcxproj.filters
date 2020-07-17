@@ -70,6 +70,21 @@
     <ClCompile Include="Explosion.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="TitleState.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="OptionsState.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="GameOverState.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="MainState.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="GameState.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameCommon.hpp">
@@ -100,6 +115,21 @@
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Explosion.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="GameState.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="MainState.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionsState.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="TitleState.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="GameOverState.hpp">
       <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
