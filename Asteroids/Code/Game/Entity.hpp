@@ -49,11 +49,15 @@ public:
 
     void DecrementHealth() noexcept;
 
+    Vector2 GetForward() const noexcept;
+    Vector2 GetBackward() const noexcept;
+    Vector2 GetRight() const noexcept;
+    Vector2 GetLeft() const noexcept;
+
     long long scoreValue = 0ll;
 protected:
     void SetHealth(int newHealth) noexcept;
 
-    Vector2 GetForward() const noexcept;
     Vector2 GetForce() const noexcept;
     void AddForce(const Vector2& force) noexcept;
 
@@ -67,9 +71,6 @@ protected:
     Mesh::Builder mesh_builder{};
 private:
 
-    Vector2 GetRight() const noexcept;
-    Vector2 GetLeft() const noexcept;
-    
     Vector2 CalcAcceleration() noexcept;
     
     void ClearForce() noexcept;

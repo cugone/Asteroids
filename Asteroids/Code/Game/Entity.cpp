@@ -43,6 +43,10 @@ Vector2 Entity::GetForward() const noexcept {
     return front;
 }
 
+Vector2 Entity::GetBackward() const noexcept {
+    return -GetForward();
+}
+
 Vector2 Entity::GetRight() const noexcept {
     return GetForward().GetRightHandNormal();
 }
