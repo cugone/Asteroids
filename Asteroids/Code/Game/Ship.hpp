@@ -4,6 +4,7 @@
 #include "Engine/Core/TimeUtils.hpp"
 
 #include "Game/Entity.hpp"
+#include "Game/ThrustComponent.hpp"
 
 class Renderer;
 
@@ -12,7 +13,10 @@ public:
     Ship();
     explicit Ship(Vector2 position);
     virtual ~Ship() = default;
+
+    void BeginFrame() noexcept override;
     void Update(TimeUtils::FPSeconds deltaSeconds) noexcept override;
+    void Render(Renderer& renderer) const noexcept override;
     void EndFrame() noexcept override;
 
     void OnCreate() noexcept override;
@@ -28,6 +32,7 @@ private:
     const Vector2 CalcNewBulletVelocity() const noexcept;
     const Vector2 CalcNewBulletPosition() const noexcept;
 
+    std::unique_ptr<ThrustComponent> _thrust{};
     Stopwatch _fireRate;
     const float _bulletSpeed = 400.0f;
     bool _canFire = false;

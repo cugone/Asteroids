@@ -161,6 +161,7 @@
     <ClCompile Include="OptionsState.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Ship.cpp" />
+    <ClCompile Include="ThrustComponent.cpp" />
     <ClCompile Include="TitleState.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -178,6 +179,7 @@
     <ClInclude Include="OptionsState.hpp" />
     <ClInclude Include="Player.hpp" />
     <ClInclude Include="Ship.hpp" />
+    <ClInclude Include="ThrustComponent.hpp" />
     <ClInclude Include="TitleState.hpp" />
   </ItemGroup>
   <ItemGroup>

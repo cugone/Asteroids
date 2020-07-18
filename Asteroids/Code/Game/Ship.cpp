@@ -20,6 +20,7 @@ Ship::Ship() : Ship(Vector2::ZERO) {}
 Ship::Ship(Vector2 position)
     : Entity()
 {
+    _thrust = std::move(std::make_unique<ThrustComponent>(this));
     material = g_theRenderer->GetMaterial("ship");
     scoreValue = -100LL;
     SetPosition(position);
@@ -27,6 +28,10 @@ Ship::Ship(Vector2 position)
     SetCosmeticRadius(25.0f);
     SetPhysicalRadius(15.0f);
     _fireRate.SetFrequency(3u);
+}
+
+void Ship::BeginFrame() noexcept {
+    _thrust->BeginFrame();
 }
 
 void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
@@ -69,6 +74,13 @@ void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     builder.AddIndicies(Mesh::Builder::Primitive::Quad);
     builder.End(material);
 
+    _thrust->Update(deltaSeconds);
+
+}
+
+void Ship::Render(Renderer& renderer) const noexcept {
+    _thrust->Render(renderer);
+    Entity::Render(renderer);
 }
 
 void Ship::EndFrame() noexcept {
@@ -76,6 +88,7 @@ void Ship::EndFrame() noexcept {
     if(_fireRate.CheckAndReset()) {
         _canFire = true;
     }
+    _thrust->EndFrame();
 }
 
 void Ship::OnDestroy() noexcept {
@@ -91,6 +104,7 @@ void Ship::OnFire() noexcept {
 }
 
 void Ship::Thrust(float force) noexcept {
+    _thrust->SetThrust(force);
     AddForce(GetForward() * force);
 }
 
@@ -99,6 +113,7 @@ void Ship::OnCollision(Entity* a, Entity* b) noexcept {
     if(asAsteroid) {
         a->DecrementHealth();
         if(a->IsDead()) {
+            Thrust(0.0f);
             g_theGame->DecrementLives();
         }
     }

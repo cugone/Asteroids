@@ -1,0 +1,6 @@
+<material name="thrust">
+    <shader src="Data/Shaders/thrust.shader" />
+    <textures>
+        <diffuse src="Data/Images/thrust.png" />
+    </textures>
+</material>
