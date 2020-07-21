@@ -8,11 +8,12 @@
 
 #include <memory>
 
-enum class TitleMenu : uint8_t {
+enum class TitleMenu {
     First_,
     Start = First_,
     Options,
-    Exit,
+    Last_Valid_,
+    Exit = Last_Valid_,
     Last_,
 };
 

@@ -33,16 +33,32 @@ class Explosion;
 class Ship;
 
 enum class Difficulty {
-    Easy,
+    First_,
+    Easy = First_,
     Normal,
-    Hard
+    Hard,
+    Last_,
 };
 
+template<>
+struct TypeUtils::is_incrementable_enum_type<Difficulty> : std::true_type {};
+
+template<>
+struct TypeUtils::is_decrementable_enum_type<Difficulty> : std::true_type {};
+
 enum class ControlPreference {
-    Keyboard,
+    First_,
+    Keyboard = First_,
     Mouse,
     XboxController,
+    Last_,
 };
+
+template<>
+struct TypeUtils::is_incrementable_enum_type<ControlPreference> : std::true_type {};
+
+template<>
+struct TypeUtils::is_decrementable_enum_type<ControlPreference> : std::true_type {};
 
 struct GameOptions {
     Difficulty difficulty{Difficulty::Normal};

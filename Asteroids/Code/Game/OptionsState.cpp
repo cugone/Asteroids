@@ -150,8 +150,10 @@ std::unique_ptr<GameState> OptionsState::HandleControllerInput() noexcept {
 std::unique_ptr<GameState> OptionsState::HandleOptionsMenuState(const bool up, const bool down, const bool left, const bool right, const bool cancel, const bool select) noexcept {
     if(up) {
         --m_selected_item;
+        m_selected_item = std::clamp(m_selected_item, OptionsMenu::First_, OptionsMenu::Last_Valid_);
     } else if(down) {
         ++m_selected_item;
+        m_selected_item = std::clamp(m_selected_item, OptionsMenu::First_, OptionsMenu::Last_Valid_);
     }
     if(left) {
         CycleSelectedOptionDown(m_selected_item);
@@ -177,35 +179,18 @@ void OptionsState::CycleSelectedOptionDown(OptionsMenu selectedItem) noexcept {
     switch(selectedItem) {
     case OptionsMenu::DifficultySelection:
     {
-        switch(m_temp_options.difficulty) {
-        case Difficulty::Easy:
-            m_temp_options.difficulty = Difficulty::Hard;
-            break;
-        case Difficulty::Normal:
-            m_temp_options.difficulty = Difficulty::Easy;
-            break;
-        case Difficulty::Hard:
-            m_temp_options.difficulty = Difficulty::Normal;
-            break;
-        default: /* DO NOTHING */;
+        if(m_temp_options.difficulty == Difficulty::First_) {
+            m_temp_options.difficulty = Difficulty::Last_;
         }
+        --m_temp_options.difficulty;
         break;
     }
     case OptionsMenu::ControlSelection:
     {
-        switch(m_temp_options.controlPref) {
-        case ControlPreference::Keyboard:
-            m_temp_options.controlPref = ControlPreference::XboxController;
-            break;
-        case ControlPreference::Mouse:
-            m_temp_options.controlPref = ControlPreference::Keyboard;
-            break;
-        case ControlPreference::XboxController:
-            m_temp_options.controlPref = ControlPreference::Mouse;
-            break;
-        default:
-            break;
+        if(m_temp_options.controlPref == ControlPreference::First_) {
+            m_temp_options.controlPref = ControlPreference::Last_;
         }
+        --m_temp_options.controlPref;
         break;
     }
     case OptionsMenu::SoundVolume:
@@ -239,34 +224,17 @@ void OptionsState::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
     switch(selectedItem) {
     case OptionsMenu::DifficultySelection:
     {
-        switch(m_temp_options.difficulty) {
-        case Difficulty::Easy:
-            m_temp_options.difficulty = Difficulty::Normal;
-            break;
-        case Difficulty::Normal:
-            m_temp_options.difficulty = Difficulty::Hard;
-            break;
-        case Difficulty::Hard:
-            m_temp_options.difficulty = Difficulty::Easy;
-            break;
-        default: /* DO NOTHING */;
+        ++m_temp_options.difficulty;
+        if(m_temp_options.difficulty == Difficulty::Last_) {
+            m_temp_options.difficulty = Difficulty::First_;
         }
         break;
     }
     case OptionsMenu::ControlSelection:
     {
-        switch(m_temp_options.controlPref) {
-        case ControlPreference::Keyboard:
-            m_temp_options.controlPref = ControlPreference::Mouse;
-            break;
-        case ControlPreference::Mouse:
-            m_temp_options.controlPref = ControlPreference::XboxController;
-            break;
-        case ControlPreference::XboxController:
-            m_temp_options.controlPref = ControlPreference::Keyboard;
-            break;
-        default:
-            break;
+        ++m_temp_options.controlPref;
+        if(m_temp_options.controlPref == ControlPreference::Last_) {
+            m_temp_options.controlPref = ControlPreference::First_;
         }
         break;
     }

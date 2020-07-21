@@ -97,9 +97,10 @@ std::unique_ptr<GameState> TitleState::HandleKeyboardInput() noexcept {
     const bool cancel = g_theInputSystem->WasKeyJustPressed(KeyCode::Esc);
     if(up) {
         --m_selected_item;
-
+        m_selected_item = std::clamp(m_selected_item, TitleMenu::First_, TitleMenu::Last_Valid_);
     } else if(down) {
         ++m_selected_item;
+        m_selected_item = std::clamp(m_selected_item, TitleMenu::First_, TitleMenu::Last_Valid_);
     }
     if(cancel) {
         m_selected_item = TitleMenu::Exit;

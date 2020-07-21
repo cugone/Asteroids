@@ -17,7 +17,8 @@ enum class OptionsMenu {
     SoundVolume,
     MusicVolume,
     Cancel,
-    Accept,
+    Last_Valid_,
+    Accept = Last_Valid_,
     Last_
 };
 
