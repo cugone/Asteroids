@@ -29,6 +29,7 @@ public:
 private:
     void MakeBullet() const noexcept;
 
+    const Vector2 CalcBulletDirectionFromDifficulty() const noexcept;
     const Vector2 CalcNewBulletVelocity() const noexcept;
     const Vector2 CalcNewBulletPosition() const noexcept;
 
