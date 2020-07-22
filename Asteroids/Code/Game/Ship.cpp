@@ -27,7 +27,7 @@ Ship::Ship(Vector2 position)
     SetOrientationDegrees(-90.0f);
     SetCosmeticRadius(25.0f);
     SetPhysicalRadius(15.0f);
-    _fireRate.SetFrequency(3u);
+    _fireRate.SetFrequency(10u);
 }
 
 void Ship::BeginFrame() noexcept {
