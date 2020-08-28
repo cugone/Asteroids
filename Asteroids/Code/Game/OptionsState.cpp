@@ -272,7 +272,7 @@ void OptionsState::SaveCurrentOptions() {
     g_theConfig->SetValue("controlpref", ControlPreferenceToString(g_theGame->gameOptions.controlPref));
     g_theConfig->SetValue("sound", static_cast<int>(g_theGame->gameOptions.soundVolume));
     g_theConfig->SetValue("music", static_cast<int>(g_theGame->gameOptions.musicVolume));
-    g_theConfig->SetValue("camerashakestrength", g_theGame->gameOptions.cameraShakeStrength);
+    g_theConfig->SetValue("cameraShakeStrength", g_theGame->gameOptions.cameraShakeStrength);
     std::ofstream ofs(g_options_filepath);
     ofs << *g_theConfig;
     ofs.close();
