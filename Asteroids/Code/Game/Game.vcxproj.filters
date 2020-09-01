@@ -149,6 +149,15 @@
     <Image Include="..\..\Run_x64\Data\Images\ship.png">
       <Filter>Data\Images</Filter>
     </Image>
+    <Image Include="..\..\Run_x64\Data\Images\bkgd_0.png">
+      <Filter>Data\Images</Filter>
+    </Image>
+    <Image Include="..\..\Run_x64\Data\Images\explosion.png">
+      <Filter>Data\Images</Filter>
+    </Image>
+    <Image Include="..\..\Run_x64\Data\Images\thrust.png">
+      <Filter>Data\Images</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Run_x64\Data\Materials\asteroid.material">

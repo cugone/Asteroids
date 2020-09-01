@@ -189,8 +189,11 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\Run_x64\Data\Images\asteroid.png" />
+    <Image Include="..\..\Run_x64\Data\Images\bkgd_0.png" />
+    <Image Include="..\..\Run_x64\Data\Images\explosion.png" />
     <Image Include="..\..\Run_x64\Data\Images\laserBullet.png" />
     <Image Include="..\..\Run_x64\Data\Images\ship.png" />
+    <Image Include="..\..\Run_x64\Data\Images\thrust.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Run_x64\Data\Materials\asteroid.material" />
