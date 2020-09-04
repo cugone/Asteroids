@@ -32,6 +32,7 @@ void MainState::OnEnter() noexcept {
 
     world_bounds = AABB2::ZERO_TO_ONE;
     const auto dims = Vector2{g_theRenderer->GetOutput()->GetDimensions()};
+    //TODO: Fix world dims
     world_bounds.ScalePadding(dims.x, dims.y);
     world_bounds.Translate(-world_bounds.CalcCenter());
 
