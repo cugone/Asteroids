@@ -192,7 +192,7 @@ void MainState::HandleDebugInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeco
 }
 
 void MainState::HandleDebugKeyboardInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) {
-    if(g_theUISystem->GetIO().WantCaptureKeyboard) {
+    if(g_theUISystem->WantsInputKeyboardCapture()) {
         return;
     }
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::F1)) {
