@@ -156,7 +156,7 @@ void Game::CreateOptionsFile() const noexcept {
 }
 
 void Game::LoadOptionsFile() const noexcept {
-    g_theConfig->AppendFromFile(g_options_filepath);
+    GUARANTEE_OR_DIE(g_theConfig->AppendFromFile(g_options_filepath), "Could not load options file.");
 }
 
 void Game::CreateOrLoadOptionsFile() noexcept {
