@@ -211,4 +211,9 @@
       <Filter>Data\Audio\Music</Filter>
     </Media>
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\Run_x64\Data\ShaderPrograms\entity.hlsl">
+      <Filter>Data\ShaderPrograms</Filter>
+    </FxCompile>
+  </ItemGroup>
 </Project>

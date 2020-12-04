@@ -215,6 +215,14 @@
     <Media Include="..\..\Run_x64\Data\Audio\Sound\Hit.wav" />
     <Media Include="..\..\Run_x64\Data\Audio\Sound\Laser_Shoot.wav" />
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\Run_x64\Data\ShaderPrograms\entity.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugProfile|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='FinalBuild|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
