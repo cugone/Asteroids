@@ -152,6 +152,7 @@ bool Game::IsMouseActive() const noexcept {
 }
 
 void Game::CreateOptionsFile() const noexcept {
+    (void)FileUtils::CreateFolders("Data/Config/");
     GUARANTEE_OR_DIE(FileUtils::WriteBufferToFile(g_options_str, g_options_filepath), "Could not create options file.");
 }
 
