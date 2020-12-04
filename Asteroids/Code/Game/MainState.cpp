@@ -266,13 +266,8 @@ void MainState::UpdateEntities(TimeUtils::FPSeconds deltaSeconds) noexcept {
     HandleBulletAsteroidCollision();
     HandleShipAsteroidCollision();
     static Vector2 previousPos = world_bounds.CalcCenter();
-    if(ship) {
-        Vector2 currentPosition = ship->GetPosition();
-        //TODO: Fix Camera Interpolation
-        //currentPosition = MathUtils::Interpolate(previousPos, currentPosition, g_theRenderer->GetGameTime().count());
-        m_cameraController.SetPosition(currentPosition);
-        previousPos = currentPosition;
-    }
+    Vector2 currentPosition = ship ? ship->GetPosition() : previousPos;
+    previousPos = currentPosition;
     ClampCameraToWorld();
 }
 
@@ -476,9 +471,11 @@ void MainState::RenderStatus() const noexcept {
 
 void MainState::ClampCameraToWorld() noexcept {
     const auto camera_limits = CalculateCameraBounds();
-    const auto cameraPos = m_cameraController.GetCamera().GetPosition();
+    const auto& cameraPos = m_cameraController.GetCamera().GetPosition();
     const auto clamped_position = MathUtils::CalcClosestPoint(cameraPos, camera_limits);
     const auto clamped_displacement = cameraPos - clamped_position;
+    const auto current_ship_position = ship ? ship->GetPosition() : Vector2::ZERO;
+    m_cameraController.TranslateTo(current_ship_position, g_theRenderer->GetGameTime());
     m_cameraController.SetPosition(clamped_position);
 }
 
