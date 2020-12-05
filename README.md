@@ -1,6 +1,25 @@
 # Asteroids
 Asteroids clone
 
+## How To Play
+
+The game supports keyboard, mouse, and XBox 360 controllers.
+
+- Keyboard
+  - W - Thrust
+  - A - Rotate CW
+  - D - Rotate CCW
+  - Space - Fire
+
+- Mouse
+  - Left mouse - Fire
+  - Right mouse - Thrust
+  - The ship will automatically orient to face the mouse cursor.
+
+- XBox 360 controller
+  - A - Thrust
+  - Right Trigger - Fire
+  - Left Thumb Stick - Rotate
 
 ## Building from source
 
