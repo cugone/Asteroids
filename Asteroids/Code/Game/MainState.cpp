@@ -62,6 +62,11 @@ void MainState::BeginFrame() noexcept {
             entity->BeginFrame();
         }
     }
+    if(!ship) {
+        if(g_theGame->respawnTimer.CheckAndReset()) {
+            Respawn();
+        }
+    }
 }
 
 void MainState::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) {

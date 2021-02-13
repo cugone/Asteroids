@@ -122,6 +122,8 @@ public:
     std::shared_ptr<SpriteSheet> asteroid_sheet{};
     std::shared_ptr<SpriteSheet> explosion_sheet{};
 
+    Stopwatch respawnTimer{TimeUtils::FPSeconds{1.0f}};
+
 protected:
 private:
     void InitializeAudio() noexcept;

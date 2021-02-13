@@ -26,6 +26,10 @@ public:
 
     void Thrust(float force) noexcept;
 
+    void SetRespawning() noexcept;
+    const bool IsRespawning() const noexcept;
+    void DoneRespawning() noexcept;
+
 private:
     void MakeBullet() const noexcept;
 
@@ -36,5 +40,7 @@ private:
     std::unique_ptr<ThrustComponent> _thrust{};
     Stopwatch _fireRate;
     const float _bulletSpeed = 400.0f;
+    float _scale = 2.0f;
     bool _canFire = false;
+    bool _respawning = true;
 };

@@ -49,7 +49,16 @@ void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     const auto frameHeight = static_cast<float>(tex->GetDimensions().y);
     const auto half_extents = Vector2{frameWidth, frameHeight};
     {
-        const auto S = Matrix4::CreateScaleMatrix(half_extents);
+        if(IsRespawning()) {
+            _scale -= (0.90f * deltaSeconds.count());
+            _scale = std::clamp(_scale, 1.0f, 2.0f);
+            if(_scale == 1.0f) {
+                DoneRespawning();
+            }
+        } else {
+            _scale = 1.0f;
+        }
+        const auto S = Matrix4::CreateScaleMatrix(_scale * half_extents);
         const auto R = Matrix4::Create2DRotationDegreesMatrix(90.0f + GetOrientationDegrees());
         const auto T = Matrix4::CreateTranslationMatrix(GetPosition());
         transform = Matrix4::MakeSRT(S, R, T);
@@ -57,7 +66,12 @@ void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 
     auto& builder = mesh_builder;
     builder.Begin(PrimitiveType::Triangles);
-    builder.SetColor(Rgba::White);
+    if(IsRespawning()) {
+        float a = MathUtils::Interpolate(0.0f, 1.0f, deltaSeconds.count());
+        builder.SetColor(Vector4{1.0f, 1.0f, 1.0f, a});
+    } else {
+        builder.SetColor(Rgba::White);
+    }
 
     builder.SetUV(Vector2{uvs.maxs.x, uvs.maxs.y});
     builder.AddVertex(Vector2{+0.5f, +0.5f});
@@ -74,7 +88,9 @@ void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     builder.AddIndicies(Mesh::Builder::Primitive::Quad);
     builder.End(material);
 
-    _thrust->Update(deltaSeconds);
+    if(!IsRespawning()) {
+        _thrust->Update(deltaSeconds);
+    }
 
 }
 
@@ -85,18 +101,26 @@ void Ship::Render(Renderer& renderer) const noexcept {
 
 void Ship::EndFrame() noexcept {
     Entity::EndFrame();
-    if(_fireRate.CheckAndReset()) {
+    if(!IsRespawning() && _fireRate.CheckAndReset()) {
         _canFire = true;
     }
     _thrust->EndFrame();
 }
 
 void Ship::OnDestroy() noexcept {
+    if(IsRespawning()) {
+        return;
+    }
     Entity::OnDestroy();
     g_theGame->MakeExplosion(GetPosition());
+    SetRespawning();
+    g_theGame->respawnTimer.Reset();
 }
 
 void Ship::OnFire() noexcept {
+    if(IsRespawning()) {
+        return;
+    }
     if(_canFire) {
         _canFire = false;
         MakeBullet();
@@ -104,11 +128,29 @@ void Ship::OnFire() noexcept {
 }
 
 void Ship::Thrust(float force) noexcept {
+    if(IsRespawning()) {
+        return;
+    }
     _thrust->SetThrust(force);
     AddForce(GetForward() * force);
 }
 
+void Ship::SetRespawning() noexcept {
+    _respawning = true;
+}
+
+const bool Ship::IsRespawning() const noexcept {
+    return _respawning;
+}
+
+void Ship::DoneRespawning() noexcept {
+    _respawning = false;
+}
+
 void Ship::OnCollision(Entity* a, Entity* b) noexcept {
+    if(IsRespawning()) {
+        return;
+    }
     const auto* asAsteroid = dynamic_cast<Asteroid*>(b);
     if(asAsteroid) {
         a->DecrementHealth();
@@ -120,7 +162,7 @@ void Ship::OnCollision(Entity* a, Entity* b) noexcept {
 }
 
 void Ship::OnCreate() noexcept {
-    /* DO NOTHING */
+    SetRespawning();
 }
 
 void Ship::MakeBullet() const noexcept {

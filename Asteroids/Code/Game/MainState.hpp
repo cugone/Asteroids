@@ -2,6 +2,7 @@
 
 #include "Engine/Core/TypeUtils.hpp"
 #include "Engine/Core/OrthographicCameraController.hpp"
+#include "Engine/Core/Stopwatch.hpp"
 
 #include "Engine/Math/AABB2.hpp"
 
