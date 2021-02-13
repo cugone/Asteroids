@@ -265,9 +265,6 @@ void MainState::UpdateEntities(TimeUtils::FPSeconds deltaSeconds) noexcept {
     }
     HandleBulletAsteroidCollision();
     HandleShipAsteroidCollision();
-    static Vector2 previousPos = world_bounds.CalcCenter();
-    Vector2 currentPosition = ship ? ship->GetPosition() : previousPos;
-    previousPos = currentPosition;
     ClampCameraToWorld();
 }
 
