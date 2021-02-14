@@ -12,6 +12,13 @@ class Renderer;
 
 class Entity {
 public:
+    enum class Faction {
+        None
+        ,Player
+        ,Enemy
+        ,Asteroid
+    };
+
     virtual ~Entity() = default;
     virtual void BeginFrame() noexcept;
     virtual void Update(TimeUtils::FPSeconds deltaSeconds) noexcept;
@@ -30,6 +37,7 @@ public:
     Vector2 GetPosition() const noexcept;
     void SetPosition(Vector2 newPosition) noexcept;
     Vector2 GetVelocity() const noexcept;
+    void SetVelocity(Vector2 newVelocity) noexcept;
     Vector2 GetAcceleration() const noexcept;
 
     void SetOrientationDegrees(float newDegrees) noexcept;
@@ -55,13 +63,12 @@ public:
     Vector2 GetLeft() const noexcept;
 
     long long scoreValue = 0ll;
+    Faction faction = Faction::None;
 protected:
     void SetHealth(int newHealth) noexcept;
 
     Vector2 GetForce() const noexcept;
     void AddForce(const Vector2& force) noexcept;
-
-    void SetVelocity(Vector2 newVelocity) noexcept;
 
     void SetCosmeticRadius(float value) noexcept;
     void SetPhysicalRadius(float value) noexcept;

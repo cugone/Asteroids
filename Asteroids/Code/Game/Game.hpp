@@ -22,6 +22,7 @@
 #include "Game/GameState.hpp"
 #include "Game/Entity.hpp"
 #include "Game/Player.hpp"
+#include "Game/Ufo.hpp"
 
 #include <memory>
 #include <string>
@@ -86,9 +87,16 @@ public:
 
     std::vector<std::unique_ptr<Entity>>& GetEntities() noexcept;
 
+    Ship* GetShip() const noexcept;
+
     void MakeExplosion(Vector2 position) noexcept;
     void MakeBullet(const Entity* parent, Vector2 pos, Vector2 vel) noexcept;
 
+    void MakeSmallUfo(AABB2 world_bounds) noexcept;
+    void MakeBigUfo(AABB2 world_bounds) noexcept;
+    void MakeBossUfo(AABB2 world_bounds) noexcept;
+
+    void AddNewUfoToWorld(std::unique_ptr<Ufo> newUfo) noexcept;
     void AddNewAsteroidToWorld(std::unique_ptr<Asteroid> newAsteroid);
     void MakeLargeAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
     void MakeLargeAsteroidAt(Vector2 pos) noexcept;
@@ -107,6 +115,8 @@ public:
     void DecrementLives() noexcept;
     bool IsGameOver() const noexcept;
     void SetAsteroidSpriteSheet() noexcept;
+    void SetExplosionSpriteSheet() noexcept;
+    void SetUfoSpriteSheets() noexcept;
 
     AABB2 CalcOrthoBounds(const OrthographicCameraController& cameraController) const noexcept;
     AABB2 CalcViewBounds(const OrthographicCameraController& cameraController) const noexcept;
@@ -117,10 +127,14 @@ public:
     Player player{};
     unsigned int m_current_wave{1u};
     std::vector<Asteroid*> asteroids{};
+    std::vector<Ufo*> ufos{};
     std::vector<Bullet*> bullets{};
     std::vector<Explosion*> explosions{};
     std::shared_ptr<SpriteSheet> asteroid_sheet{};
     std::shared_ptr<SpriteSheet> explosion_sheet{};
+    std::shared_ptr<SpriteSheet> ufo_small_sheet{};
+    std::shared_ptr<SpriteSheet> ufo_big_sheet{};
+    std::shared_ptr<SpriteSheet> ufo_boss_sheet{};
 
     Stopwatch respawnTimer{TimeUtils::FPSeconds{1.0f}};
 
@@ -133,6 +147,8 @@ private:
     void CreateOrLoadOptionsFile() noexcept;
     void CreateOptionsFile() const noexcept;
     void LoadOptionsFile() const noexcept;
+
+    void MakeUfo(Ufo::Type type, AABB2 world_bounds) noexcept;
 
     std::unique_ptr<GameState> _current_state{nullptr};
     std::unique_ptr<GameState> _next_state{nullptr};

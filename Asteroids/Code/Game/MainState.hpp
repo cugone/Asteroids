@@ -10,6 +10,7 @@
 
 #include "Game/GameState.hpp"
 #include "Game/Player.hpp"
+#include "Game/Ufo.hpp"
 
 #include <memory>
 #include <vector>
@@ -19,6 +20,7 @@ class Bullet;
 class Explosion;
 class Ship;
 class Entity;
+class Ufo;
 
 class MainState : public GameState {
 public:
@@ -31,6 +33,7 @@ public:
     void Render() const noexcept override;
     void EndFrame() noexcept override;
 
+    mutable Ship* ship{nullptr};
 protected:
 private:
     std::unique_ptr<GameState> HandleInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept override;
@@ -47,12 +50,17 @@ private:
     void UpdateEntities(TimeUtils::FPSeconds deltaSeconds) noexcept;
     void StartNewWave(unsigned int wave_number) noexcept;
 
+    void MakeUfo() noexcept;
+    void MakeUfo(Ufo::Type type) noexcept;
+
     void MakeShip() noexcept;
     void MakeLargeAsteroidAtMouse() noexcept;
 
     void Respawn() noexcept;
 
+    void HandleBulletCollision() const noexcept;
     void HandleBulletAsteroidCollision() const noexcept;
+    void HandleBulletUfoCollision() const noexcept;
     void HandleShipAsteroidCollision() noexcept;
 
     void KillAll() noexcept;
@@ -68,7 +76,6 @@ private:
 
     void RenderStatus() const noexcept;
 
-    mutable Ship* ship{nullptr};
     AABB2 world_bounds = AABB2::ZERO_TO_ONE;
 
     mutable Camera2D m_ui_camera{};

@@ -206,7 +206,7 @@ void MainState::HandleDebugKeyboardInput([[maybe_unused]] TimeUtils::FPSeconds d
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::F4)) {
         g_theUISystem->ToggleImguiDemoWindow();
     }
-    if(g_theInputSystem->WasKeyJustPressed(KeyCode::I)) {
+    if(g_theInputSystem->WasKeyJustPressed(KeyCode::P)) {
         MakeLargeAsteroidAtMouse();
     }
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::N)) {
@@ -214,6 +214,15 @@ void MainState::HandleDebugKeyboardInput([[maybe_unused]] TimeUtils::FPSeconds d
     }
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::R)) {
         Respawn();
+    }
+    if(g_theInputSystem->WasKeyJustPressed(KeyCode::U)) {
+        MakeUfo(Ufo::Type::Small);
+    }
+    if(g_theInputSystem->WasKeyJustPressed(KeyCode::I)) {
+        MakeUfo(Ufo::Type::Big);
+    }
+    if(g_theInputSystem->WasKeyJustPressed(KeyCode::O)) {
+        MakeUfo(Ufo::Type::Boss);
     }
 }
 
@@ -268,7 +277,7 @@ void MainState::UpdateEntities(TimeUtils::FPSeconds deltaSeconds) noexcept {
             entity->Update(deltaSeconds);
         }
     }
-    HandleBulletAsteroidCollision();
+    HandleBulletCollision();
     HandleShipAsteroidCollision();
     ClampCameraToWorld();
 }
@@ -277,6 +286,20 @@ void MainState::StartNewWave(unsigned int wave_number) noexcept {
     for(unsigned int i = 0; i < wave_number * GetWaveMultiplierFromDifficulty(); ++i) {
         g_theGame->MakeLargeAsteroidOffScreen(world_bounds);
     }
+}
+
+void MainState::MakeUfo() noexcept {
+    MakeUfo(Ufo::Type::Small);
+}
+
+void MainState::MakeUfo(Ufo::Type type) noexcept {
+    switch(type) {
+    case Ufo::Type::Small: g_theGame->MakeSmallUfo(world_bounds); break;
+    case Ufo::Type::Big: g_theGame->MakeBigUfo(world_bounds); break;
+    case Ufo::Type::Boss: g_theGame->MakeBossUfo(world_bounds); break;
+    default: break;
+    }
+
 }
 
 void MainState::MakeShip() noexcept {
@@ -302,6 +325,11 @@ void MainState::Respawn() noexcept {
     MakeShip();
 }
 
+void MainState::HandleBulletCollision() const noexcept {
+    HandleBulletAsteroidCollision();
+    HandleBulletUfoCollision();
+}
+
 void MainState::HandleBulletAsteroidCollision() const noexcept {
     for(auto& bullet : g_theGame->bullets) {
         for(auto& asteroid : g_theGame->asteroids) {
@@ -310,6 +338,19 @@ void MainState::HandleBulletAsteroidCollision() const noexcept {
             if(MathUtils::DoDiscsOverlap(bulletCollisionMesh, asteroidCollisionMesh)) {
                 bullet->OnCollision(bullet, asteroid);
                 asteroid->OnCollision(asteroid, bullet);
+            }
+        }
+    }
+}
+
+void MainState::HandleBulletUfoCollision() const noexcept {
+    for(auto& ufo : g_theGame->ufos) {
+        for(auto& bullet : g_theGame->bullets) {
+            Disc2 bulletCollisionMesh{bullet->GetPosition(), bullet->GetPhysicalRadius()};
+            Disc2 ufoCollisionMesh{ufo->GetPosition(), ufo->GetPhysicalRadius()};
+            if(MathUtils::DoDiscsOverlap(bulletCollisionMesh, ufoCollisionMesh)) {
+                bullet->OnCollision(bullet, ufo);
+                ufo->OnCollision(ufo, bullet);
             }
         }
     }

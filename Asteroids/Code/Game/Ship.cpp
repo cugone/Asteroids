@@ -12,6 +12,8 @@
 #include "Game/Game.hpp"
 
 #include "Game/Asteroid.hpp"
+#include "Game/Bullet.hpp"
+#include "Game/Ufo.hpp"
 
 #include <algorithm>
 
@@ -151,13 +153,45 @@ void Ship::OnCollision(Entity* a, Entity* b) noexcept {
     if(IsRespawning()) {
         return;
     }
-    const auto* asAsteroid = dynamic_cast<Asteroid*>(b);
-    if(asAsteroid) {
-        a->DecrementHealth();
-        if(a->IsDead()) {
-            Thrust(0.0f);
-            g_theGame->DecrementLives();
+    if(a->faction == b->faction) {
+        return;
+    }
+    switch(b->faction) {
+    case Entity::Faction::None:
+    {/* DO NOTHING */}
+    break;
+    case Entity::Faction::Player:
+    {/* DO NOTHING */}
+    break;
+    case Entity::Faction::Enemy:
+    {
+        if(auto* asBullet = dynamic_cast<Bullet*>(b); asBullet != nullptr) {
+            a->DecrementHealth();
+            if(a->IsDead()) {
+                Thrust(0.0f);
+                g_theGame->DecrementLives();
+            }
+        } else if(auto* asUfo = dynamic_cast<Ufo*>(b); asUfo != nullptr) {
+            a->DecrementHealth();
+            if(a->IsDead()) {
+                Thrust(0.0f);
+                g_theGame->DecrementLives();
+            }
         }
+    }
+    break;
+    case Entity::Faction::Asteroid:
+    {
+        if(auto* asAsteroid = dynamic_cast<Asteroid*>(b); asAsteroid != nullptr) {
+            a->DecrementHealth();
+            if(a->IsDead()) {
+                Thrust(0.0f);
+                g_theGame->DecrementLives();
+            }
+        }
+    }
+    break;
+    default: break;
     }
 }
 

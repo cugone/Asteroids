@@ -163,6 +163,7 @@
     <ClCompile Include="Ship.cpp" />
     <ClCompile Include="ThrustComponent.cpp" />
     <ClCompile Include="TitleState.cpp" />
+    <ClCompile Include="Ufo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp" />
@@ -181,6 +182,7 @@
     <ClInclude Include="Ship.hpp" />
     <ClInclude Include="ThrustComponent.hpp" />
     <ClInclude Include="TitleState.hpp" />
+    <ClInclude Include="Ufo.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Abrams2019\Engine\Code\Engine\Engine.vcxproj">
@@ -190,10 +192,23 @@
   <ItemGroup>
     <Image Include="..\..\Run_x64\Data\Images\asteroid.png" />
     <Image Include="..\..\Run_x64\Data\Images\bkgd_0.png" />
+    <Image Include="..\..\Run_x64\Data\Images\blue_ufo.png" />
+    <Image Include="..\..\Run_x64\Data\Images\cyan_ufo.png" />
+    <Image Include="..\..\Run_x64\Data\Images\drone.png" />
     <Image Include="..\..\Run_x64\Data\Images\explosion.png" />
+    <Image Include="..\..\Run_x64\Data\Images\green_ufo.png" />
     <Image Include="..\..\Run_x64\Data\Images\laserBullet.png" />
+    <Image Include="..\..\Run_x64\Data\Images\laser_beam.png" />
+    <Image Include="..\..\Run_x64\Data\Images\laser_chargeup.png" />
+    <Image Include="..\..\Run_x64\Data\Images\magenta_ufo.png" />
+    <Image Include="..\..\Run_x64\Data\Images\orange_ufo.png" />
+    <Image Include="..\..\Run_x64\Data\Images\purple_ufo.png" />
+    <Image Include="..\..\Run_x64\Data\Images\red_ufo.png" />
     <Image Include="..\..\Run_x64\Data\Images\ship.png" />
+    <Image Include="..\..\Run_x64\Data\Images\sonic_bullet.png" />
     <Image Include="..\..\Run_x64\Data\Images\thrust.png" />
+    <Image Include="..\..\Run_x64\Data\Images\ufo_explosion.png" />
+    <Image Include="..\..\Run_x64\Data\Images\yellow_ufo.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Run_x64\Data\Materials\asteroid.material" />
@@ -201,13 +216,17 @@
     <None Include="..\..\Run_x64\Data\Materials\bullet.material" />
     <None Include="..\..\Run_x64\Data\Materials\explosion.material" />
     <None Include="..\..\Run_x64\Data\Materials\ship.material" />
+    <None Include="..\..\Run_x64\Data\Materials\ufo.material" />
     <None Include="..\..\Run_x64\Data\ShaderPrograms\entity_PS.cso" />
     <None Include="..\..\Run_x64\Data\ShaderPrograms\entity_VS.cso" />
+    <None Include="..\..\Run_x64\Data\ShaderPrograms\ufo_PS.cso" />
+    <None Include="..\..\Run_x64\Data\ShaderPrograms\ufo_VS.cso" />
     <None Include="..\..\Run_x64\Data\Shaders\asteroid.shader" />
     <None Include="..\..\Run_x64\Data\Shaders\background.shader" />
     <None Include="..\..\Run_x64\Data\Shaders\bullet.shader" />
     <None Include="..\..\Run_x64\Data\Shaders\explosion.shader" />
     <None Include="..\..\Run_x64\Data\Shaders\ship.shader" />
+    <None Include="..\..\Run_x64\Data\Shaders\ufo.shader" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\..\Run_x64\Data\Audio\Music\bgm.wav" />
@@ -217,6 +236,12 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\Run_x64\Data\ShaderPrograms\entity.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugProfile|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='FinalBuild|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\..\Run_x64\Data\ShaderPrograms\ufo.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugProfile|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>

@@ -23,6 +23,7 @@
 #include "Game/Ship.hpp"
 
 #include "Game/GameState.hpp"
+#include "Game/MainState.hpp"
 #include "Game/TitleState.hpp"
 
 #include <algorithm>
@@ -95,6 +96,24 @@ void Game::SetAsteroidSpriteSheet() noexcept {
     }
 }
 
+void Game::SetExplosionSpriteSheet() noexcept {
+    if(!explosion_sheet) {
+        explosion_sheet = g_theRenderer->CreateSpriteSheet("Data/Images/explosion.png", 5, 5);
+    }
+}
+
+void Game::SetUfoSpriteSheets() noexcept {
+    if(!ufo_small_sheet) {
+        ufo_small_sheet = g_theRenderer->CreateSpriteSheet("Data/Images/ufo_small.png", 4, 2);
+    }
+    if(!ufo_big_sheet) {
+        ufo_big_sheet = g_theRenderer->CreateSpriteSheet("Data/Images/ufo_large.png", 4, 2);
+    }
+    if(!ufo_boss_sheet) {
+        ufo_boss_sheet = g_theRenderer->CreateSpriteSheet("Data/Images/orange_ufo.png", 2, 4);
+    }
+}
+
 AABB2 Game::CalcOrthoBounds(const OrthographicCameraController& cameraController) const noexcept {
     float half_view_height = cameraController.GetCamera().GetViewHeight() * 0.5f;
     float half_view_width = half_view_height * cameraController.GetAspectRatio();
@@ -119,6 +138,29 @@ AABB2 Game::CalcCullBoundsFromOrthoBounds(const OrthographicCameraController& ca
     AABB2 cullBounds = CalcOrthoBounds(cameraController);
     cullBounds.AddPaddingToSides(-1.0f, -1.0f);
     return cullBounds;
+}
+
+void Game::AddNewUfoToWorld(std::unique_ptr<Ufo> newUfo) noexcept {
+    auto* last_entity = newUfo.get();
+    m_pending_entities.emplace_back(std::move(newUfo));
+    auto* asUfo = reinterpret_cast<Ufo*>(last_entity);
+    ufos.push_back(asUfo);
+    asUfo->OnCreate();
+}
+
+void Game::MakeUfo(Ufo::Type type, AABB2 world_bounds) noexcept {
+    const auto pos = [world_bounds]()->const Vector2 {
+        const auto world_dims = world_bounds.CalcDimensions();
+        const auto world_width = world_dims.x;
+        const auto world_height = world_dims.y;
+        const auto left = Vector2{world_bounds.mins.x, MathUtils::GetRandomFloatNegOneToOne() * world_height};
+        const auto right = Vector2{world_bounds.maxs.x, MathUtils::GetRandomFloatNegOneToOne() * world_height};
+        return MathUtils::GetRandomBool() ? left : right;
+    }();
+    auto newUfo = std::make_unique<Ufo>(type, pos);
+    const auto ptr = newUfo.get();
+    g_theGame->AddNewUfoToWorld(std::move(newUfo));
+    ptr->SetVelocity(Vector2{pos.x < 0.0f ? -ptr->GetSpeed() : ptr->GetSpeed(), 0.0f});
 }
 
 void Game::SetControlType() noexcept {
@@ -204,13 +246,36 @@ std::vector<std::unique_ptr<Entity>>& Game::GetEntities() noexcept {
     return m_entities;
 }
 
+Ship* Game::GetShip() const noexcept {
+    if(const auto state = dynamic_cast<MainState*>(_current_state.get()); state != nullptr) {
+        return state->ship;
+    }
+    return nullptr;
+}
+
 void Game::MakeBullet(const Entity* parent, Vector2 pos, Vector2 vel) noexcept {
     auto newBullet = std::make_unique<Bullet>(parent, pos, vel);
     auto* last_entity = newBullet.get();
     m_pending_entities.emplace_back(std::move(newBullet));
     auto* asBullet = reinterpret_cast<Bullet*>(last_entity);
     bullets.push_back(asBullet);
+    asBullet->faction = parent->faction;
     asBullet->OnCreate();
+}
+
+void Game::MakeSmallUfo(AABB2 world_bounds) noexcept {
+    SetUfoSpriteSheets();
+    MakeUfo(Ufo::Type::Small, world_bounds);
+}
+
+void Game::MakeBigUfo(AABB2 world_bounds) noexcept {
+    SetUfoSpriteSheets();
+    MakeUfo(Ufo::Type::Big, world_bounds);
+}
+
+void Game::MakeBossUfo(AABB2 world_bounds) noexcept {
+    SetUfoSpriteSheets();
+    MakeUfo(Ufo::Type::Boss, world_bounds);
 }
 
 void Game::AddNewAsteroidToWorld(std::unique_ptr<Asteroid> newAsteroid) {
@@ -280,9 +345,7 @@ void Game::DoCameraShake(OrthographicCameraController& cameraController) const n
 }
 
 void Game::MakeExplosion(Vector2 position) noexcept {
-    if(!explosion_sheet) {
-        explosion_sheet = g_theRenderer->CreateSpriteSheet("Data/Images/explosion.png", 5, 5);
-    }
+    SetExplosionSpriteSheet();
     auto newExplosion = std::make_unique<Explosion>(position);
     auto* last_entity = newExplosion.get();
     m_pending_entities.emplace_back(std::move(newExplosion));

@@ -88,6 +88,9 @@
     <ClCompile Include="ThrustComponent.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="Ufo.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameCommon.hpp">
@@ -138,6 +141,9 @@
     <ClInclude Include="ThrustComponent.hpp">
       <Filter>Game</Filter>
     </ClInclude>
+    <ClInclude Include="Ufo.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\Run_x64\Data\Images\asteroid.png">
@@ -156,6 +162,45 @@
       <Filter>Data\Images</Filter>
     </Image>
     <Image Include="..\..\Run_x64\Data\Images\thrust.png">
+      <Filter>Data\Images</Filter>
+    </Image>
+    <Image Include="..\..\Run_x64\Data\Images\blue_ufo.png">
+      <Filter>Data\Images</Filter>
+    </Image>
+    <Image Include="..\..\Run_x64\Data\Images\cyan_ufo.png">
+      <Filter>Data\Images</Filter>
+    </Image>
+    <Image Include="..\..\Run_x64\Data\Images\drone.png">
+      <Filter>Data\Images</Filter>
+    </Image>
+    <Image Include="..\..\Run_x64\Data\Images\green_ufo.png">
+      <Filter>Data\Images</Filter>
+    </Image>
+    <Image Include="..\..\Run_x64\Data\Images\laser_beam.png">
+      <Filter>Data\Images</Filter>
+    </Image>
+    <Image Include="..\..\Run_x64\Data\Images\laser_chargeup.png">
+      <Filter>Data\Images</Filter>
+    </Image>
+    <Image Include="..\..\Run_x64\Data\Images\magenta_ufo.png">
+      <Filter>Data\Images</Filter>
+    </Image>
+    <Image Include="..\..\Run_x64\Data\Images\orange_ufo.png">
+      <Filter>Data\Images</Filter>
+    </Image>
+    <Image Include="..\..\Run_x64\Data\Images\purple_ufo.png">
+      <Filter>Data\Images</Filter>
+    </Image>
+    <Image Include="..\..\Run_x64\Data\Images\red_ufo.png">
+      <Filter>Data\Images</Filter>
+    </Image>
+    <Image Include="..\..\Run_x64\Data\Images\sonic_bullet.png">
+      <Filter>Data\Images</Filter>
+    </Image>
+    <Image Include="..\..\Run_x64\Data\Images\ufo_explosion.png">
+      <Filter>Data\Images</Filter>
+    </Image>
+    <Image Include="..\..\Run_x64\Data\Images\yellow_ufo.png">
       <Filter>Data\Images</Filter>
     </Image>
   </ItemGroup>
@@ -196,6 +241,18 @@
     <None Include="..\..\Run_x64\Data\Shaders\background.shader">
       <Filter>Data\Shaders</Filter>
     </None>
+    <None Include="..\..\Run_x64\Data\Shaders\ufo.shader">
+      <Filter>Data\Shaders</Filter>
+    </None>
+    <None Include="..\..\Run_x64\Data\Materials\ufo.material">
+      <Filter>Data\Materials</Filter>
+    </None>
+    <None Include="..\..\Run_x64\Data\ShaderPrograms\ufo_PS.cso">
+      <Filter>Data\ShaderPrograms</Filter>
+    </None>
+    <None Include="..\..\Run_x64\Data\ShaderPrograms\ufo_VS.cso">
+      <Filter>Data\ShaderPrograms</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\..\Run_x64\Data\Audio\Sound\Explosion.wav">
@@ -213,6 +270,9 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\Run_x64\Data\ShaderPrograms\entity.hlsl">
+      <Filter>Data\ShaderPrograms</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run_x64\Data\ShaderPrograms\ufo.hlsl">
       <Filter>Data\ShaderPrograms</Filter>
     </FxCompile>
   </ItemGroup>

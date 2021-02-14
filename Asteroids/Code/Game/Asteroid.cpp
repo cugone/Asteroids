@@ -11,6 +11,7 @@
 #include "Engine/Renderer/ConstantBuffer.hpp"
 
 #include "Game/GameCommon.hpp"
+#include "Game/GameConfig.hpp"
 #include "Game/Game.hpp"
 
 #include "Game/Bullet.hpp"
@@ -26,6 +27,7 @@ Asteroid::Asteroid(Type type, Vector2 position, Vector2 velocity, float rotation
     : Entity()
     , _type(type)
 {
+    faction = Entity::Faction::Asteroid;
     scoreValue = GetScoreFromType(type);
     SetHealth(GetHealthFromType(type));
     SetPosition(position);
@@ -173,13 +175,12 @@ void Asteroid::OnFire() noexcept {
 }
 
 void Asteroid::OnCollision(Entity* a, Entity* b) noexcept {
-    const auto* asBullet = dynamic_cast<Bullet*>(b);
-    if(asBullet) {
+    if(auto* asBullet = dynamic_cast<Bullet*>(b); asBullet != nullptr) {
         if(TimeUtils::FPFrames{1.0f} < _timeSinceLastHit) {
             _timeSinceLastHit = _timeSinceLastHit.zero();
         }
         a->DecrementHealth();
-        g_theAudioSystem->Play("Data/Audio/Sound/Hit.wav");
+        g_theAudioSystem->Play(g_sound_hitpath);
         asteroid_state.wasHit = WasHit();
     }
 }

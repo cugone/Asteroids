@@ -6,9 +6,8 @@
 #include "Engine/Renderer/Material.hpp"
 
 #include "Game/GameCommon.hpp"
+#include "Game/GameConfig.hpp"
 #include "Game/Game.hpp"
-
-#include "Game/Asteroid.hpp"
 
 #include <algorithm>
 
@@ -20,7 +19,7 @@ Bullet::Bullet(const Entity* parent, Vector2 position, Vector2 velocity) noexcep
     SetVelocity(velocity);
     SetCosmeticRadius(15.0f);
     SetPhysicalRadius(10.0f);
-    SetOrientationDegrees(_parent->GetOrientationDegrees());
+    SetOrientationDegrees(velocity.CalcHeadingDegrees());
     ttl.SetSeconds(TimeUtils::FPSeconds{CalculateTtlFromDifficulty()});
 }
 
@@ -95,13 +94,13 @@ void Bullet::OnFire() noexcept {
 }
 
 void Bullet::OnCollision(Entity* a, Entity* b) noexcept {
-    const auto* asAsteroid = dynamic_cast<Asteroid*>(b);
-    if(asAsteroid) {
-        a->Kill();
+    if(a->faction == b->faction) {
+        return;
     }
+    a->Kill();
 }
 
 void Bullet::OnCreate() noexcept {
-    g_theAudioSystem->Play("Data/Audio/Sound/Laser_Shoot.wav");
+    g_theAudioSystem->Play(g_sound_shootpath);
 }
 

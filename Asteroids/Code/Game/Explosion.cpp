@@ -8,6 +8,7 @@
 #include "Engine/Renderer/Material.hpp"
 
 #include "Game/GameCommon.hpp"
+#include "Game/GameConfig.hpp"
 #include "Game/Game.hpp"
 
 #include <algorithm>
@@ -96,5 +97,5 @@ void Explosion::OnCollision(Entity* /*a*/, Entity* /*b*/) noexcept {
 }
 
 void Explosion::OnCreate() noexcept {
-    g_theAudioSystem->Play("Data/Audio/Sound/Explosion.wav");
+    g_theAudioSystem->Play(g_sound_explosionpath);
 }
