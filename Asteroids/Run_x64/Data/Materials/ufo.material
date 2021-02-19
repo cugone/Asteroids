@@ -1,8 +1,6 @@
 <material name="ufo">
     <shader src="Data/Shaders/ufo.shader" />
     <textures>
-        <diffuse src="Data/Images/ufo_small.png" />
-        <normal src="Data/Images/ufo_large.png" />
-        <displacement src="Data/Images/ufo_boss.png" />
+        <diffuse src="Data/Images/ufo.png" />
     </textures>
 </material>

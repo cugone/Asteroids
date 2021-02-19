@@ -176,12 +176,14 @@ void Asteroid::OnFire() noexcept {
 
 void Asteroid::OnCollision(Entity* a, Entity* b) noexcept {
     if(auto* asBullet = dynamic_cast<Bullet*>(b); asBullet != nullptr) {
-        if(TimeUtils::FPFrames{1.0f} < _timeSinceLastHit) {
-            _timeSinceLastHit = _timeSinceLastHit.zero();
+        if(a->faction != b->faction) {
+            if(TimeUtils::FPFrames{1.0f} < _timeSinceLastHit) {
+                _timeSinceLastHit = _timeSinceLastHit.zero();
+            }
+            a->DecrementHealth();
+            g_theAudioSystem->Play(g_sound_hitpath);
+            asteroid_state.wasHit = WasHit();
         }
-        a->DecrementHealth();
-        g_theAudioSystem->Play(g_sound_hitpath);
-        asteroid_state.wasHit = WasHit();
     }
 }
 

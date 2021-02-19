@@ -45,22 +45,24 @@ public:
     void OnFire() noexcept override;
     void OnDestroy() noexcept override;
 
+    static float GetCosmeticRadiusFromType(Type type) noexcept;
+    static float GetPhysicalRadiusFromType(Type type) noexcept;
+    static float GetScaleFromType(Type type) noexcept;
+    static Style GetStyleFromType(Type type) noexcept;
+    static int GetStartIndexFromTypeAndStyle(Type type, Style style) noexcept;
+    static int GetFrameLengthFromTypeAndStyle(Type type, Style style) noexcept;
+    static long long GetValueFromType(Type type) noexcept;
+    static unsigned int GetFireRateFromTypeAndDifficulty(Type type) noexcept;
+    static float GetUfoIndexFromStyle(Style style) noexcept;
+    static int GetHealthFromType(Type type) noexcept;
 protected:
-private:
-    float GetCosmeticRadiusFromType(Type type) const noexcept;
-    float GetPhysicalRadiusFromType(Type type) const noexcept;
 
-    Style GetStyleFromType(Type type) const noexcept;
-    int GetStartIndexFromTypeAndStyle(Type type, Style style) const noexcept;
-    int GetFrameLengthFromTypeAndStyle(Type type, Style style) const noexcept;
-    long long GetValueFromType(Type type) const noexcept;
-    
-    std::weak_ptr<SpriteSheet> GetSpriteSheetFromType(Type type) const noexcept;
-    unsigned int GetFireRateFromTypeAndDifficulty(Type type) const noexcept;
     float GetBulletSpeedFromTypeAndDifficulty(Type type) const noexcept;
+
+    std::weak_ptr<SpriteSheet> GetSpriteSheet() const noexcept;
     Vector2 CalculateFireTarget() const noexcept;
 
-    Vector4 WasHit() const noexcept;
+    float WasHit() const noexcept;
 
     void MakeBullet() const noexcept;
 
@@ -79,4 +81,7 @@ private:
     Vector2 _fireTarget{};
     float _bulletSpeed{800.0f};
     bool _canFire{false};
+
+private:
+
 };

@@ -82,4 +82,5 @@ private:
     OrthographicCameraController m_cameraController{};
     float m_thrust_force{100.0f};
     bool m_debug_render{false};
+    bool m_initialized{false};
 };

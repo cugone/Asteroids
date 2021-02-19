@@ -192,23 +192,15 @@
   <ItemGroup>
     <Image Include="..\..\Run_x64\Data\Images\asteroid.png" />
     <Image Include="..\..\Run_x64\Data\Images\bkgd_0.png" />
-    <Image Include="..\..\Run_x64\Data\Images\blue_ufo.png" />
-    <Image Include="..\..\Run_x64\Data\Images\cyan_ufo.png" />
     <Image Include="..\..\Run_x64\Data\Images\drone.png" />
     <Image Include="..\..\Run_x64\Data\Images\explosion.png" />
-    <Image Include="..\..\Run_x64\Data\Images\green_ufo.png" />
     <Image Include="..\..\Run_x64\Data\Images\laserBullet.png" />
     <Image Include="..\..\Run_x64\Data\Images\laser_beam.png" />
     <Image Include="..\..\Run_x64\Data\Images\laser_chargeup.png" />
-    <Image Include="..\..\Run_x64\Data\Images\magenta_ufo.png" />
-    <Image Include="..\..\Run_x64\Data\Images\orange_ufo.png" />
-    <Image Include="..\..\Run_x64\Data\Images\purple_ufo.png" />
-    <Image Include="..\..\Run_x64\Data\Images\red_ufo.png" />
     <Image Include="..\..\Run_x64\Data\Images\ship.png" />
     <Image Include="..\..\Run_x64\Data\Images\sonic_bullet.png" />
     <Image Include="..\..\Run_x64\Data\Images\thrust.png" />
-    <Image Include="..\..\Run_x64\Data\Images\ufo_explosion.png" />
-    <Image Include="..\..\Run_x64\Data\Images\yellow_ufo.png" />
+    <Image Include="..\..\Run_x64\Data\Images\ufo.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Run_x64\Data\Materials\asteroid.material" />

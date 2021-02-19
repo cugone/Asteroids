@@ -5,7 +5,7 @@
 #include "Game/Game.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/GameConfig.hpp"
-#include "Game/MainState.hpp"
+#include "Game/TitleState.hpp"
 
 void GameOverState::OnEnter() noexcept {
     /* DO NOTHING */
@@ -40,21 +40,21 @@ std::unique_ptr<GameState> GameOverState::HandleInput([[maybe_unused]] TimeUtils
 
 std::unique_ptr<GameState> GameOverState::HandleKeyboardInput() noexcept {
     if(g_theInputSystem->WasAnyKeyPressed()) {
-        return std::make_unique<MainState>();
+        return std::make_unique<TitleState>();
     }
     return {};
 }
 
 std::unique_ptr<GameState> GameOverState::HandleControllerInput() noexcept {
     if(const auto controller = g_theInputSystem->GetXboxController(0); controller.IsConnected() && controller.WasAnyButtonJustPressed()) {
-        return std::make_unique<MainState>();
+        return std::make_unique<TitleState>();
     }
     return {};
 }
 
 std::unique_ptr<GameState> GameOverState::HandleMouseInput() noexcept {
     if(g_theInputSystem->WasAnyMouseButtonPressed()) {
-        return std::make_unique<MainState>();
+        return std::make_unique<TitleState>();
     }
     return {};
 }

@@ -103,14 +103,8 @@ void Game::SetExplosionSpriteSheet() noexcept {
 }
 
 void Game::SetUfoSpriteSheets() noexcept {
-    if(!ufo_small_sheet) {
-        ufo_small_sheet = g_theRenderer->CreateSpriteSheet("Data/Images/ufo_small.png", 4, 2);
-    }
-    if(!ufo_big_sheet) {
-        ufo_big_sheet = g_theRenderer->CreateSpriteSheet("Data/Images/ufo_large.png", 4, 2);
-    }
-    if(!ufo_boss_sheet) {
-        ufo_boss_sheet = g_theRenderer->CreateSpriteSheet("Data/Images/orange_ufo.png", 2, 4);
+    if(!ufo_sheet) {
+        ufo_sheet = g_theRenderer->CreateSpriteSheet("Data/Images/ufo.png", 1, 4);
     }
 }
 
@@ -149,12 +143,21 @@ void Game::AddNewUfoToWorld(std::unique_ptr<Ufo> newUfo) noexcept {
 }
 
 void Game::MakeUfo(Ufo::Type type, AABB2 world_bounds) noexcept {
-    const auto pos = [world_bounds]()->const Vector2 {
+    const auto pos = [world_bounds, type]()->const Vector2 {
         const auto world_dims = world_bounds.CalcDimensions();
         const auto world_width = world_dims.x;
         const auto world_height = world_dims.y;
-        const auto left = Vector2{world_bounds.mins.x, MathUtils::GetRandomFloatNegOneToOne() * world_height};
-        const auto right = Vector2{world_bounds.maxs.x, MathUtils::GetRandomFloatNegOneToOne() * world_height};
+        const auto cr = Ufo::GetCosmeticRadiusFromType(type);
+        const auto y = [world_height, cr]() {
+            const auto r = MathUtils::GetRandomFloatNegOneToOne();
+            if(r < 0.0f) {
+                return r * world_height + cr;
+            }
+            return r * world_height - cr;
+        }();
+
+        const auto left = Vector2{world_bounds.mins.x, y };
+        const auto right = Vector2{world_bounds.maxs.x, y};
         return MathUtils::GetRandomBool() ? left : right;
     }();
     auto newUfo = std::make_unique<Ufo>(type, pos);
@@ -234,6 +237,7 @@ void Game::PostFrameCleanup() noexcept {
     explosions.erase(std::remove_if(std::begin(explosions), std::end(explosions), [&](Explosion* e) { return !e; }), std::end(explosions));
     bullets.erase(std::remove_if(std::begin(bullets), std::end(bullets), [&](Bullet* e) { return !e; }), std::end(bullets));
     asteroids.erase(std::remove_if(std::begin(asteroids), std::end(asteroids), [&](Asteroid* e) { return !e; }), std::end(asteroids));
+    ufos.erase(std::remove_if(std::begin(ufos), std::end(ufos), [&](Ufo* e) { return !e; }), std::end(ufos));
     m_entities.erase(std::remove_if(std::begin(m_entities) + 1, std::end(m_entities), [&](std::unique_ptr<Entity>& e) { return !e; }), std::end(m_entities));
 
     for(auto&& pending : m_pending_entities) {

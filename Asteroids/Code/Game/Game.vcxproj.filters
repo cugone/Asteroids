@@ -164,16 +164,7 @@
     <Image Include="..\..\Run_x64\Data\Images\thrust.png">
       <Filter>Data\Images</Filter>
     </Image>
-    <Image Include="..\..\Run_x64\Data\Images\blue_ufo.png">
-      <Filter>Data\Images</Filter>
-    </Image>
-    <Image Include="..\..\Run_x64\Data\Images\cyan_ufo.png">
-      <Filter>Data\Images</Filter>
-    </Image>
     <Image Include="..\..\Run_x64\Data\Images\drone.png">
-      <Filter>Data\Images</Filter>
-    </Image>
-    <Image Include="..\..\Run_x64\Data\Images\green_ufo.png">
       <Filter>Data\Images</Filter>
     </Image>
     <Image Include="..\..\Run_x64\Data\Images\laser_beam.png">
@@ -182,25 +173,10 @@
     <Image Include="..\..\Run_x64\Data\Images\laser_chargeup.png">
       <Filter>Data\Images</Filter>
     </Image>
-    <Image Include="..\..\Run_x64\Data\Images\magenta_ufo.png">
-      <Filter>Data\Images</Filter>
-    </Image>
-    <Image Include="..\..\Run_x64\Data\Images\orange_ufo.png">
-      <Filter>Data\Images</Filter>
-    </Image>
-    <Image Include="..\..\Run_x64\Data\Images\purple_ufo.png">
-      <Filter>Data\Images</Filter>
-    </Image>
-    <Image Include="..\..\Run_x64\Data\Images\red_ufo.png">
-      <Filter>Data\Images</Filter>
-    </Image>
     <Image Include="..\..\Run_x64\Data\Images\sonic_bullet.png">
       <Filter>Data\Images</Filter>
     </Image>
-    <Image Include="..\..\Run_x64\Data\Images\ufo_explosion.png">
-      <Filter>Data\Images</Filter>
-    </Image>
-    <Image Include="..\..\Run_x64\Data\Images\yellow_ufo.png">
+    <Image Include="..\..\Run_x64\Data\Images\ufo.png">
       <Filter>Data\Images</Filter>
     </Image>
   </ItemGroup>

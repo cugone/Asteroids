@@ -132,11 +132,10 @@ public:
     std::vector<Explosion*> explosions{};
     std::shared_ptr<SpriteSheet> asteroid_sheet{};
     std::shared_ptr<SpriteSheet> explosion_sheet{};
-    std::shared_ptr<SpriteSheet> ufo_small_sheet{};
-    std::shared_ptr<SpriteSheet> ufo_big_sheet{};
-    std::shared_ptr<SpriteSheet> ufo_boss_sheet{};
+    std::shared_ptr<SpriteSheet> ufo_sheet{};
 
     Stopwatch respawnTimer{TimeUtils::FPSeconds{1.0f}};
+    bool easyMode{false};
 
 protected:
 private:

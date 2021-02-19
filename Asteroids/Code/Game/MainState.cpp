@@ -49,6 +49,8 @@ void MainState::OnExit() noexcept {
     g_theGame->bullets.shrink_to_fit();
     g_theGame->explosions.clear();
     g_theGame->explosions.shrink_to_fit();
+    g_theGame->ufos.clear();
+    g_theGame->ufos.shrink_to_fit();
     g_theGame->GetEntities().clear();
     g_theGame->GetEntities().shrink_to_fit();
     g_theGame->m_current_wave = 1u;
@@ -111,11 +113,10 @@ void MainState::EndFrame() noexcept {
         }
     }
     g_theGame->PostFrameCleanup();
-    Utils::DoOnce(
-        [&]() {
-            m_ui_camera = m_cameraController.GetCamera();
-        }
-    );
+    if(!m_initialized) {
+        m_ui_camera = m_cameraController.GetCamera();
+        m_initialized = m_initialized;
+    }
 }
 
 std::unique_ptr<GameState> MainState::HandleInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
@@ -203,6 +204,9 @@ void MainState::HandleDebugKeyboardInput([[maybe_unused]] TimeUtils::FPSeconds d
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::F1)) {
         m_debug_render = !m_debug_render;
     }
+    if(g_theInputSystem->WasKeyJustPressed(KeyCode::F2)) {
+        g_theGame->easyMode = !g_theGame->easyMode;
+    }
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::F4)) {
         g_theUISystem->ToggleImguiDemoWindow();
     }
@@ -224,17 +228,72 @@ void MainState::HandleDebugKeyboardInput([[maybe_unused]] TimeUtils::FPSeconds d
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::O)) {
         MakeUfo(Ufo::Type::Boss);
     }
+    if(g_theInputSystem->WasKeyJustPressed(KeyCode::A)) {
+
+    }
 }
 
 void MainState::HandlePlayerInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) {
-    if(auto kb_state = HandleKeyboardInput(deltaSeconds)) {
-        g_theGame->ChangeState(std::move(kb_state));
-    }
-    if(auto mouse_state = HandleMouseInput(deltaSeconds)) {
-        g_theGame->ChangeState(std::move(mouse_state));
-    }
-    if(auto ctrl_state = HandleControllerInput(deltaSeconds)) {
-        g_theGame->ChangeState(std::move(ctrl_state));
+    if(!g_theGame->easyMode) {
+        if(auto kb_state = HandleKeyboardInput(deltaSeconds)) {
+            g_theGame->ChangeState(std::move(kb_state));
+        }
+        if(auto mouse_state = HandleMouseInput(deltaSeconds)) {
+            g_theGame->ChangeState(std::move(mouse_state));
+        }
+        if(auto ctrl_state = HandleControllerInput(deltaSeconds)) {
+            g_theGame->ChangeState(std::move(ctrl_state));
+        }
+    } else {
+        const auto closest_asteroid_target = [this]()->std::optional<Vector2> {
+            if(ship) {
+                const auto iter = std::min_element(std::cbegin(g_theGame->asteroids), std::cend(g_theGame->asteroids),
+                [this](const Asteroid* a, const Asteroid* b) {
+                        const auto a_dist = MathUtils::CalcDistanceSquared(ship->GetPosition(), a->GetPosition());
+                        const auto b_dist = MathUtils::CalcDistanceSquared(ship->GetPosition(), b->GetPosition());
+                        return a_dist < b_dist;
+                });
+                if(iter == std::cend(g_theGame->asteroids)) {
+                    return {};
+                }
+                return (*iter)->GetPosition();
+            }
+            return {};
+        }();
+        const auto closest_ufo_target = [this]()->std::optional<Vector2> {
+            if(ship) {
+                const auto iter = std::min_element(std::cbegin(g_theGame->ufos), std::cend(g_theGame->ufos),
+                    [this](const Ufo* a, const Ufo* b) {
+                        const auto a_dist = MathUtils::CalcDistanceSquared(ship->GetPosition(), a->GetPosition());
+                        const auto b_dist = MathUtils::CalcDistanceSquared(ship->GetPosition(), b->GetPosition());
+                        return a_dist < b_dist;
+                    });
+                if(iter == std::cend(g_theGame->ufos)) {
+                    return {};
+                }
+                return (*iter)->GetPosition();
+            }
+            return {};
+        }();
+        const auto closest_target = [closest_asteroid_target, closest_ufo_target]()->std::optional<Vector2> {
+            if(closest_asteroid_target && closest_ufo_target) {
+                if(closest_asteroid_target->CalcLengthSquared() < closest_ufo_target->CalcLengthSquared()) {
+                    return closest_asteroid_target;
+                } else {
+                    return closest_ufo_target;
+                }
+            } else if(closest_ufo_target) {
+                return closest_ufo_target;
+            } else if(closest_asteroid_target) {
+                return closest_asteroid_target;
+            } else {
+                return {};
+            }
+        }();
+        if(closest_target.has_value()) {
+            ship->SetOrientationDegrees(closest_target->CalcHeadingDegrees());
+            ship->OnFire();
+        }
     }
 }
 
@@ -346,6 +405,9 @@ void MainState::HandleBulletAsteroidCollision() const noexcept {
 void MainState::HandleBulletUfoCollision() const noexcept {
     for(auto& ufo : g_theGame->ufos) {
         for(auto& bullet : g_theGame->bullets) {
+            if(bullet->faction == ufo->faction) {
+                continue;
+            }
             Disc2 bulletCollisionMesh{bullet->GetPosition(), bullet->GetPhysicalRadius()};
             Disc2 ufoCollisionMesh{ufo->GetPosition(), ufo->GetPhysicalRadius()};
             if(MathUtils::DoDiscsOverlap(bulletCollisionMesh, ufoCollisionMesh)) {

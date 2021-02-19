@@ -97,7 +97,7 @@ void Bullet::OnCollision(Entity* a, Entity* b) noexcept {
     if(a->faction == b->faction) {
         return;
     }
-    a->Kill();
+    a->DecrementHealth();
 }
 
 void Bullet::OnCreate() noexcept {

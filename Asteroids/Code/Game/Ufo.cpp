@@ -23,6 +23,7 @@ Ufo::Ufo(Type type, Vector2 position)
     SetPhysicalRadius(GetPhysicalRadiusFromType(_type));
     SetPosition(position);
     SetVelocity(Vector2::X_AXIS * 100.0f);
+    SetHealth(GetHealthFromType(_type));
     faction = Entity::Faction::Enemy;
     _bulletSpeed = GetBulletSpeedFromTypeAndDifficulty(_type);
     _fireRate.SetFrequency(GetFireRateFromTypeAndDifficulty(_type));
@@ -31,7 +32,7 @@ Ufo::Ufo(Type type, Vector2 position)
 
     AnimatedSpriteDesc desc{};
     desc.material = g_theRenderer->GetMaterial("ufo");
-    desc.spriteSheet = GetSpriteSheetFromType(_type);
+    desc.spriteSheet = GetSpriteSheet();
     desc.durationSeconds = TimeUtils::FPSeconds{0.3f};
     desc.playbackMode = AnimatedSprite::SpriteAnimMode::Looping;
     desc.frameLength = GetFrameLengthFromTypeAndStyle(_type, _style);
@@ -57,6 +58,7 @@ void Ufo::BeginFrame() noexcept {
 
 void Ufo::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     Entity::Update(deltaSeconds);
+    _timeSinceLastHit += deltaSeconds;
     _sprite->Update(deltaSeconds);
 
     if(_canFire) {
@@ -67,8 +69,9 @@ void Ufo::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     const auto frameWidth = static_cast<float>(_sprite->GetFrameDimensions().x);
     const auto frameHeight = static_cast<float>(_sprite->GetFrameDimensions().y);
     const auto half_extents = Vector2{frameWidth, frameHeight};
+    const auto scale = GetScaleFromType(_type);
     {
-        const auto S = Matrix4::CreateScaleMatrix(half_extents);
+        const auto S = Matrix4::CreateScaleMatrix(scale * half_extents);
         const auto R = Matrix4::Create2DRotationDegreesMatrix(90.0f + GetOrientationDegrees());
         const auto T = Matrix4::CreateTranslationMatrix(GetPosition());
         transform = Matrix4::MakeSRT(S, R, T);
@@ -96,10 +99,19 @@ void Ufo::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 }
 
 void Ufo::Render(Renderer& renderer) const noexcept {
+    ufo_state.wasHitUfoIndex.x = WasHit();
+    ufo_state.wasHitUfoIndex.y = GetUfoIndexFromStyle(_style);
+    ufo_state_cb->Update(*renderer.GetDeviceContext(), &ufo_state);
     Entity::Render(renderer);
 }
 
 void Ufo::EndFrame() noexcept {
+    if(const auto& found = std::find(std::begin(g_theGame->ufos), std::end(g_theGame->ufos), this);
+        (found != std::end(g_theGame->ufos) &&
+            (*found)->IsDead()))
+    {
+        *found = nullptr;
+    }
     Entity::EndFrame();
 }
 
@@ -109,16 +121,18 @@ void Ufo::OnCreate() noexcept {
     desc.frequency = 1.0f;
     desc.loopCount = -1;
     _warble_sound = g_theAudioSystem->CreateSound(g_sound_warblepath);
-    g_theAudioSystem->Play(*_warble_sound, desc);
+    //g_theAudioSystem->Play(*_warble_sound, desc);
 }
 
 void Ufo::OnCollision(Entity* a, Entity* b) noexcept {
     if(auto* asBullet = dynamic_cast<Bullet*>(b); asBullet != nullptr) {
         if(b->faction != a->faction) {
-            a->DecrementHealth();
-            if(a->IsDead()) {
-                a->Kill();
+            if(TimeUtils::FPFrames{1.0f} < _timeSinceLastHit) {
+                _timeSinceLastHit = _timeSinceLastHit.zero();
             }
+            a->DecrementHealth();
+            g_theAudioSystem->Play(g_sound_hitpath);
+            ufo_state.wasHitUfoIndex.x = WasHit();
         }
     }
 }
@@ -131,12 +145,12 @@ void Ufo::OnFire() noexcept {
 }
 
 void Ufo::OnDestroy() noexcept {
-    _warble_sound->Stop();
+    //_warble_sound->Stop();
     g_theGame->MakeExplosion(GetPosition());
 }
 
-Vector4 Ufo::WasHit() const noexcept {
-    return _timeSinceLastHit.count() == 0.0f ? Vector4::X_AXIS : Vector4::ZERO;
+float Ufo::WasHit() const noexcept {
+    return _timeSinceLastHit.count() == 0.0f ? 1.0f : 0.0f;
 }
 
 void Ufo::MakeBullet() const noexcept {
@@ -145,36 +159,39 @@ void Ufo::MakeBullet() const noexcept {
     g_theGame->MakeBullet(this, source, Vector2::CreateFromPolarCoordinatesDegrees(_bulletSpeed, angle));
 }
 
-float Ufo::GetCosmeticRadiusFromType(Type type) const noexcept {
+float Ufo::GetCosmeticRadiusFromType(Type type) noexcept {
     switch(type) {
-    case Type::Small: return 10.0f;
-    case Type::Big: return 10.0f;
-    case Type::Boss: return 10.0f;
-    default: return 0.0f;
+    case Type::Small: return 15.0f;
+    case Type::Big: return 30.0f;
+    case Type::Boss: return 60.0f;
+    default: return 15.0f;
     }
 }
 
-float Ufo::GetPhysicalRadiusFromType(Type type) const noexcept {
+float Ufo::GetPhysicalRadiusFromType(Type type) noexcept {
     const auto cr = GetCosmeticRadiusFromType(type);
     switch(type) {
-    case Type::Small: return cr * 0.98f;
-    case Type::Big: return  cr * 0.98f;
-    case Type::Boss: return  cr * 0.98f;
+    case Type::Small: return 10.0f;
+    case Type::Big: return  20.0f;
+    case Type::Boss: return  30.0f;
     default: return cr;
     }
 }
 
-std::weak_ptr<SpriteSheet> Ufo::GetSpriteSheetFromType(Type type) const noexcept {
+float Ufo::GetScaleFromType(Type type) noexcept {
     switch(type) {
-    case Type::Small: return g_theGame->ufo_small_sheet;
-    case Type::Big: return g_theGame->ufo_big_sheet;
-    case Type::Boss: return g_theGame->ufo_boss_sheet;
-    default: return g_theGame->ufo_small_sheet;
+    case Type::Small: return 1.0f;
+    case Type::Big: return  2.0f;
+    case Type::Boss: return  4.0f;
+    default: return 1.0f;
     }
-
 }
 
-unsigned int Ufo::GetFireRateFromTypeAndDifficulty(Type type) const noexcept {
+std::weak_ptr<SpriteSheet> Ufo::GetSpriteSheet() const noexcept {
+    return g_theGame->ufo_sheet;
+}
+
+unsigned int Ufo::GetFireRateFromTypeAndDifficulty(Type type) noexcept {
     switch(type) {
     case Type::Small: return 2u;
     case Type::Big: return 1u;
@@ -184,7 +201,7 @@ unsigned int Ufo::GetFireRateFromTypeAndDifficulty(Type type) const noexcept {
 }
 
 float Ufo::GetBulletSpeedFromTypeAndDifficulty(Type type) const noexcept {
-    const auto typeMultiplier = [this, type]()->float {
+    const auto typeMultiplier = [type]()->float {
         switch(type) {
         case Type::Small: return 2.0f;
         case Type::Big: return 1.0f;
@@ -192,7 +209,7 @@ float Ufo::GetBulletSpeedFromTypeAndDifficulty(Type type) const noexcept {
         default: return 1.0f;
         }
     }();
-    const auto difficultyMultiplier = [this]() -> float{
+    const auto difficultyMultiplier = []() -> float{
         switch(g_theGame->gameOptions.difficulty) {
         case Difficulty::Easy: return 0.50f;
         case Difficulty::Normal: return 1.0f;
@@ -209,21 +226,12 @@ Vector2 Ufo::CalculateFireTarget() const noexcept {
         if(auto ship = g_theGame->GetShip()) {
             return ship->GetPosition();
         } else {
-            return Vector2::CreateFromPolarCoordinatesDegrees(1.0f, MathUtils::GetRandomFloatInRange(0.0f, 359.0f));
+            return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, MathUtils::GetRandomFloatInRange(0.0f, 359.0f));
         }
     }
     case Type::Big:
     {
-        if(auto ship = g_theGame->GetShip()) {
-            const auto target = ship->GetPosition();
-            const auto source = GetPosition();
-            const auto angle = (target - source).CalcHeadingDegrees();
-            const auto offset_range = 180.0f;
-            const auto offset = MathUtils::GetRandomFloatNegOneToOne() * offset_range;
-            return Vector2::CreateFromPolarCoordinatesDegrees(1.0f, angle + offset);
-        } else {
-            return Vector2::CreateFromPolarCoordinatesDegrees(1.0f, MathUtils::GetRandomFloatInRange(0.0f, 359.0f));
-        }
+        return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, MathUtils::GetRandomFloatInRange(0.0f, 359.0f));
     }
     case Type::Boss:
     {
@@ -231,18 +239,48 @@ Vector2 Ufo::CalculateFireTarget() const noexcept {
             const auto target = ship->GetPosition();
             const auto source = GetPosition();
             const auto angle = (target - source).CalcHeadingDegrees();
-            const auto offset_range = 15.0f;
+            const auto offset_range = 90.0f;
             const auto offset = MathUtils::GetRandomFloatNegOneToOne() * offset_range;
-            return Vector2::CreateFromPolarCoordinatesDegrees(1.0f, angle + offset);
+            return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, angle + offset);
         } else {
-            return Vector2::CreateFromPolarCoordinatesDegrees(1.0f, MathUtils::GetRandomFloatInRange(0.0f, 359.0f));
+            return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, MathUtils::GetRandomFloatInRange(0.0f, 359.0f));
         }
     }
-    default: return Vector2::CreateFromPolarCoordinatesDegrees(1.0f, MathUtils::GetRandomFloatInRange(0.0f, 359.0f));
+    default: return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, MathUtils::GetRandomFloatInRange(0.0f, 359.0f));
     }
 }
 
-int Ufo::GetStartIndexFromTypeAndStyle(Type type, Style style) const noexcept {
+float Ufo::GetUfoIndexFromStyle(Style style) noexcept {
+    switch(style) {
+    case Style::Blue: return 0.0f;
+    case Style::Green: return 1.0f;
+    case Style::Yellow: return 2.0f;
+    //case Style::Cyan:
+    //    break;
+    //case Style::Magenta:
+    //    break;
+    //case Style::Last_Big:
+    //    break;
+    //case Style::First_Boss:
+    //    break;
+    //case Style::Orange:
+    //    break;
+    //case Style::Last_Boss:
+    //    break;
+    default: return 0.0f;
+    }
+}
+
+int Ufo::GetHealthFromType(Type type) noexcept {
+    switch(type) {
+    case Type::Small: return 1;
+    case Type::Big: return 2;
+    case Type::Boss: return 3;
+    default: return 1;
+    }
+}
+
+int Ufo::GetStartIndexFromTypeAndStyle(Type type, Style style) noexcept {
     switch(type) {
     case Type::Small:
     {
@@ -271,7 +309,7 @@ int Ufo::GetStartIndexFromTypeAndStyle(Type type, Style style) const noexcept {
     }
 }
 
-int Ufo::GetFrameLengthFromTypeAndStyle(Type type, Style style) const noexcept {
+int Ufo::GetFrameLengthFromTypeAndStyle(Type type, Style style) noexcept {
     switch(type) {
     case Type::Small:
     {
@@ -301,7 +339,7 @@ int Ufo::GetFrameLengthFromTypeAndStyle(Type type, Style style) const noexcept {
     }
 }
 
-long long Ufo::GetValueFromType(Type type) const noexcept {
+long long Ufo::GetValueFromType(Type type) noexcept {
     switch(type) {
     case Type::Small: return 1000LL;
     case Type::Big: return 200LL;
@@ -310,7 +348,7 @@ long long Ufo::GetValueFromType(Type type) const noexcept {
     }
 }
 
-Ufo::Style Ufo::GetStyleFromType(Type type) const noexcept {
+Ufo::Style Ufo::GetStyleFromType(Type type) noexcept {
     switch(type) {
     case Type::Small:
     {
