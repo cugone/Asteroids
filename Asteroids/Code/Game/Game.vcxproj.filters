@@ -91,6 +91,9 @@
     <ClCompile Include="Ufo.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="Mine.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameCommon.hpp">
@@ -142,6 +145,9 @@
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Ufo.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Mine.hpp">
       <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>

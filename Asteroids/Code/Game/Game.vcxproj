@@ -158,6 +158,7 @@
     <ClCompile Include="GameState.cpp" />
     <ClCompile Include="MainState.cpp" />
     <ClCompile Include="Main_Win32.cpp" />
+    <ClCompile Include="Mine.cpp" />
     <ClCompile Include="OptionsState.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Ship.cpp" />
@@ -177,6 +178,7 @@
     <ClInclude Include="GameOverState.hpp" />
     <ClInclude Include="GameState.hpp" />
     <ClInclude Include="MainState.hpp" />
+    <ClInclude Include="Mine.hpp" />
     <ClInclude Include="OptionsState.hpp" />
     <ClInclude Include="Player.hpp" />
     <ClInclude Include="Ship.hpp" />
