@@ -32,6 +32,7 @@ class Asteroid;
 class Bullet;
 class Explosion;
 class Ship;
+class Mine;
 
 enum class Difficulty {
     First_,
@@ -91,7 +92,7 @@ public:
 
     void MakeExplosion(Vector2 position) noexcept;
     void MakeBullet(const Entity* parent, Vector2 pos, Vector2 vel) noexcept;
-
+    void MakeMine(const Entity* parent, Vector2 position) noexcept;
     void MakeSmallUfo(AABB2 world_bounds) noexcept;
     void MakeBigUfo(AABB2 world_bounds) noexcept;
     void MakeBossUfo(AABB2 world_bounds) noexcept;
@@ -115,6 +116,7 @@ public:
     void DecrementLives() noexcept;
     bool IsGameOver() const noexcept;
     void SetAsteroidSpriteSheet() noexcept;
+    void SetMineSpriteSheet() noexcept;
     void SetExplosionSpriteSheet() noexcept;
     void SetUfoSpriteSheets() noexcept;
 
@@ -130,7 +132,9 @@ public:
     std::vector<Ufo*> ufos{};
     std::vector<Bullet*> bullets{};
     std::vector<Explosion*> explosions{};
+    std::vector<Mine*> mines{};
     std::shared_ptr<SpriteSheet> asteroid_sheet{};
+    std::shared_ptr<SpriteSheet> mine_sheet{};
     std::shared_ptr<SpriteSheet> explosion_sheet{};
     std::shared_ptr<SpriteSheet> ufo_sheet{};
 

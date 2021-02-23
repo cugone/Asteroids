@@ -22,6 +22,7 @@ Ship::Ship() : Ship(Vector2::ZERO) {}
 Ship::Ship(Vector2 position)
     : Entity()
 {
+    faction = Entity::Faction::Player;
     _thrust = std::move(std::make_unique<ThrustComponent>(this));
     material = g_theRenderer->GetMaterial("ship");
     scoreValue = -100LL;
@@ -30,6 +31,7 @@ Ship::Ship(Vector2 position)
     SetCosmeticRadius(25.0f);
     SetPhysicalRadius(15.0f);
     _fireRate.SetFrequency(10u);
+    _mineFireRate.SetFrequency(1u);
 }
 
 void Ship::BeginFrame() noexcept {
@@ -106,6 +108,9 @@ void Ship::EndFrame() noexcept {
     if(!IsRespawning() && _fireRate.CheckAndReset()) {
         _canFire = true;
     }
+    if(!IsRespawning() && _mineFireRate.CheckAndReset()) {
+        _canDropMine = true;
+    }
     _thrust->EndFrame();
 }
 
@@ -126,6 +131,16 @@ void Ship::OnFire() noexcept {
     if(_canFire) {
         _canFire = false;
         MakeBullet();
+    }
+}
+
+void Ship::DropMine() noexcept {
+    if(IsRespawning()) {
+        return;
+    }
+    if(_canDropMine) {
+        _canDropMine = false;
+        MakeMine();
     }
 }
 
@@ -201,6 +216,10 @@ void Ship::OnCreate() noexcept {
 
 void Ship::MakeBullet() const noexcept {
     g_theGame->MakeBullet(this, CalcNewBulletPosition(), CalcNewBulletVelocity());
+}
+
+void Ship::MakeMine() const noexcept {
+    g_theGame->MakeMine(this, GetPosition());
 }
 
 const Vector2 Ship::CalcNewBulletVelocity() const noexcept {

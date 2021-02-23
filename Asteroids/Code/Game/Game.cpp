@@ -21,6 +21,7 @@
 #include "Game/Bullet.hpp"
 #include "Game/Explosion.hpp"
 #include "Game/Ship.hpp"
+#include "Game/Mine.hpp"
 
 #include "Game/GameState.hpp"
 #include "Game/MainState.hpp"
@@ -93,6 +94,12 @@ bool Game::IsGameOver() const noexcept {
 void Game::SetAsteroidSpriteSheet() noexcept {
     if(!asteroid_sheet) {
         asteroid_sheet = g_theRenderer->CreateSpriteSheet("Data/Images/asteroid.png", 6, 5);
+    }
+}
+
+void Game::SetMineSpriteSheet() noexcept {
+    if(!mine_sheet) {
+        mine_sheet = g_theRenderer->CreateSpriteSheet("Data/Images/mine.png", 3, 4);
     }
 }
 
@@ -238,6 +245,7 @@ void Game::PostFrameCleanup() noexcept {
     bullets.erase(std::remove_if(std::begin(bullets), std::end(bullets), [&](Bullet* e) { return !e; }), std::end(bullets));
     asteroids.erase(std::remove_if(std::begin(asteroids), std::end(asteroids), [&](Asteroid* e) { return !e; }), std::end(asteroids));
     ufos.erase(std::remove_if(std::begin(ufos), std::end(ufos), [&](Ufo* e) { return !e; }), std::end(ufos));
+    mines.erase(std::remove_if(std::begin(mines), std::end(mines), [&](Mine* e) { return !e; }), std::end(mines));
     m_entities.erase(std::remove_if(std::begin(m_entities) + 1, std::end(m_entities), [&](std::unique_ptr<Entity>& e) { return !e; }), std::end(m_entities));
 
     for(auto&& pending : m_pending_entities) {
@@ -265,6 +273,16 @@ void Game::MakeBullet(const Entity* parent, Vector2 pos, Vector2 vel) noexcept {
     bullets.push_back(asBullet);
     asBullet->faction = parent->faction;
     asBullet->OnCreate();
+}
+
+void Game::MakeMine(const Entity* parent, Vector2 position) noexcept {
+    SetMineSpriteSheet();
+    auto newMine = std::make_unique<Mine>(parent, position);
+    auto* last_entity = newMine.get();
+    m_pending_entities.emplace_back(std::move(newMine));
+    auto* asMine = reinterpret_cast<Mine*>(last_entity);
+    mines.push_back(asMine);
+    asMine->OnCreate();
 }
 
 void Game::MakeSmallUfo(AABB2 world_bounds) noexcept {

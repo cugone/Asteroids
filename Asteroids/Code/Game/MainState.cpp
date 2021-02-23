@@ -130,20 +130,24 @@ std::unique_ptr<GameState> MainState::HandleKeyboardInput([[maybe_unused]] TimeU
     if(!g_theGame->IsKeyboardActive()) {
         return {};
     }
-    if(ship) {
-        if(g_theInputSystem->IsKeyDown(KeyCode::A)) {
-            ship->RotateClockwise(ship->GetRotationSpeed() * deltaSeconds.count());
-        } else if(g_theInputSystem->IsKeyDown(KeyCode::D)) {
-            ship->RotateCounterClockwise(ship->GetRotationSpeed() * deltaSeconds.count());
-        }
-        if(g_theInputSystem->IsKeyDown(KeyCode::W)) {
-            ship->Thrust(m_thrust_force);
-        } else {
-            ship->Thrust(0.0f);
-        }
-        if(g_theInputSystem->IsKeyDown(KeyCode::Space)) {
-            ship->OnFire();
-        }
+    if(!ship) {
+        return {};
+    }
+    if(g_theInputSystem->IsKeyDown(KeyCode::A)) {
+        ship->RotateClockwise(ship->GetRotationSpeed() * deltaSeconds.count());
+    } else if(g_theInputSystem->IsKeyDown(KeyCode::D)) {
+        ship->RotateCounterClockwise(ship->GetRotationSpeed() * deltaSeconds.count());
+    }
+    if(g_theInputSystem->IsKeyDown(KeyCode::W)) {
+        ship->Thrust(m_thrust_force);
+    } else {
+        ship->Thrust(0.0f);
+    }
+    if(g_theInputSystem->IsKeyDown(KeyCode::Space)) {
+        ship->OnFire();
+    }
+    if(g_theInputSystem->IsKeyDown(KeyCode::S)) {
+        ship->DropMine();
     }
     return{};
 }
@@ -152,19 +156,23 @@ std::unique_ptr<GameState> MainState::HandleControllerInput([[maybe_unused]] Tim
     if(!g_theGame->IsControllerActive()) {
         return {};
     }
-    if(ship) {
-        if(auto& controller = g_theInputSystem->GetXboxController(0); controller.IsConnected() && controller.IsButtonDown(XboxController::Button::A)) {
-            ship->Thrust(m_thrust_force);
-        } else {
-            ship->Thrust(0.0f);
-        }
-        if(auto& controller = g_theInputSystem->GetXboxController(0); controller.IsConnected() && controller.GetRightTriggerPosition() > 0.0f) {
-            ship->OnFire();
-        }
-        if(auto& controller = g_theInputSystem->GetXboxController(0); controller.IsConnected() && controller.GetLeftThumbPosition().CalcLengthSquared() > 0.0f) {
-            const auto newFacing = controller.GetLeftThumbPosition().CalcHeadingDegrees();
-            ship->SetOrientationDegrees(newFacing);
-        }
+    if(!ship) {
+        return {};
+    }
+    if(auto& controller = g_theInputSystem->GetXboxController(0); controller.IsConnected() && controller.IsButtonDown(XboxController::Button::A)) {
+        ship->Thrust(m_thrust_force);
+    } else {
+        ship->Thrust(0.0f);
+    }
+    if(auto& controller = g_theInputSystem->GetXboxController(0); controller.IsConnected() && controller.GetRightTriggerPosition() > 0.0f) {
+        ship->OnFire();
+    }
+    if(auto& controller = g_theInputSystem->GetXboxController(0); controller.IsConnected() && controller.IsButtonDown(XboxController::Button::Y)) {
+        ship->DropMine();
+    }
+    if(auto& controller = g_theInputSystem->GetXboxController(0); controller.IsConnected() && controller.GetLeftThumbPosition().CalcLengthSquared() > 0.0f) {
+        const auto newFacing = controller.GetLeftThumbPosition().CalcHeadingDegrees();
+        ship->SetOrientationDegrees(newFacing);
     }
     return {};
 }
@@ -173,22 +181,26 @@ std::unique_ptr<GameState> MainState::HandleMouseInput([[maybe_unused]] TimeUtil
     if(!g_theGame->IsMouseActive()) {
         return {};
     }
-    if(ship) {
-        if(g_theInputSystem->GetMouseDelta().CalcLengthSquared() > 0.0f) {
-            const auto& camera = m_cameraController.GetCamera();
-            auto mouseWorldCoords = g_theRenderer->ConvertScreenToWorldCoords(camera, g_theInputSystem->GetCursorScreenPosition());
-            const auto newFacing = (mouseWorldCoords - ship->GetPosition()).CalcHeadingDegrees();
-            ship->SetOrientationDegrees(newFacing);
-        }
+    if(!ship) {
+        return {};
+    }
+    if(g_theInputSystem->GetMouseDelta().CalcLengthSquared() > 0.0f) {
+        const auto& camera = m_cameraController.GetCamera();
+        auto mouseWorldCoords = g_theRenderer->ConvertScreenToWorldCoords(camera, g_theInputSystem->GetCursorScreenPosition());
+        const auto newFacing = (mouseWorldCoords - ship->GetPosition()).CalcHeadingDegrees();
+        ship->SetOrientationDegrees(newFacing);
+    }
 
-        if(g_theInputSystem->IsKeyDown(KeyCode::LButton)) {
-            ship->OnFire();
-        }
-        if(g_theInputSystem->IsKeyDown(KeyCode::RButton)) {
-            ship->Thrust(m_thrust_force);
-        } else {
-            ship->Thrust(0.0f);
-        }
+    if(g_theInputSystem->IsKeyDown(KeyCode::LButton)) {
+        ship->OnFire();
+    }
+    if(g_theInputSystem->WasKeyJustPressed(KeyCode::MButton)) {
+        ship->DropMine();
+    }
+    if(g_theInputSystem->IsKeyDown(KeyCode::RButton)) {
+        ship->Thrust(m_thrust_force);
+    } else {
+        ship->Thrust(0.0f);
     }
     return {};
 }

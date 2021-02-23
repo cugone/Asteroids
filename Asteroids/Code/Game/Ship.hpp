@@ -30,8 +30,11 @@ public:
     const bool IsRespawning() const noexcept;
     void DoneRespawning() noexcept;
 
+    void DropMine() noexcept;
+
 private:
     void MakeBullet() const noexcept;
+    void MakeMine() const noexcept;
 
     const Vector2 CalcBulletDirectionFromDifficulty() const noexcept;
     const Vector2 CalcNewBulletVelocity() const noexcept;
@@ -39,8 +42,10 @@ private:
 
     std::unique_ptr<ThrustComponent> _thrust{};
     Stopwatch _fireRate;
+    Stopwatch _mineFireRate;
     const float _bulletSpeed = 400.0f;
     float _scale = 2.0f;
     bool _canFire = false;
+    bool _canDropMine = false;
     bool _respawning = true;
 };
