@@ -8,6 +8,7 @@
 #include "Engine/Renderer/Shader.hpp"
 
 #include "Game/Bullet.hpp"
+#include "Game/Mine.hpp"
 #include "Game/Game.hpp"
 #include "Game/Ship.hpp"
 
@@ -125,15 +126,23 @@ void Ufo::OnCreate() noexcept {
 }
 
 void Ufo::OnCollision(Entity* a, Entity* b) noexcept {
-    if(auto* asBullet = dynamic_cast<Bullet*>(b); asBullet != nullptr) {
-        if(b->faction != a->faction) {
-            if(TimeUtils::FPFrames{1.0f} < _timeSinceLastHit) {
-                _timeSinceLastHit = _timeSinceLastHit.zero();
-            }
+    if(a->faction == b->faction) {
+        return;
+    }
+    switch(b->faction) {
+    case Entity::Faction::Player:
+    {
+        if(const auto* asBullet = dynamic_cast<Bullet*>(b); asBullet != nullptr) {
             a->DecrementHealth();
-            g_theAudioSystem->Play(g_sound_hitpath);
-            ufo_state.wasHitUfoIndex.x = WasHit();
+            OnHit();
         }
+        if(const auto* asMine = dynamic_cast<Mine*>(b); asMine != nullptr) {
+            a->Kill();
+        }
+        break;
+    }
+    default:
+        break;
     }
 }
 
@@ -144,8 +153,17 @@ void Ufo::OnFire() noexcept {
     }
 }
 
+void Ufo::OnHit() {
+    if(TimeUtils::FPFrames{1.0f} < _timeSinceLastHit) {
+        _timeSinceLastHit = _timeSinceLastHit.zero();
+    }
+    g_theAudioSystem->Play(g_sound_hitpath);
+    ufo_state.wasHitUfoIndex.x = WasHit();
+}
+
 void Ufo::OnDestroy() noexcept {
     //_warble_sound->Stop();
+    Entity::OnDestroy();
     g_theGame->MakeExplosion(GetPosition());
 }
 

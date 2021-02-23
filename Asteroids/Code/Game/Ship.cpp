@@ -172,26 +172,19 @@ void Ship::OnCollision(Entity* a, Entity* b) noexcept {
         return;
     }
     switch(b->faction) {
-    case Entity::Faction::None:
-    {/* DO NOTHING */}
-    break;
-    case Entity::Faction::Player:
-    {/* DO NOTHING */}
-    break;
     case Entity::Faction::Enemy:
     {
         if(auto* asBullet = dynamic_cast<Bullet*>(b); asBullet != nullptr) {
             a->DecrementHealth();
+            asBullet->DecrementHealth();
             if(a->IsDead()) {
                 Thrust(0.0f);
                 g_theGame->DecrementLives();
             }
         } else if(auto* asUfo = dynamic_cast<Ufo*>(b); asUfo != nullptr) {
-            a->DecrementHealth();
-            if(a->IsDead()) {
-                Thrust(0.0f);
-                g_theGame->DecrementLives();
-            }
+            a->Kill();
+            Thrust(0.0f);
+            g_theGame->DecrementLives();
         }
     }
     break;

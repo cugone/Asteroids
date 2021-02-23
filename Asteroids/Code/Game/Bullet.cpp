@@ -15,6 +15,7 @@ Bullet::Bullet(const Entity* parent, Vector2 position, Vector2 velocity) noexcep
 : Entity()
 , _parent(parent)
 {
+    faction = _parent->faction;
     SetPosition(position);
     SetVelocity(velocity);
     SetCosmeticRadius(15.0f);
@@ -93,11 +94,8 @@ void Bullet::OnFire() noexcept {
     /* DO NOTHING */
 }
 
-void Bullet::OnCollision(Entity* a, Entity* b) noexcept {
-    if(a->faction == b->faction) {
-        return;
-    }
-    a->DecrementHealth();
+void Bullet::OnCollision(Entity* /*a*/, Entity* /*b*/) noexcept {
+    /* DO NOTHING */
 }
 
 void Bullet::OnCreate() noexcept {

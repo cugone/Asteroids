@@ -61,8 +61,12 @@ private:
     void HandleBulletCollision() const noexcept;
     void HandleBulletAsteroidCollision() const noexcept;
     void HandleBulletUfoCollision() const noexcept;
+    void HandleShipCollision() noexcept;
     void HandleShipAsteroidCollision() noexcept;
-
+    void HandleShipBulletCollision() noexcept;
+    void HandleMineCollision() noexcept;
+    void HandleMineUfoCollision() noexcept;
+    void HandleMineAsteroidCollision() noexcept;
     void KillAll() noexcept;
 
     unsigned int GetWaveMultiplierFromDifficulty() const noexcept;

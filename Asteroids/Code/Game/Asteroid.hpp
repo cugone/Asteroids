@@ -34,6 +34,7 @@ public:
     void OnDestroy() noexcept override;
 
 private:
+    void OnHit() noexcept;
     Vector4 WasHit() const noexcept;
     void MakeChildAsteroid() const noexcept;
     long long GetScoreFromType(Type type);

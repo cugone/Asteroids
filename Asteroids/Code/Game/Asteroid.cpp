@@ -15,6 +15,7 @@
 #include "Game/Game.hpp"
 
 #include "Game/Bullet.hpp"
+#include "Game/Mine.hpp"
 
 #include <algorithm>
 #include <type_traits>
@@ -174,17 +175,40 @@ void Asteroid::OnFire() noexcept {
     /* DO NOTHING */
 }
 
+void Asteroid::OnHit() noexcept {
+    if(TimeUtils::FPFrames{1.0f} < _timeSinceLastHit) {
+        _timeSinceLastHit = _timeSinceLastHit.zero();
+    }
+    g_theAudioSystem->Play(g_sound_hitpath);
+    asteroid_state.wasHit = WasHit();
+}
+
 void Asteroid::OnCollision(Entity* a, Entity* b) noexcept {
-    if(auto* asBullet = dynamic_cast<Bullet*>(b); asBullet != nullptr) {
-        if(a->faction != b->faction) {
-            if(TimeUtils::FPFrames{1.0f} < _timeSinceLastHit) {
-                _timeSinceLastHit = _timeSinceLastHit.zero();
-            }
+    if(a->faction == b->faction) {
+        return;
+    }
+    switch(b->faction) {
+    case Entity::Faction::Player:
+    {
+        if(auto* asBullet = dynamic_cast<Bullet*>(b); asBullet != nullptr) {
             a->DecrementHealth();
-            g_theAudioSystem->Play(g_sound_hitpath);
-            asteroid_state.wasHit = WasHit();
+            asBullet->DecrementHealth();
+            OnHit();
+        }
+        if(auto* asMine = dynamic_cast<Mine*>(b); asMine != nullptr) {
+            a->Kill();
+            b->Kill();
+            OnHit();
         }
     }
+    break;
+    case Entity::Faction::Enemy:
+    /* DO NOTHING */
+    break;
+    default: break;
+    }
+    
+
 }
 
 void Asteroid::OnCreate() noexcept {

@@ -271,7 +271,6 @@ void Game::MakeBullet(const Entity* parent, Vector2 pos, Vector2 vel) noexcept {
     m_pending_entities.emplace_back(std::move(newBullet));
     auto* asBullet = reinterpret_cast<Bullet*>(last_entity);
     bullets.push_back(asBullet);
-    asBullet->faction = parent->faction;
     asBullet->OnCreate();
 }
 

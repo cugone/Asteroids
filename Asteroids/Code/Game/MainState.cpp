@@ -21,6 +21,7 @@
 #include "Game/Asteroid.hpp"
 #include "Game/Bullet.hpp"
 #include "Game/Explosion.hpp"
+#include "Game/Mine.hpp"
 
 #include "Game/TitleState.hpp"
 #include "Game/GameOverState.hpp"
@@ -349,7 +350,8 @@ void MainState::UpdateEntities(TimeUtils::FPSeconds deltaSeconds) noexcept {
         }
     }
     HandleBulletCollision();
-    HandleShipAsteroidCollision();
+    HandleShipCollision();
+    HandleMineCollision();
     ClampCameraToWorld();
 }
 
@@ -403,11 +405,10 @@ void MainState::HandleBulletCollision() const noexcept {
 
 void MainState::HandleBulletAsteroidCollision() const noexcept {
     for(auto& bullet : g_theGame->bullets) {
+        Disc2 bulletCollisionMesh{bullet->GetPosition(), bullet->GetPhysicalRadius()};
         for(auto& asteroid : g_theGame->asteroids) {
-            Disc2 bulletCollisionMesh{bullet->GetPosition(), bullet->GetPhysicalRadius()};
             Disc2 asteroidCollisionMesh{asteroid->GetPosition(), asteroid->GetPhysicalRadius()};
             if(MathUtils::DoDiscsOverlap(bulletCollisionMesh, asteroidCollisionMesh)) {
-                bullet->OnCollision(bullet, asteroid);
                 asteroid->OnCollision(asteroid, bullet);
             }
         }
@@ -416,27 +417,30 @@ void MainState::HandleBulletAsteroidCollision() const noexcept {
 
 void MainState::HandleBulletUfoCollision() const noexcept {
     for(auto& ufo : g_theGame->ufos) {
+        Disc2 ufoCollisionMesh{ufo->GetPosition(), ufo->GetPhysicalRadius()};
         for(auto& bullet : g_theGame->bullets) {
             if(bullet->faction == ufo->faction) {
                 continue;
             }
             Disc2 bulletCollisionMesh{bullet->GetPosition(), bullet->GetPhysicalRadius()};
-            Disc2 ufoCollisionMesh{ufo->GetPosition(), ufo->GetPhysicalRadius()};
             if(MathUtils::DoDiscsOverlap(bulletCollisionMesh, ufoCollisionMesh)) {
-                bullet->OnCollision(bullet, ufo);
                 ufo->OnCollision(ufo, bullet);
             }
         }
     }
 }
 
+void MainState::HandleShipCollision() noexcept {
+    HandleShipAsteroidCollision();
+    HandleShipBulletCollision();
+}
+
 void MainState::HandleShipAsteroidCollision() noexcept {
     if(!ship) {
         return;
     }
+    Disc2 shipCollisionMesh{ship->GetPosition(), ship->GetPhysicalRadius()};
     for(auto& asteroid : g_theGame->asteroids) {
-        if(!ship) break;
-        Disc2 shipCollisionMesh{ship->GetPosition(), ship->GetPhysicalRadius()};
         Disc2 asteroidCollisionMesh{asteroid->GetPosition(), asteroid->GetPhysicalRadius()};
         if(MathUtils::DoDiscsOverlap(shipCollisionMesh, asteroidCollisionMesh)) {
             ship->OnCollision(ship, asteroid);
@@ -445,6 +449,53 @@ void MainState::HandleShipAsteroidCollision() noexcept {
             if(ship && ship->IsDead()) {
                 ship = nullptr;
                 break;
+            }
+        }
+    }
+}
+
+void MainState::HandleShipBulletCollision() noexcept {
+    if(!ship) {
+        return;
+    }
+    const auto shipCollisionMesh = Disc2{ship->GetPosition(), ship->GetPhysicalRadius()};
+    for(auto& bullet : g_theGame->bullets) {
+        const auto bulletCollisionMesh = Disc2{bullet->GetPosition(), bullet->GetPhysicalRadius()};
+        if(MathUtils::DoDiscsOverlap(shipCollisionMesh, bulletCollisionMesh)) {
+            ship->OnCollision(ship, bullet);
+            g_theGame->DoCameraShake(m_cameraController);
+            if(ship && ship->IsDead()) {
+                ship = nullptr;
+                break;
+            }
+        }
+    }
+}
+
+void MainState::HandleMineCollision() noexcept {
+    HandleMineAsteroidCollision();
+    HandleMineUfoCollision();
+}
+
+void MainState::HandleMineAsteroidCollision() noexcept {
+    for(const auto& mine : g_theGame->mines) {
+        const auto mineCollisionMesh = Disc2{mine->GetPosition(), mine->GetPhysicalRadius()};
+        for(const auto& asteroid : g_theGame->asteroids) {
+            const auto asteroidCollisionMesh = Disc2{asteroid->GetPosition(), asteroid->GetPhysicalRadius()};
+            if(MathUtils::DoDiscsOverlap(mineCollisionMesh, asteroidCollisionMesh)) {
+                asteroid->OnCollision(asteroid, mine);
+            }
+        }
+    }
+}
+
+void MainState::HandleMineUfoCollision() noexcept {
+    for(const auto& mine : g_theGame->mines) {
+        const auto mineCollisionMesh = Disc2{mine->GetPosition(), mine->GetPhysicalRadius()};
+        for(const auto& ufo : g_theGame->ufos) {
+            const auto ufoCollisionMesh = Disc2{ufo->GetPosition(), ufo->GetPhysicalRadius()};
+            if(MathUtils::DoDiscsOverlap(mineCollisionMesh, ufoCollisionMesh)) {
+                ufo->OnCollision(ufo, mine);
             }
         }
     }
