@@ -1,0 +1,6 @@
+<material name="mine">
+    <shader src="Data/Shaders/mine.shader" />
+    <textures>
+        <diffuse src="Data/Images/mine.png"/>
+    </textures>
+</material>
