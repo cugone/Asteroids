@@ -135,7 +135,7 @@ std::unique_ptr<GameState> OptionsState::HandleKeyboardInput() noexcept {
 }
 
 std::unique_ptr<GameState> OptionsState::HandleControllerInput() noexcept {
-    if(const auto controller = g_theInputSystem->GetXboxController(0); g_theGame->IsControllerActive() && controller.IsConnected()) {
+    if(const auto& controller = g_theInputSystem->GetXboxController(0); g_theGame->IsControllerActive() && controller.IsConnected()) {
         const bool up = controller.WasButtonJustPressed(XboxController::Button::Up) || MathUtils::IsEquivalent(1.0f, controller.GetLeftThumbPosition().y);
         const bool down = controller.WasButtonJustPressed(XboxController::Button::Down) || MathUtils::IsEquivalent(-1.0f, controller.GetLeftThumbPosition().y);
         const bool left = controller.WasButtonJustPressed(XboxController::Button::Left) || MathUtils::IsEquivalent(-1.0f, controller.GetLeftThumbPosition().x);
