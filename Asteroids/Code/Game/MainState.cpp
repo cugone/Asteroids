@@ -223,27 +223,6 @@ void MainState::HandleDebugKeyboardInput([[maybe_unused]] TimeUtils::FPSeconds d
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::F4)) {
         g_theUISystem->ToggleImguiDemoWindow();
     }
-    if(g_theInputSystem->WasKeyJustPressed(KeyCode::P)) {
-        MakeLargeAsteroidAtMouse();
-    }
-    if(g_theInputSystem->WasKeyJustPressed(KeyCode::N)) {
-        MakeShip();
-    }
-    if(g_theInputSystem->WasKeyJustPressed(KeyCode::R)) {
-        Respawn();
-    }
-    if(g_theInputSystem->WasKeyJustPressed(KeyCode::U)) {
-        MakeUfo(Ufo::Type::Small);
-    }
-    if(g_theInputSystem->WasKeyJustPressed(KeyCode::I)) {
-        MakeUfo(Ufo::Type::Big);
-    }
-    if(g_theInputSystem->WasKeyJustPressed(KeyCode::O)) {
-        MakeUfo(Ufo::Type::Boss);
-    }
-    if(g_theInputSystem->WasKeyJustPressed(KeyCode::A)) {
-
-    }
 }
 
 void MainState::HandlePlayerInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) {
