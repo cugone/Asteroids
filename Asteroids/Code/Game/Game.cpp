@@ -362,7 +362,7 @@ void Game::MakeSmallAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noex
 
 void Game::DoCameraShake(OrthographicCameraController& cameraController) const noexcept {
     cameraController.SetupCameraShake(currentGraphicsOptions.MaxShakeOffsetHorizontal, currentGraphicsOptions.MaxShakeOffsetVertical, currentGraphicsOptions.MaxShakeAngle);
-    cameraController.DoCameraShake([this]() { return gameOptions.cameraShakeStrength; });
+    cameraController.DoCameraShake([this]() { return gameOptions.cameraShakeStrength * (GetShip() ? GetShip()->GetVelocity().CalcLength() : 0.0f); });
 }
 
 void Game::MakeExplosion(Vector2 position) noexcept {
