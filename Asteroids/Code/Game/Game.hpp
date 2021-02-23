@@ -63,6 +63,8 @@ template<>
 struct TypeUtils::is_decrementable_enum_type<ControlPreference> : std::true_type {};
 
 struct GameOptions {
+    int windowWidth{1600};
+    int windowHeight{900};
     Difficulty difficulty{Difficulty::Normal};
     ControlPreference controlPref{ControlPreference::Mouse};
     uint8_t soundVolume{5};
