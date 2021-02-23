@@ -266,7 +266,7 @@ void OptionsState::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
     }
 }
 
-void OptionsState::SaveCurrentOptions() {
+void OptionsState::SaveCurrentOptions() noexcept {
     g_theGame->gameOptions = m_temp_options;
     g_theConfig->SetValue("difficulty", DifficultyToString(g_theGame->gameOptions.difficulty));
     g_theConfig->SetValue("controlpref", ControlPreferenceToString(g_theGame->gameOptions.controlPref));

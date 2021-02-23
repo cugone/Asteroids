@@ -48,7 +48,7 @@ private:
 
     void CycleSelectedOptionDown(OptionsMenu selectedItem) noexcept;
     void CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept;
-    void SaveCurrentOptions();
+    void SaveCurrentOptions() noexcept;
     std::string DifficultyToString(Difficulty difficulty) const noexcept;
     std::string ControlPreferenceToString(ControlPreference preference) const noexcept;
 
