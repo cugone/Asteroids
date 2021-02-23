@@ -274,7 +274,12 @@ void OptionsState::SaveCurrentOptions() noexcept {
     g_theConfig->SetValue("music", static_cast<int>(g_theGame->gameOptions.musicVolume));
     g_theConfig->SetValue("cameraShakeStrength", g_theGame->gameOptions.cameraShakeStrength);
     std::ofstream ofs(g_options_filepath);
-    ofs << *g_theConfig;
+    g_theConfig->PrintConfig("difficulty", ofs);
+    g_theConfig->PrintConfig("controlpref", ofs);
+    g_theConfig->PrintConfig("sound", ofs);
+    g_theConfig->PrintConfig("music", ofs);
+    g_theConfig->PrintConfig("cameraShakeStrength", ofs);
+    ofs.flush();
     ofs.close();
 }
 
