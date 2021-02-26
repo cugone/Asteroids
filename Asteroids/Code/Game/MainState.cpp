@@ -183,9 +183,9 @@ std::unique_ptr<GameState> MainState::HandleMouseInput([[maybe_unused]] TimeUtil
     if(!ship) {
         return {};
     }
-    if(g_theInputSystem->GetMouseDelta().CalcLengthSquared() > 0.0f) {
+    if(g_theInputSystem->WasMouseMoved()) {
         const auto& camera = m_cameraController.GetCamera();
-        auto mouseWorldCoords = g_theRenderer->ConvertScreenToWorldCoords(camera, g_theInputSystem->GetCursorScreenPosition());
+        auto mouseWorldCoords = g_theRenderer->ConvertScreenToWorldCoords(camera, g_theInputSystem->GetCursorWindowPosition());
         const auto newFacing = (mouseWorldCoords - ship->GetPosition()).CalcHeadingDegrees();
         ship->SetOrientationDegrees(newFacing);
     }
@@ -200,6 +200,11 @@ std::unique_ptr<GameState> MainState::HandleMouseInput([[maybe_unused]] TimeUtil
         ship->Thrust(m_thrust_force);
     } else {
         ship->Thrust(0.0f);
+    }
+    if(g_theInputSystem->WasMouseWheelJustScrolledDown()) {
+        m_cameraController.ZoomOut();
+    } else if(g_theInputSystem->WasMouseWheelJustScrolledUp()) {
+        m_cameraController.ZoomIn();
     }
     return {};
 }
@@ -571,8 +576,10 @@ void MainState::DebugRenderEntities() const noexcept {
 AABB2 MainState::CalculateCameraBounds() const noexcept {
     //TODO: Calculate clamped bounds based on view and world dimensions
     const auto view_bounds = g_theGame->CalcViewBounds(m_cameraController);
-    auto result = world_bounds;
-    result.ScalePadding(0.25f, 0.25f);
+    const auto zoom_ratio = m_cameraController.GetZoomLevel();
+    const auto camera_bounds_dimensions = Vector2{zoom_ratio / m_cameraController.GetAspectRatio(), zoom_ratio / m_cameraController.GetAspectRatio()};
+    AABB2 result{};
+    result.AddPaddingToSides(camera_bounds_dimensions.x, camera_bounds_dimensions.y);
     result.Translate(world_bounds.CalcCenter());
     return result;
 }
