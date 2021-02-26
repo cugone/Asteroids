@@ -53,7 +53,7 @@ void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     const auto frameHeight = static_cast<float>(tex->GetDimensions().y);
     const auto half_extents = Vector2{frameWidth, frameHeight};
 
-    DoScaleEaseOut(deltaSeconds, half_extents);
+    DoScaleEaseOut(deltaSeconds);
 
     const auto S = Matrix4::CreateScaleMatrix(_scale * half_extents);
     const auto R = Matrix4::Create2DRotationDegreesMatrix(90.0f + GetOrientationDegrees());
@@ -63,7 +63,7 @@ void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     auto& builder = mesh_builder;
     builder.Begin(PrimitiveType::Triangles);
     if(IsRespawning()) {
-        float a = MathUtils::Interpolate(0.0f, 1.0f, deltaSeconds.count());
+        float a = DoAlphaEaseOut(deltaSeconds);
         builder.SetColor(Vector4{1.0f, 1.0f, 1.0f, a});
     } else {
         builder.SetColor(Rgba::White);
@@ -95,10 +95,17 @@ void Ship::Render(Renderer& renderer) const noexcept {
     Entity::Render(renderer);
 }
 
-void Ship::DoScaleEaseOut(TimeUtils::FPSeconds& /*deltaSeconds*/, const Vector2 /*half_extents*/) {
+void Ship::DoScaleEaseOut(TimeUtils::FPSeconds& deltaSeconds) noexcept {
+    static float t = 0.0f;
+    static float duration = 0.66f;
+    static float startScale = 4.0f;
+    static float endScale = 1.0f;
     if(IsRespawning()) {
-        _scale = MathUtils::Interpolate(4.0f, 1.0f, g_theRenderer->GetGameTime().count());
-        if(_scale < 1.0f) {
+        if(t < duration) {
+            _scale = MathUtils::Interpolate(startScale, endScale, t / duration);
+            t += deltaSeconds.count();
+        } else {
+            t = 0.0f;
             _scale = 1.0f;
             DoneRespawning();
         }
@@ -106,6 +113,24 @@ void Ship::DoScaleEaseOut(TimeUtils::FPSeconds& /*deltaSeconds*/, const Vector2 
         _scale = 1.0f;
     }
 }
+
+
+float Ship::DoAlphaEaseOut(TimeUtils::FPSeconds& deltaSeconds) const noexcept {
+    static float t = 0.0f;
+    static float duration = 0.66f;
+    static float start = 0.0f;
+    static float end = 1.0f;
+    static float a = 0.0f;
+    if(t < duration) {
+        a = MathUtils::Interpolate(start, end, t / duration);
+        t += deltaSeconds.count();
+    } else {
+        t = 0.0f;
+        a = 0.0f;
+    }
+    return a;
+}
+
 void Ship::EndFrame() noexcept {
     Entity::EndFrame();
     if(!IsRespawning() && _fireRate.CheckAndReset()) {
