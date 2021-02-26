@@ -8,6 +8,9 @@
 
 #include "Engine/Renderer/Camera2D.hpp"
 
+#include "Game/GameCommon.hpp"
+
+#include "Game/Game.hpp"
 #include "Game/GameState.hpp"
 #include "Game/Player.hpp"
 #include "Game/Ufo.hpp"
@@ -80,11 +83,11 @@ private:
 
     void RenderStatus() const noexcept;
 
+    void DoCameraShake() noexcept;
+
     AABB2 world_bounds = AABB2::ZERO_TO_ONE;
 
-    mutable Camera2D m_ui_camera{};
     OrthographicCameraController m_cameraController{};
     float m_thrust_force{100.0f};
     bool m_debug_render{false};
-    bool m_initialized{false};
 };

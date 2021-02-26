@@ -424,8 +424,8 @@ void MainState::HandleShipAsteroidCollision() noexcept {
         if(MathUtils::DoDiscsOverlap(shipCollisionMesh, asteroidCollisionMesh)) {
             ship->OnCollision(ship, asteroid);
             asteroid->OnCollision(asteroid, ship);
-            g_theGame->DoCameraShake(m_cameraController);
             if(ship && ship->IsDead()) {
+                DoCameraShake();
                 ship = nullptr;
                 break;
             }
@@ -442,8 +442,8 @@ void MainState::HandleShipBulletCollision() noexcept {
         const auto bulletCollisionMesh = Disc2{bullet->GetPosition(), bullet->GetPhysicalRadius()};
         if(MathUtils::DoDiscsOverlap(shipCollisionMesh, bulletCollisionMesh)) {
             ship->OnCollision(ship, bullet);
-            g_theGame->DoCameraShake(m_cameraController);
             if(ship && ship->IsDead()) {
+                DoCameraShake();
                 ship = nullptr;
                 break;
             }
@@ -614,6 +614,10 @@ void MainState::RenderStatus() const noexcept {
     g_theRenderer->SetModelMatrix(transform);
     g_theRenderer->SetMaterial(mat);
     g_theRenderer->DrawQuad2D();
+}
+
+void MainState::DoCameraShake() noexcept {
+    g_theGame->DoCameraShake(m_cameraController);
 }
 
 void MainState::ClampCameraToWorld() noexcept {
