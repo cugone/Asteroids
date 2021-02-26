@@ -50,7 +50,7 @@ void Game::InitializeAudio() noexcept {
 void Game::InitializeSounds() noexcept {
     g_theAudioSystem->RegisterWavFilesFromFolder(g_sound_folderpath);
     g_theAudioSystem->AddChannelGroup(g_audiogroup_sound);
-    for(const auto filepath : FileUtils::GetAllPathsInFolders(g_sound_folderpath)) {
+    for(const auto& filepath : FileUtils::GetAllPathsInFolders(g_sound_folderpath)) {
         g_theAudioSystem->AddSoundToChannelGroup(g_audiogroup_sound, filepath);
     }
     if(auto* sound_group = g_theAudioSystem->GetChannelGroup(g_audiogroup_sound)) {
@@ -61,7 +61,7 @@ void Game::InitializeSounds() noexcept {
 void Game::InitializeMusic() noexcept {
     g_theAudioSystem->RegisterWavFilesFromFolder(g_music_folderpath);
     g_theAudioSystem->AddChannelGroup(g_audiogroup_music);
-    for(const auto filepath : FileUtils::GetAllPathsInFolders(g_music_folderpath)) {
+    for(const auto& filepath : FileUtils::GetAllPathsInFolders(g_music_folderpath)) {
         g_theAudioSystem->AddSoundToChannelGroup(g_audiogroup_music, filepath);
     }
     if(auto* music_group = g_theAudioSystem->GetChannelGroup(g_audiogroup_music)) {
