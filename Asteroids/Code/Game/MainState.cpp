@@ -628,11 +628,8 @@ void MainState::DoCameraShake() noexcept {
 
 void MainState::ClampCameraToWorld() noexcept {
     const auto camera_limits = CalculateCameraBounds();
-    const auto& cameraPos = m_cameraController.GetCamera().GetPosition();
-    const auto clamped_position = MathUtils::CalcClosestPoint(cameraPos, camera_limits);
-    const auto clamped_displacement = cameraPos - clamped_position;
-    const auto current_ship_position = ship ? ship->GetPosition() : Vector2::ZERO;
-    m_cameraController.TranslateTo(current_ship_position, g_theRenderer->GetGameTime());
-    m_cameraController.SetPosition(clamped_position);
+    const auto current_ship_position = Vector2::ZERO;//ship ? ship->GetPosition() : Vector2::ZERO;
+    const auto clamped_position = MathUtils::CalcClosestPoint(current_ship_position, camera_limits);
+    m_cameraController.TranslateTo(clamped_position, g_theRenderer->GetGameFrameTime() * 5.0f);
 }
 
