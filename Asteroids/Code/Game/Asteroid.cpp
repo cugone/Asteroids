@@ -149,9 +149,15 @@ void Asteroid::OnDestroy() noexcept {
         break;
     }
     case Type::Small:
+    {
         /* DO NOTHING */
         break;
-    default: /* DO NOTHING */;
+    }
+    default:
+    {
+        /* DO NOTHING */
+        break;
+    }
     }
 }
 
