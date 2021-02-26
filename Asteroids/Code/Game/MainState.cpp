@@ -27,15 +27,17 @@
 #include "Game/GameOverState.hpp"
 
 void MainState::OnEnter() noexcept {
-    m_cameraController = OrthographicCameraController{g_theRenderer, g_theInputSystem};
-    m_cameraController.SetMaxZoomLevel(450.0f);
-    m_cameraController.SetZoomLevel(450.0f);
 
     world_bounds = AABB2::ZERO_TO_ONE;
-    const auto dims = Vector2{g_theRenderer->GetOutput()->GetDimensions()};
+    auto dims = Vector2{g_theRenderer->GetOutput()->GetDimensions()};
     //TODO: Fix world dims
     world_bounds.ScalePadding(dims.x, dims.y);
     world_bounds.Translate(-world_bounds.CalcCenter());
+
+    m_cameraController = OrthographicCameraController{g_theRenderer, g_theInputSystem};
+    m_cameraController.SetPosition(world_bounds.CalcCenter());
+    m_cameraController.SetZoomLevelRange(Vector2{225.0f, 450.0f});
+    m_cameraController.SetZoomLevel(450.0f);
 
     PlayerDesc playerDesc{};
     playerDesc.lives = GetLivesFromDifficulty();
