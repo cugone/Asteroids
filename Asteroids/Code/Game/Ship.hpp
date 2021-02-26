@@ -43,8 +43,9 @@ private:
     std::unique_ptr<ThrustComponent> _thrust{};
     Stopwatch _fireRate;
     Stopwatch _mineFireRate;
-    const float _bulletSpeed = 400.0f;
-    float _scale = 2.0f;
+    const float _bulletSpeed{400.0f};
+    float _maxScale{2.0f};
+    float _scale{1.0f};
     bool _canFire = false;
     bool _canDropMine = false;
     bool _respawning = true;
