@@ -585,18 +585,19 @@ AABB2 MainState::CalculateCameraBounds() const noexcept {
 }
 
 void MainState::RenderStatus() const noexcept {
-    const float ui_view_height = m_ui_camera.GetViewHeight();
-    const float ui_view_width = ui_view_height * m_ui_camera.GetAspectRatio();
+    static Camera2D ui_camera = m_cameraController.GetCamera();
+    const float ui_view_height = ui_camera.GetViewHeight();
+    const float ui_view_width = ui_view_height * ui_camera.GetAspectRatio();
     const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
     const auto ui_view_half_extents = ui_view_extents * 0.5f;
     const auto ui_leftBottom = Vector2{-ui_view_half_extents.x, ui_view_half_extents.y};
     const auto ui_rightTop = Vector2{ui_view_half_extents.x, -ui_view_half_extents.y};
     const auto ui_nearFar = Vector2{0.0f, 1.0f};
     const auto ui_cam_pos = ui_view_half_extents;
-    m_ui_camera.position = ui_cam_pos;
-    m_ui_camera.orientation_degrees = 0.0f;
-    m_ui_camera.SetupView(ui_leftBottom, ui_rightTop, ui_nearFar, MathUtils::M_16_BY_9_RATIO);
-    g_theRenderer->SetCamera(m_ui_camera);
+    ui_camera.position = ui_cam_pos;
+    ui_camera.orientation_degrees = 0.0f;
+    ui_camera.SetupView(ui_leftBottom, ui_rightTop, ui_nearFar, MathUtils::M_16_BY_9_RATIO);
+    g_theRenderer->SetCamera(ui_camera);
 
     const auto* font = g_theRenderer->GetFont("System32");
     const auto font_position = ui_cam_pos - ui_view_half_extents + Vector2{5.0f, font->GetLineHeight() * 0.0f};
