@@ -179,7 +179,7 @@ void Game::SetControlType() noexcept {
         _mouse_control_active = false;
         _controller_control_active = false;
     }
-    if(g_theInputSystem->WasAnyMouseButtonPressed()) {
+    if(g_theInputSystem->WasMouseJustUsed()) {
         _keyboard_control_active = false;
         _mouse_control_active = true;
         _controller_control_active = false;
