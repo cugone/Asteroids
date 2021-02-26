@@ -107,7 +107,7 @@ public:
     void MakeMediumAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
     void MakeSmallAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
 
-    void DoCameraShake(OrthographicCameraController& cameraController) const noexcept;
+    void DoCameraShake(OrthographicCameraController& controller) const noexcept;
 
     void SetControlType() noexcept;
     bool IsControllerActive() const noexcept;
@@ -122,10 +122,10 @@ public:
     void SetExplosionSpriteSheet() noexcept;
     void SetUfoSpriteSheets() noexcept;
 
-    AABB2 CalcOrthoBounds(const OrthographicCameraController& cameraController) const noexcept;
-    AABB2 CalcViewBounds(const OrthographicCameraController& cameraController) const noexcept;
-    AABB2 CalcCullBounds(const OrthographicCameraController& cameraController) const noexcept;
-    AABB2 CalcCullBoundsFromOrthoBounds(const OrthographicCameraController& cameraController) const noexcept;
+    AABB2 CalcOrthoBounds(const OrthographicCameraController& controller) const noexcept;
+    AABB2 CalcViewBounds(const OrthographicCameraController& controller) const noexcept;
+    AABB2 CalcCullBounds(const OrthographicCameraController& controller) const noexcept;
+    AABB2 CalcCullBoundsFromOrthoBounds(const OrthographicCameraController& controller) const noexcept;
 
     GameOptions gameOptions{};
     Player player{};

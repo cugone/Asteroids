@@ -115,28 +115,28 @@ void Game::SetUfoSpriteSheets() noexcept {
     }
 }
 
-AABB2 Game::CalcOrthoBounds(const OrthographicCameraController& cameraController) const noexcept {
-    float half_view_height = cameraController.GetCamera().GetViewHeight() * 0.5f;
-    float half_view_width = half_view_height * cameraController.GetAspectRatio();
+AABB2 Game::CalcOrthoBounds(const OrthographicCameraController& controller) const noexcept {
+    float half_view_height = controller.GetCamera().GetViewHeight() * 0.5f;
+    float half_view_width = half_view_height * controller.GetAspectRatio();
     auto ortho_mins = Vector2{-half_view_width, -half_view_height};
     auto ortho_maxs = Vector2{half_view_width, half_view_height};
     return AABB2{ortho_mins, ortho_maxs};
 }
 
-AABB2 Game::CalcViewBounds(const OrthographicCameraController& cameraController) const noexcept {
-    auto view_bounds = CalcOrthoBounds(cameraController);
-    view_bounds.Translate(cameraController.GetCamera().GetPosition());
+AABB2 Game::CalcViewBounds(const OrthographicCameraController& controller) const noexcept {
+    auto view_bounds = CalcOrthoBounds(controller);
+    view_bounds.Translate(controller.GetCamera().GetPosition());
     return view_bounds;
 }
 
-AABB2 Game::CalcCullBounds(const OrthographicCameraController& cameraController) const noexcept {
-    AABB2 cullBounds = CalcViewBounds(cameraController);
+AABB2 Game::CalcCullBounds(const OrthographicCameraController& controller) const noexcept {
+    AABB2 cullBounds = CalcViewBounds(controller);
     cullBounds.AddPaddingToSides(-1.0f, -1.0f);
     return cullBounds;
 }
 
-AABB2 Game::CalcCullBoundsFromOrthoBounds(const OrthographicCameraController& cameraController) const noexcept {
-    AABB2 cullBounds = CalcOrthoBounds(cameraController);
+AABB2 Game::CalcCullBoundsFromOrthoBounds(const OrthographicCameraController& controller) const noexcept {
+    AABB2 cullBounds = CalcOrthoBounds(controller);
     cullBounds.AddPaddingToSides(-1.0f, -1.0f);
     return cullBounds;
 }
@@ -360,9 +360,17 @@ void Game::MakeSmallAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noex
     AddNewAsteroidToWorld(std::move(newAsteroid));
 }
 
-void Game::DoCameraShake(OrthographicCameraController& cameraController) const noexcept {
-    cameraController.SetupCameraShake(currentGraphicsOptions.MaxShakeOffsetHorizontal, currentGraphicsOptions.MaxShakeOffsetVertical, currentGraphicsOptions.MaxShakeAngle);
-    cameraController.DoCameraShake([this]() { return gameOptions.cameraShakeStrength * (GetShip() ? GetShip()->GetVelocity().CalcLength() : 0.0f); });
+void Game::DoCameraShake(OrthographicCameraController& controller) const noexcept {
+    controller.SetupCameraShake(currentGraphicsOptions.MaxShakeOffsetHorizontal, currentGraphicsOptions.MaxShakeOffsetVertical, currentGraphicsOptions.MaxShakeAngle);
+    controller.DoCameraShake([this]() {
+        const auto shakeMultiplier = gameOptions.cameraShakeStrength;
+        if(const auto* ship = GetShip(); ship) {
+            const auto speed = ship->GetVelocity().CalcLength();
+            return speed;
+        } else {
+            return 0.0f;
+        }
+    });
 }
 
 void Game::MakeExplosion(Vector2 position) noexcept {
