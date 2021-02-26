@@ -36,6 +36,8 @@ private:
     void MakeBullet() const noexcept;
     void MakeMine() const noexcept;
 
+    void DoScaleEaseOut(TimeUtils::FPSeconds& deltaSeconds, const  Vector2 half_extents);
+
     const Vector2 CalcBulletDirectionFromDifficulty() const noexcept;
     const Vector2 CalcNewBulletVelocity() const noexcept;
     const Vector2 CalcNewBulletPosition() const noexcept;

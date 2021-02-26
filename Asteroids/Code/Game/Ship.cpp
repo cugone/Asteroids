@@ -52,22 +52,14 @@ void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     const auto frameWidth = static_cast<float>(tex->GetDimensions().x);
     const auto frameHeight = static_cast<float>(tex->GetDimensions().y);
     const auto half_extents = Vector2{frameWidth, frameHeight};
-    {
-        if(IsRespawning()) {
-            _scale -= (0.90f * deltaSeconds.count());
-            _scale = std::clamp(_scale, 1.0f, 2.0f);
-            if(_scale == 1.0f) {
-                DoneRespawning();
-            }
-        } else {
-            _scale = 1.0f;
-        }
-        const auto S = Matrix4::CreateScaleMatrix(_scale * half_extents);
-        const auto R = Matrix4::Create2DRotationDegreesMatrix(90.0f + GetOrientationDegrees());
-        const auto T = Matrix4::CreateTranslationMatrix(GetPosition());
-        transform = Matrix4::MakeSRT(S, R, T);
-    }
 
+    DoScaleEaseOut(deltaSeconds, half_extents);
+
+    const auto S = Matrix4::CreateScaleMatrix(_scale * half_extents);
+    const auto R = Matrix4::Create2DRotationDegreesMatrix(90.0f + GetOrientationDegrees());
+    const auto T = Matrix4::CreateTranslationMatrix(GetPosition());
+    transform = Matrix4::MakeSRT(S, R, T);
+    
     auto& builder = mesh_builder;
     builder.Begin(PrimitiveType::Triangles);
     if(IsRespawning()) {
@@ -103,6 +95,17 @@ void Ship::Render(Renderer& renderer) const noexcept {
     Entity::Render(renderer);
 }
 
+void Ship::DoScaleEaseOut(TimeUtils::FPSeconds& /*deltaSeconds*/, const Vector2 /*half_extents*/) {
+    if(IsRespawning()) {
+        _scale = MathUtils::Interpolate(4.0f, 1.0f, g_theRenderer->GetGameTime().count());
+        if(_scale < 1.0f) {
+            _scale = 1.0f;
+            DoneRespawning();
+        }
+    } else {
+        _scale = 1.0f;
+    }
+}
 void Ship::EndFrame() noexcept {
     Entity::EndFrame();
     if(!IsRespawning() && _fireRate.CheckAndReset()) {
