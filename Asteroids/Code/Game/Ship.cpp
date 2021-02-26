@@ -178,12 +178,10 @@ void Ship::OnCollision(Entity* a, Entity* b) noexcept {
             a->DecrementHealth();
             asBullet->DecrementHealth();
             if(a->IsDead()) {
-                Thrust(0.0f);
                 g_theGame->DecrementLives();
             }
         } else if(auto* asUfo = dynamic_cast<Ufo*>(b); asUfo != nullptr) {
             a->Kill();
-            Thrust(0.0f);
             g_theGame->DecrementLives();
         }
     }
@@ -193,7 +191,6 @@ void Ship::OnCollision(Entity* a, Entity* b) noexcept {
         if(auto* asAsteroid = dynamic_cast<Asteroid*>(b); asAsteroid != nullptr) {
             a->DecrementHealth();
             if(a->IsDead()) {
-                Thrust(0.0f);
                 g_theGame->DecrementLives();
             }
         }
