@@ -116,10 +116,6 @@ void MainState::EndFrame() noexcept {
         }
     }
     g_theGame->PostFrameCleanup();
-    if(!m_initialized) {
-        m_ui_camera = m_cameraController.GetCamera();
-        m_initialized = m_initialized;
-    }
 }
 
 std::unique_ptr<GameState> MainState::HandleInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
