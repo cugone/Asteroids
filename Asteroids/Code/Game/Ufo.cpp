@@ -15,7 +15,7 @@
 #include "Game/GameCommon.hpp"
 #include "Game/GameConfig.hpp"
 
-Ufo::Ufo(Type type, Vector2 position)
+Ufo::Ufo(Type type, a2de::Vector2 position)
     : Entity()
     , _type(type)
 {
@@ -23,7 +23,7 @@ Ufo::Ufo(Type type, Vector2 position)
     SetCosmeticRadius(GetCosmeticRadiusFromType(_type));
     SetPhysicalRadius(GetPhysicalRadiusFromType(_type));
     SetPosition(position);
-    SetVelocity(Vector2::X_AXIS * 100.0f);
+    SetVelocity(a2de::Vector2::X_AXIS * 100.0f);
     SetHealth(GetHealthFromType(_type));
     faction = Entity::Faction::Enemy;
     _bulletSpeed = GetBulletSpeedFromTypeAndDifficulty(_type);
@@ -31,11 +31,11 @@ Ufo::Ufo(Type type, Vector2 position)
     _style = GetStyleFromType(_type);
     scoreValue = GetValueFromType(_type);
 
-    AnimatedSpriteDesc desc{};
+    a2de::AnimatedSpriteDesc desc{};
     desc.material = g_theRenderer->GetMaterial("ufo");
     desc.spriteSheet = GetSpriteSheet();
-    desc.durationSeconds = TimeUtils::FPSeconds{0.3f};
-    desc.playbackMode = AnimatedSprite::SpriteAnimMode::Looping;
+    desc.durationSeconds = a2de::TimeUtils::FPSeconds{0.3f};
+    desc.playbackMode = a2de::AnimatedSprite::SpriteAnimMode::Looping;
     desc.frameLength = GetFrameLengthFromTypeAndStyle(_type, _style);
     desc.startSpriteIndex = GetStartIndexFromTypeAndStyle(_type, _style);
 
@@ -57,7 +57,7 @@ void Ufo::BeginFrame() noexcept {
     }
 }
 
-void Ufo::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
+void Ufo::Update(a2de::TimeUtils::FPSeconds deltaSeconds) noexcept {
     Entity::Update(deltaSeconds);
     _timeSinceLastHit += deltaSeconds;
     _sprite->Update(deltaSeconds);
@@ -69,37 +69,37 @@ void Ufo::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     const auto uvs = _sprite->GetCurrentTexCoords();
     const auto frameWidth = static_cast<float>(_sprite->GetFrameDimensions().x);
     const auto frameHeight = static_cast<float>(_sprite->GetFrameDimensions().y);
-    const auto half_extents = Vector2{frameWidth, frameHeight};
+    const auto half_extents = a2de::Vector2{frameWidth, frameHeight};
     const auto scale = GetScaleFromType(_type);
     {
-        const auto S = Matrix4::CreateScaleMatrix(scale * half_extents);
-        const auto R = Matrix4::Create2DRotationDegreesMatrix(90.0f + GetOrientationDegrees());
-        const auto T = Matrix4::CreateTranslationMatrix(GetPosition());
-        transform = Matrix4::MakeSRT(S, R, T);
+        const auto S = a2de::Matrix4::CreateScaleMatrix(scale * half_extents);
+        const auto R = a2de::Matrix4::Create2DRotationDegreesMatrix(90.0f + GetOrientationDegrees());
+        const auto T = a2de::Matrix4::CreateTranslationMatrix(GetPosition());
+        transform = a2de::Matrix4::MakeSRT(S, R, T);
     }
 
     auto& builder = mesh_builder;
-    builder.Begin(PrimitiveType::Triangles);
-    builder.SetColor(Rgba::White);
+    builder.Begin(a2de::PrimitiveType::Triangles);
+    builder.SetColor(a2de::Rgba::White);
 
-    builder.SetUV(Vector2{uvs.maxs.x, uvs.maxs.y});
-    builder.AddVertex(Vector2{+0.5f, +0.5f});
+    builder.SetUV(a2de::Vector2{uvs.maxs.x, uvs.maxs.y});
+    builder.AddVertex(a2de::Vector2{+0.5f, +0.5f});
 
-    builder.SetUV(Vector2{uvs.mins.x, uvs.maxs.y});
-    builder.AddVertex(Vector2{-0.5f, +0.5f});
+    builder.SetUV(a2de::Vector2{uvs.mins.x, uvs.maxs.y});
+    builder.AddVertex(a2de::Vector2{-0.5f, +0.5f});
 
-    builder.SetUV(Vector2{uvs.mins.x, uvs.mins.y});
-    builder.AddVertex(Vector2{-0.5f, -0.5f});
+    builder.SetUV(a2de::Vector2{uvs.mins.x, uvs.mins.y});
+    builder.AddVertex(a2de::Vector2{-0.5f, -0.5f});
 
-    builder.SetUV(Vector2{uvs.maxs.x, uvs.mins.y});
-    builder.AddVertex(Vector2{+0.5f, -0.5f});
+    builder.SetUV(a2de::Vector2{uvs.maxs.x, uvs.mins.y});
+    builder.AddVertex(a2de::Vector2{+0.5f, -0.5f});
 
-    builder.AddIndicies(Mesh::Builder::Primitive::Quad);
+    builder.AddIndicies(a2de::Mesh::Builder::Primitive::Quad);
     builder.End(material);
 
 }
 
-void Ufo::Render(Renderer& renderer) const noexcept {
+void Ufo::Render(a2de::Renderer& renderer) const noexcept {
     ufo_state.wasHitUfoIndex.x = WasHit();
     ufo_state.wasHitUfoIndex.y = GetUfoIndexFromStyle(_style);
     ufo_state_cb->Update(*renderer.GetDeviceContext(), &ufo_state);
@@ -117,7 +117,7 @@ void Ufo::EndFrame() noexcept {
 }
 
 void Ufo::OnCreate() noexcept {
-    AudioSystem::SoundDesc desc{};
+    a2de::AudioSystem::SoundDesc desc{};
     desc.volume = 1.0f;
     desc.frequency = 1.0f;
     desc.loopCount = -1;
@@ -154,7 +154,7 @@ void Ufo::OnFire() noexcept {
 }
 
 void Ufo::OnHit() {
-    if(TimeUtils::FPFrames{1.0f} < _timeSinceLastHit) {
+    if(a2de::TimeUtils::FPFrames{1.0f} < _timeSinceLastHit) {
         _timeSinceLastHit = _timeSinceLastHit.zero();
     }
     g_theAudioSystem->Play(g_sound_hitpath);
@@ -174,7 +174,7 @@ float Ufo::WasHit() const noexcept {
 void Ufo::MakeBullet() const noexcept {
     const auto source = GetPosition();
     const auto angle = (_fireTarget - source).CalcHeadingDegrees();
-    g_theGame->MakeBullet(this, source, Vector2::CreateFromPolarCoordinatesDegrees(_bulletSpeed, angle));
+    g_theGame->MakeBullet(this, source, a2de::Vector2::CreateFromPolarCoordinatesDegrees(_bulletSpeed, angle));
 }
 
 float Ufo::GetCosmeticRadiusFromType(Type type) noexcept {
@@ -205,7 +205,7 @@ float Ufo::GetScaleFromType(Type type) noexcept {
     }
 }
 
-std::weak_ptr<SpriteSheet> Ufo::GetSpriteSheet() const noexcept {
+std::weak_ptr<a2de::SpriteSheet> Ufo::GetSpriteSheet() const noexcept {
     return g_theGame->ufo_sheet;
 }
 
@@ -238,18 +238,18 @@ float Ufo::GetBulletSpeedFromTypeAndDifficulty(Type type) const noexcept {
     return difficultyMultiplier * typeMultiplier * _bulletSpeed;
 }
 
-Vector2 Ufo::CalculateFireTarget() const noexcept {
+a2de::Vector2 Ufo::CalculateFireTarget() const noexcept {
     switch(_type) {
     case Type::Small: {
         if(auto ship = g_theGame->GetShip()) {
             return ship->GetPosition();
         } else {
-            return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, MathUtils::GetRandomFloatInRange(0.0f, 359.0f));
+            return GetPosition() + a2de::Vector2::CreateFromPolarCoordinatesDegrees(1.0f, a2de::MathUtils::GetRandomFloatInRange(0.0f, 359.0f));
         }
     }
     case Type::Big:
     {
-        return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, MathUtils::GetRandomFloatInRange(0.0f, 359.0f));
+        return GetPosition() + a2de::Vector2::CreateFromPolarCoordinatesDegrees(1.0f, a2de::MathUtils::GetRandomFloatInRange(0.0f, 359.0f));
     }
     case Type::Boss:
     {
@@ -258,13 +258,13 @@ Vector2 Ufo::CalculateFireTarget() const noexcept {
             const auto source = GetPosition();
             const auto angle = (target - source).CalcHeadingDegrees();
             const auto offset_range = 90.0f;
-            const auto offset = MathUtils::GetRandomFloatNegOneToOne() * offset_range;
-            return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, angle + offset);
+            const auto offset = a2de::MathUtils::GetRandomFloatNegOneToOne() * offset_range;
+            return GetPosition() + a2de::Vector2::CreateFromPolarCoordinatesDegrees(1.0f, angle + offset);
         } else {
-            return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, MathUtils::GetRandomFloatInRange(0.0f, 359.0f));
+            return GetPosition() + a2de::Vector2::CreateFromPolarCoordinatesDegrees(1.0f, a2de::MathUtils::GetRandomFloatInRange(0.0f, 359.0f));
         }
     }
-    default: return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, MathUtils::GetRandomFloatInRange(0.0f, 359.0f));
+    default: return GetPosition() + a2de::Vector2::CreateFromPolarCoordinatesDegrees(1.0f, a2de::MathUtils::GetRandomFloatInRange(0.0f, 359.0f));
     }
 }
 
@@ -370,17 +370,17 @@ Ufo::Style Ufo::GetStyleFromType(Type type) noexcept {
     switch(type) {
     case Type::Small:
     {
-        const auto i = MathUtils::GetRandomIntInRange(static_cast<int>(Style::First_Small), static_cast<int>(Style::Last_Small));
+        const auto i = a2de::MathUtils::GetRandomIntInRange(static_cast<int>(Style::First_Small), static_cast<int>(Style::Last_Small));
         return static_cast<Style>(i);
     }
     case Type::Big:
     {
-        const auto i = MathUtils::GetRandomIntInRange(static_cast<int>(Style::First_Big), static_cast<int>(Style::Last_Big));
+        const auto i = a2de::MathUtils::GetRandomIntInRange(static_cast<int>(Style::First_Big), static_cast<int>(Style::Last_Big));
         return static_cast<Style>(i);
     }
     case Type::Boss:
     {
-        const auto i = MathUtils::GetRandomIntInRange(static_cast<int>(Style::First_Boss), static_cast<int>(Style::Last_Boss));
+        const auto i = a2de::MathUtils::GetRandomIntInRange(static_cast<int>(Style::First_Boss), static_cast<int>(Style::Last_Boss));
         return static_cast<Style>(i);
     }
     default:

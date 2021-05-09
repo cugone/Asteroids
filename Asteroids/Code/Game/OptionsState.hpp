@@ -23,10 +23,10 @@ enum class OptionsMenu {
 };
 
 template<>
-struct TypeUtils::is_incrementable_enum_type<OptionsMenu> : std::true_type {};
+struct a2de::TypeUtils::is_incrementable_enum_type<OptionsMenu> : std::true_type {};
 
 template<>
-struct TypeUtils::is_decrementable_enum_type<OptionsMenu> : std::true_type {};
+struct a2de::TypeUtils::is_decrementable_enum_type<OptionsMenu> : std::true_type {};
 
 class OptionsState : public GameState {
 public:
@@ -35,12 +35,12 @@ public:
     void OnEnter() noexcept override;
     void OnExit() noexcept override;
     void BeginFrame() noexcept override;
-    void Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) override;
+    void Update([[maybe_unused]] a2de::TimeUtils::FPSeconds deltaSeconds) override;
     void Render() const noexcept override;
     void EndFrame() noexcept override;
 protected:
 private:
-    std::unique_ptr<GameState> HandleInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept override;
+    std::unique_ptr<GameState> HandleInput([[maybe_unused]] a2de::TimeUtils::FPSeconds deltaSeconds) noexcept override;
     std::unique_ptr<GameState> HandleKeyboardInput() noexcept;
     std::unique_ptr<GameState> HandleControllerInput() noexcept;
 
@@ -52,7 +52,7 @@ private:
     std::string DifficultyToString(Difficulty difficulty) const noexcept;
     std::string ControlPreferenceToString(ControlPreference preference) const noexcept;
 
-    mutable Camera2D m_ui_camera{};
+    mutable a2de::Camera2D m_ui_camera{};
     OptionsMenu m_selected_item{OptionsMenu::First_};
     GameOptions m_temp_options{};
     float m_min_camera_shake{0.0f};

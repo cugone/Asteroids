@@ -32,12 +32,12 @@ public:
         ,Last_Boss = Orange
     };
 
-    Ufo(Ufo::Type type, Vector2 position);
+    Ufo(Ufo::Type type, a2de::Vector2 position);
     virtual ~Ufo() = default;
 
     void BeginFrame() noexcept override;
-    void Update(TimeUtils::FPSeconds deltaSeconds) noexcept override;
-    void Render(Renderer& renderer) const noexcept override;
+    void Update(a2de::TimeUtils::FPSeconds deltaSeconds) noexcept override;
+    void Render(a2de::Renderer& renderer) const noexcept override;
     void EndFrame() noexcept override;
 
     void OnCreate() noexcept override;
@@ -59,26 +59,26 @@ protected:
 
     float GetBulletSpeedFromTypeAndDifficulty(Type type) const noexcept;
 
-    std::weak_ptr<SpriteSheet> GetSpriteSheet() const noexcept;
-    Vector2 CalculateFireTarget() const noexcept;
+    std::weak_ptr<a2de::SpriteSheet> GetSpriteSheet() const noexcept;
+    a2de::Vector2 CalculateFireTarget() const noexcept;
 
     float WasHit() const noexcept;
 
     void MakeBullet() const noexcept;
 
     struct ufo_state_t {
-        Vector4 wasHitUfoIndex = Vector4::Y_AXIS;
+        a2de::Vector4 wasHitUfoIndex = a2de::Vector4::Y_AXIS;
     };
 
-    ConstantBuffer* ufo_state_cb{nullptr};
+    a2de::ConstantBuffer* ufo_state_cb{nullptr};
     mutable ufo_state_t ufo_state{};
     Type _type{Type::Small};
     Style _style{Style::Blue};
-    std::unique_ptr<AnimatedSprite> _sprite{};
-    TimeUtils::FPSeconds _timeSinceLastHit{0.0f};
-    Stopwatch _fireRate{};
-    AudioSystem::Sound* _warble_sound{};
-    Vector2 _fireTarget{};
+    std::unique_ptr<a2de::AnimatedSprite> _sprite{};
+    a2de::TimeUtils::FPSeconds _timeSinceLastHit{0.0f};
+    a2de::Stopwatch _fireRate{};
+    a2de::AudioSystem::Sound* _warble_sound{};
+    a2de::Vector2 _fireTarget{};
     float _bulletSpeed{800.0f};
     bool _canFire{false};
 

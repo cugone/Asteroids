@@ -15,11 +15,15 @@
 #include "Game/Bullet.hpp"
 #include "Game/Ufo.hpp"
 
+#include "Game/ThrustComponent.hpp"
+#include "Game/LaserComponent.hpp"
+#include "Game/LaserChargeComponent.hpp"
+
 #include <algorithm>
 
-Ship::Ship() : Ship(Vector2::ZERO) {}
+Ship::Ship() : Ship(a2de::Vector2::ZERO) {}
 
-Ship::Ship(Vector2 position)
+Ship::Ship(a2de::Vector2 position)
     : Entity()
 {
     faction = Entity::Faction::Player;
@@ -36,73 +40,94 @@ Ship::Ship(Vector2 position)
 
 void Ship::BeginFrame() noexcept {
     _thrust->BeginFrame();
+    if(_laserCharge) {
+        _laserCharge->BeginFrame();
+        if(_laserCharge->DoneFiring()) {
+            Laser();
+        }
+    }
+    if(_laser) {
+        _laser->BeginFrame();
+    }
 }
 
-void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
+void Ship::Update(a2de::TimeUtils::FPSeconds deltaSeconds) noexcept {
     Entity::Update(deltaSeconds);
     if(GetForce().CalcLengthSquared() == 0.0f) {
         auto newVelocity = GetVelocity() * 0.99f;
-        if(MathUtils::IsEquivalentToZero(newVelocity)) {
-            newVelocity = Vector2::ZERO;
+        if(a2de::MathUtils::IsEquivalentToZero(newVelocity)) {
+            newVelocity = a2de::Vector2::ZERO;
         }
         SetVelocity(newVelocity);
     }
-    const auto uvs = AABB2::ZERO_TO_ONE;
-    const auto tex = material->GetTexture(Material::TextureID::Diffuse);
+    const auto uvs = a2de::AABB2::ZERO_TO_ONE;
+    const auto tex = material->GetTexture(a2de::Material::TextureID::Diffuse);
     const auto frameWidth = static_cast<float>(tex->GetDimensions().x);
     const auto frameHeight = static_cast<float>(tex->GetDimensions().y);
-    const auto half_extents = Vector2{frameWidth, frameHeight};
+    const auto half_extents = a2de::Vector2{frameWidth, frameHeight};
 
     DoScaleEaseOut(deltaSeconds);
 
-    const auto S = Matrix4::CreateScaleMatrix(_scale * half_extents);
-    const auto R = Matrix4::Create2DRotationDegreesMatrix(90.0f + GetOrientationDegrees());
-    const auto T = Matrix4::CreateTranslationMatrix(GetPosition());
-    transform = Matrix4::MakeSRT(S, R, T);
+    const auto S = a2de::Matrix4::CreateScaleMatrix(_scale * half_extents);
+    const auto R = a2de::Matrix4::Create2DRotationDegreesMatrix(90.0f + GetOrientationDegrees());
+    const auto T = a2de::Matrix4::CreateTranslationMatrix(GetPosition());
+    transform = a2de::Matrix4::MakeSRT(S, R, T);
     
     auto& builder = mesh_builder;
-    builder.Begin(PrimitiveType::Triangles);
+    builder.Begin(a2de::PrimitiveType::Triangles);
     if(IsRespawning()) {
         float a = DoAlphaEaseOut(deltaSeconds);
-        builder.SetColor(Vector4{1.0f, 1.0f, 1.0f, a});
+        builder.SetColor(a2de::Vector4{1.0f, 1.0f, 1.0f, a});
     } else {
-        builder.SetColor(Rgba::White);
+        builder.SetColor(a2de::Rgba::White);
     }
 
-    builder.SetUV(Vector2{uvs.maxs.x, uvs.maxs.y});
-    builder.AddVertex(Vector2{+0.5f, +0.5f});
+    builder.SetUV(a2de::Vector2{uvs.maxs.x, uvs.maxs.y});
+    builder.AddVertex(a2de::Vector2{+0.5f, +0.5f});
 
-    builder.SetUV(Vector2{uvs.mins.x, uvs.maxs.y});
-    builder.AddVertex(Vector2{-0.5f, +0.5f});
+    builder.SetUV(a2de::Vector2{uvs.mins.x, uvs.maxs.y});
+    builder.AddVertex(a2de::Vector2{-0.5f, +0.5f});
 
-    builder.SetUV(Vector2{uvs.mins.x, uvs.mins.y});
-    builder.AddVertex(Vector2{-0.5f, -0.5f});
+    builder.SetUV(a2de::Vector2{uvs.mins.x, uvs.mins.y});
+    builder.AddVertex(a2de::Vector2{-0.5f, -0.5f});
 
-    builder.SetUV(Vector2{uvs.maxs.x, uvs.mins.y});
-    builder.AddVertex(Vector2{+0.5f, -0.5f});
+    builder.SetUV(a2de::Vector2{uvs.maxs.x, uvs.mins.y});
+    builder.AddVertex(a2de::Vector2{+0.5f, -0.5f});
 
-    builder.AddIndicies(Mesh::Builder::Primitive::Quad);
+    builder.AddIndicies(a2de::Mesh::Builder::Primitive::Quad);
     builder.End(material);
 
     if(!IsRespawning()) {
         _thrust->Update(deltaSeconds);
+        if(_laser) {
+            _laser->Update(deltaSeconds);
+        }
+        if(_laserCharge) {
+            _laserCharge->Update(deltaSeconds);
+        }
     }
 
 }
 
-void Ship::Render(Renderer& renderer) const noexcept {
+void Ship::Render(a2de::Renderer& renderer) const noexcept {
     _thrust->Render(renderer);
+    if(_laser) {
+        _laser->Render(renderer);
+    }
+    if(_laserCharge) {
+        _laserCharge->Render(renderer);
+    }
     Entity::Render(renderer);
 }
 
-void Ship::DoScaleEaseOut(TimeUtils::FPSeconds& deltaSeconds) noexcept {
+void Ship::DoScaleEaseOut(a2de::TimeUtils::FPSeconds& deltaSeconds) noexcept {
     static float t = 0.0f;
     static float duration = 0.66f;
     static float startScale = 4.0f;
     static float endScale = 1.0f;
     if(IsRespawning()) {
         if(t < duration) {
-            _scale = MathUtils::Interpolate(startScale, endScale, t / duration);
+            _scale = a2de::MathUtils::Interpolate(startScale, endScale, t / duration);
             t += deltaSeconds.count();
         } else {
             t = 0.0f;
@@ -115,14 +140,14 @@ void Ship::DoScaleEaseOut(TimeUtils::FPSeconds& deltaSeconds) noexcept {
 }
 
 
-float Ship::DoAlphaEaseOut(TimeUtils::FPSeconds& deltaSeconds) const noexcept {
+float Ship::DoAlphaEaseOut(a2de::TimeUtils::FPSeconds& deltaSeconds) const noexcept {
     static float t = 0.0f;
     static float duration = 0.66f;
     static float start = 0.0f;
     static float end = 1.0f;
     static float a = 0.0f;
     if(t < duration) {
-        a = MathUtils::Interpolate(start, end, t / duration);
+        a = a2de::MathUtils::Interpolate(start, end, t / duration);
         t += deltaSeconds.count();
     } else {
         t = 0.0f;
@@ -140,6 +165,18 @@ void Ship::EndFrame() noexcept {
         _canDropMine = true;
     }
     _thrust->EndFrame();
+    if(_laser) {
+        _laser->EndFrame();
+        if(_laser->DoneFiring()) {
+            _laser.reset();
+        }
+    }
+    if(_laserCharge) {
+        _laserCharge->EndFrame();
+        if(_laserCharge->DoneFiring()) {
+            _laserCharge.reset();
+        }
+    }
 }
 
 void Ship::OnDestroy() noexcept {
@@ -178,6 +215,20 @@ void Ship::Thrust(float force) noexcept {
     }
     _thrust->SetThrust(force);
     AddForce(GetForward() * force);
+}
+
+void Ship::Laser() noexcept {
+    if(IsRespawning() || _laser) {
+        return;
+    }
+    _laser = std::move(std::make_unique<LaserComponent>(this));
+}
+
+void Ship::Charge() noexcept {
+    if(IsRespawning() || _laserCharge) {
+        return;
+    }
+    _laserCharge = std::move(std::make_unique<LaserChargeComponent>(this));
 }
 
 void Ship::SetRespawning() noexcept {
@@ -240,24 +291,24 @@ void Ship::MakeMine() const noexcept {
     g_theGame->MakeMine(this, GetPosition());
 }
 
-const Vector2 Ship::CalcNewBulletVelocity() const noexcept {
+const a2de::Vector2 Ship::CalcNewBulletVelocity() const noexcept {
     return CalcBulletDirectionFromDifficulty() * _bulletSpeed;
 }
 
-const Vector2 Ship::CalcNewBulletPosition() const noexcept {
+const a2de::Vector2 Ship::CalcNewBulletPosition() const noexcept {
     return GetPosition() + GetForward() * GetCosmeticRadius();
 }
 
-const Vector2 Ship::CalcBulletDirectionFromDifficulty() const noexcept {
+const a2de::Vector2 Ship::CalcBulletDirectionFromDifficulty() const noexcept {
     const auto current_angle = GetForward().CalcHeadingDegrees();
     const auto angle_bias = []() {
         switch(g_theGame->gameOptions.difficulty) {
-        case Difficulty::Easy: return MathUtils::GetRandomFloatNegOneToOne() * 2.5f;
-        case Difficulty::Normal: return MathUtils::GetRandomFloatNegOneToOne() * 5.0f;
-        case Difficulty::Hard: return MathUtils::GetRandomFloatNegOneToOne() * 10.0f;
+        case Difficulty::Easy: return a2de::MathUtils::GetRandomFloatNegOneToOne() * 2.5f;
+        case Difficulty::Normal: return a2de::MathUtils::GetRandomFloatNegOneToOne() * 5.0f;
+        case Difficulty::Hard: return a2de::MathUtils::GetRandomFloatNegOneToOne() * 10.0f;
         default: return 0.0f;
         }
     }();
     const auto new_angle = current_angle + angle_bias;
-    return Vector2::CreateFromPolarCoordinatesDegrees(1.0f, new_angle);
+    return a2de::Vector2::CreateFromPolarCoordinatesDegrees(1.0f, new_angle);
 }

@@ -41,7 +41,7 @@ void Game::Initialize() {
 void Game::InitializeAudio() noexcept {
     InitializeSounds();
     InitializeMusic();
-    AudioSystem::SoundDesc desc{};
+    a2de::AudioSystem::SoundDesc desc{};
     desc.loopCount = -1;
     desc.frequency = 2.0f;
     //g_theAudioSystem->Play(g_music_bgmpath, desc);
@@ -50,7 +50,7 @@ void Game::InitializeAudio() noexcept {
 void Game::InitializeSounds() noexcept {
     g_theAudioSystem->RegisterWavFilesFromFolder(g_sound_folderpath);
     g_theAudioSystem->AddChannelGroup(g_audiogroup_sound);
-    for(const auto& filepath : FileUtils::GetAllPathsInFolders(g_sound_folderpath)) {
+    for(const auto& filepath : a2de::FileUtils::GetAllPathsInFolders(g_sound_folderpath)) {
         g_theAudioSystem->AddSoundToChannelGroup(g_audiogroup_sound, filepath);
     }
     if(auto* sound_group = g_theAudioSystem->GetChannelGroup(g_audiogroup_sound)) {
@@ -61,7 +61,7 @@ void Game::InitializeSounds() noexcept {
 void Game::InitializeMusic() noexcept {
     g_theAudioSystem->RegisterWavFilesFromFolder(g_music_folderpath);
     g_theAudioSystem->AddChannelGroup(g_audiogroup_music);
-    for(const auto& filepath : FileUtils::GetAllPathsInFolders(g_music_folderpath)) {
+    for(const auto& filepath : a2de::FileUtils::GetAllPathsInFolders(g_music_folderpath)) {
         g_theAudioSystem->AddSoundToChannelGroup(g_audiogroup_music, filepath);
     }
     if(auto* music_group = g_theAudioSystem->GetChannelGroup(g_audiogroup_music)) {
@@ -115,28 +115,34 @@ void Game::SetUfoSpriteSheets() noexcept {
     }
 }
 
-AABB2 Game::CalcOrthoBounds(const OrthographicCameraController& controller) const noexcept {
-    float half_view_height = controller.GetCamera().GetViewHeight() * 0.5f;
-    float half_view_width = half_view_height * controller.GetAspectRatio();
-    auto ortho_mins = Vector2{-half_view_width, -half_view_height};
-    auto ortho_maxs = Vector2{half_view_width, half_view_height};
-    return AABB2{ortho_mins, ortho_maxs};
+void Game::SetLaserChargeSpriteSheet() noexcept {
+    if(!lasercharge_sheet) {
+        lasercharge_sheet = g_theRenderer->CreateSpriteSheet("Data/Images/laser_chargeup.png", 4, 4);
+    }
 }
 
-AABB2 Game::CalcViewBounds(const OrthographicCameraController& controller) const noexcept {
+a2de::AABB2 Game::CalcOrthoBounds(const a2de::OrthographicCameraController& controller) const noexcept {
+    float half_view_height = controller.GetCamera().GetViewHeight() * 0.5f;
+    float half_view_width = half_view_height * controller.GetAspectRatio();
+    auto ortho_mins = a2de::Vector2{-half_view_width, -half_view_height};
+    auto ortho_maxs = a2de::Vector2{half_view_width, half_view_height};
+    return a2de::AABB2{ortho_mins, ortho_maxs};
+}
+
+a2de::AABB2 Game::CalcViewBounds(const a2de::OrthographicCameraController& controller) const noexcept {
     auto view_bounds = CalcOrthoBounds(controller);
     view_bounds.Translate(controller.GetCamera().GetPosition());
     return view_bounds;
 }
 
-AABB2 Game::CalcCullBounds(const OrthographicCameraController& controller) const noexcept {
-    AABB2 cullBounds = CalcViewBounds(controller);
+a2de::AABB2 Game::CalcCullBounds(const a2de::OrthographicCameraController& controller) const noexcept {
+    a2de::AABB2 cullBounds = CalcViewBounds(controller);
     cullBounds.AddPaddingToSides(-1.0f, -1.0f);
     return cullBounds;
 }
 
-AABB2 Game::CalcCullBoundsFromOrthoBounds(const OrthographicCameraController& controller) const noexcept {
-    AABB2 cullBounds = CalcOrthoBounds(controller);
+a2de::AABB2 Game::CalcCullBoundsFromOrthoBounds(const a2de::OrthographicCameraController& controller) const noexcept {
+    a2de::AABB2 cullBounds = CalcOrthoBounds(controller);
     cullBounds.AddPaddingToSides(-1.0f, -1.0f);
     return cullBounds;
 }
@@ -149,28 +155,28 @@ void Game::AddNewUfoToWorld(std::unique_ptr<Ufo> newUfo) noexcept {
     asUfo->OnCreate();
 }
 
-void Game::MakeUfo(Ufo::Type type, AABB2 world_bounds) noexcept {
-    const auto pos = [world_bounds, type]()->const Vector2 {
+void Game::MakeUfo(Ufo::Type type, a2de::AABB2 world_bounds) noexcept {
+    const auto pos = [world_bounds, type]()->const a2de::Vector2 {
         const auto world_dims = world_bounds.CalcDimensions();
         const auto world_width = world_dims.x;
         const auto world_height = world_dims.y;
         const auto cr = Ufo::GetCosmeticRadiusFromType(type);
         const auto y = [world_height, cr]() {
-            const auto r = MathUtils::GetRandomFloatNegOneToOne();
+            const auto r = a2de::MathUtils::GetRandomFloatNegOneToOne();
             if(r < 0.0f) {
                 return r * world_height + cr;
             }
             return r * world_height - cr;
         }();
 
-        const auto left = Vector2{world_bounds.mins.x, y };
-        const auto right = Vector2{world_bounds.maxs.x, y};
-        return MathUtils::GetRandomBool() ? left : right;
+        const auto left = a2de::Vector2{world_bounds.mins.x, y };
+        const auto right = a2de::Vector2{world_bounds.maxs.x, y};
+        return a2de::MathUtils::GetRandomBool() ? left : right;
     }();
     auto newUfo = std::make_unique<Ufo>(type, pos);
     const auto ptr = newUfo.get();
     g_theGame->AddNewUfoToWorld(std::move(newUfo));
-    ptr->SetVelocity(Vector2{pos.x < 0.0f ? -ptr->GetSpeed() : ptr->GetSpeed(), 0.0f});
+    ptr->SetVelocity(a2de::Vector2{pos.x < 0.0f ? -ptr->GetSpeed() : ptr->GetSpeed(), 0.0f});
 }
 
 void Game::SetControlType() noexcept {
@@ -204,8 +210,8 @@ bool Game::IsMouseActive() const noexcept {
 }
 
 void Game::CreateOptionsFile() const noexcept {
-    FileUtils::CreateFolders("Data/Config/");
-    GUARANTEE_OR_DIE(FileUtils::WriteBufferToFile(g_options_str, g_options_filepath), "Could not create options file.");
+    a2de::FileUtils::CreateFolders("Data/Config/");
+    GUARANTEE_OR_DIE(a2de::FileUtils::WriteBufferToFile(g_options_str, g_options_filepath), "Could not create options file.");
 }
 
 void Game::LoadOptionsFile() const noexcept {
@@ -228,7 +234,7 @@ void Game::CreateOrLoadOptionsFile() noexcept {
 
 }
 
-void Game::Update(TimeUtils::FPSeconds deltaSeconds) {
+void Game::Update(a2de::TimeUtils::FPSeconds deltaSeconds) {
     _current_state->Update(deltaSeconds);
 }
 
@@ -265,7 +271,7 @@ Ship* Game::GetShip() const noexcept {
     return nullptr;
 }
 
-void Game::MakeBullet(const Entity* parent, Vector2 pos, Vector2 vel) noexcept {
+void Game::MakeBullet(const Entity* parent, a2de::Vector2 pos, a2de::Vector2 vel) noexcept {
     auto newBullet = std::make_unique<Bullet>(parent, pos, vel);
     auto* last_entity = newBullet.get();
     m_pending_entities.emplace_back(std::move(newBullet));
@@ -274,7 +280,7 @@ void Game::MakeBullet(const Entity* parent, Vector2 pos, Vector2 vel) noexcept {
     asBullet->OnCreate();
 }
 
-void Game::MakeMine(const Entity* parent, Vector2 position) noexcept {
+void Game::MakeMine(const Entity* parent, a2de::Vector2 position) noexcept {
     SetMineSpriteSheet();
     auto newMine = std::make_unique<Mine>(parent, position);
     auto* last_entity = newMine.get();
@@ -284,17 +290,17 @@ void Game::MakeMine(const Entity* parent, Vector2 position) noexcept {
     asMine->OnCreate();
 }
 
-void Game::MakeSmallUfo(AABB2 world_bounds) noexcept {
+void Game::MakeSmallUfo(a2de::AABB2 world_bounds) noexcept {
     SetUfoSpriteSheets();
     MakeUfo(Ufo::Type::Small, world_bounds);
 }
 
-void Game::MakeBigUfo(AABB2 world_bounds) noexcept {
+void Game::MakeBigUfo(a2de::AABB2 world_bounds) noexcept {
     SetUfoSpriteSheets();
     MakeUfo(Ufo::Type::Big, world_bounds);
 }
 
-void Game::MakeBossUfo(AABB2 world_bounds) noexcept {
+void Game::MakeBossUfo(a2de::AABB2 world_bounds) noexcept {
     SetUfoSpriteSheets();
     MakeUfo(Ufo::Type::Boss, world_bounds);
 }
@@ -307,31 +313,31 @@ void Game::AddNewAsteroidToWorld(std::unique_ptr<Asteroid> newAsteroid) {
     asAsteroid->OnCreate();
 }
 
-void Game::MakeLargeAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept {
+void Game::MakeLargeAsteroid(a2de::Vector2 pos, a2de::Vector2 vel, float rotationSpeed) noexcept {
     SetAsteroidSpriteSheet();
     auto newAsteroid = std::make_unique<Asteroid>(Asteroid::Type::Large, pos, vel, rotationSpeed);
     AddNewAsteroidToWorld(std::move(newAsteroid));
 }
 
-void Game::MakeLargeAsteroidAt(Vector2 pos) noexcept {
-    const auto vx = MathUtils::GetRandomFloatNegOneToOne();
-    const auto vy = MathUtils::GetRandomFloatNegOneToOne();
-    const auto s = MathUtils::GetRandomFloatInRange(20.0f, 100.0f);
-    const auto vel = Vector2{vx, vy} * s;
-    const auto rot = MathUtils::GetRandomFloatNegOneToOne() * 180.0f;
+void Game::MakeLargeAsteroidAt(a2de::Vector2 pos) noexcept {
+    const auto vx = a2de::MathUtils::GetRandomFloatNegOneToOne();
+    const auto vy = a2de::MathUtils::GetRandomFloatNegOneToOne();
+    const auto s = a2de::MathUtils::GetRandomFloatInRange(20.0f, 100.0f);
+    const auto vel = a2de::Vector2{vx, vy} * s;
+    const auto rot = a2de::MathUtils::GetRandomFloatNegOneToOne() * 180.0f;
     MakeLargeAsteroid(pos, vel, rot);
 }
 
-void Game::MakeLargeAsteroidOffScreen(AABB2 world_bounds) noexcept {
-    const auto pos = [world_bounds]()->const Vector2 {
+void Game::MakeLargeAsteroidOffScreen(a2de::AABB2 world_bounds) noexcept {
+    const auto pos = [world_bounds]()->const a2de::Vector2 {
         const auto world_dims = world_bounds.CalcDimensions();
         const auto world_width = world_dims.x;
         const auto world_height = world_dims.y;
-        const auto left = Vector2{world_bounds.mins.x, MathUtils::GetRandomFloatNegOneToOne() * world_height};
-        const auto right = Vector2{world_bounds.maxs.x, MathUtils::GetRandomFloatNegOneToOne() * world_height};
-        const auto top = Vector2{MathUtils::GetRandomFloatNegOneToOne() * world_width, world_bounds.mins.y};
-        const auto bottom = Vector2{MathUtils::GetRandomFloatNegOneToOne() * world_width, world_bounds.maxs.y};
-        const auto i = MathUtils::GetRandomIntLessThan(4);
+        const auto left = a2de::Vector2{world_bounds.mins.x, a2de::MathUtils::GetRandomFloatNegOneToOne() * world_height};
+        const auto right = a2de::Vector2{world_bounds.maxs.x, a2de::MathUtils::GetRandomFloatNegOneToOne() * world_height};
+        const auto top = a2de::Vector2{a2de::MathUtils::GetRandomFloatNegOneToOne() * world_width, world_bounds.mins.y};
+        const auto bottom = a2de::Vector2{a2de::MathUtils::GetRandomFloatNegOneToOne() * world_width, world_bounds.maxs.y};
+        const auto i = a2de::MathUtils::GetRandomIntLessThan(4);
         switch(i) {
         case 0:
             return left;
@@ -348,19 +354,19 @@ void Game::MakeLargeAsteroidOffScreen(AABB2 world_bounds) noexcept {
     MakeLargeAsteroidAt(pos);
 }
 
-void Game::MakeMediumAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept {
+void Game::MakeMediumAsteroid(a2de::Vector2 pos, a2de::Vector2 vel, float rotationSpeed) noexcept {
     SetAsteroidSpriteSheet();
     auto newAsteroid = std::make_unique<Asteroid>(Asteroid::Type::Medium, pos, vel, rotationSpeed);
     AddNewAsteroidToWorld(std::move(newAsteroid));
 }
 
-void Game::MakeSmallAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept {
+void Game::MakeSmallAsteroid(a2de::Vector2 pos, a2de::Vector2 vel, float rotationSpeed) noexcept {
     SetAsteroidSpriteSheet();
     auto newAsteroid = std::make_unique<Asteroid>(Asteroid::Type::Small, pos, vel, rotationSpeed);
     AddNewAsteroidToWorld(std::move(newAsteroid));
 }
 
-void Game::DoCameraShake(OrthographicCameraController& controller) const noexcept {
+void Game::DoCameraShake(a2de::OrthographicCameraController& controller) const noexcept {
     controller.SetupCameraShake(currentGraphicsOptions.MaxShakeOffsetHorizontal, currentGraphicsOptions.MaxShakeOffsetVertical, currentGraphicsOptions.MaxShakeAngle);
     controller.DoCameraShake([this]() {
         const auto shakeMultiplier = gameOptions.cameraShakeStrength;
@@ -373,7 +379,7 @@ void Game::DoCameraShake(OrthographicCameraController& controller) const noexcep
     });
 }
 
-void Game::MakeExplosion(Vector2 position) noexcept {
+void Game::MakeExplosion(a2de::Vector2 position) noexcept {
     SetExplosionSpriteSheet();
     auto newExplosion = std::make_unique<Explosion>(position);
     auto* last_entity = newExplosion.get();

@@ -21,10 +21,10 @@
 #include <type_traits>
 #include <vector>
 
-Asteroid::Asteroid(Vector2 position, Vector2 velocity, float rotationSpeed)
+Asteroid::Asteroid(a2de::Vector2 position, a2de::Vector2 velocity, float rotationSpeed)
     : Asteroid(Type::Large, position, velocity, rotationSpeed) {/* DO NOTHING */}
 
-Asteroid::Asteroid(Type type, Vector2 position, Vector2 velocity, float rotationSpeed)
+Asteroid::Asteroid(Type type, a2de::Vector2 position, a2de::Vector2 velocity, float rotationSpeed)
     : Entity()
     , _type(type)
 {
@@ -38,11 +38,11 @@ Asteroid::Asteroid(Type type, Vector2 position, Vector2 velocity, float rotation
     SetCosmeticRadius(cosmeticRadius);
     SetPhysicalRadius(physicalRadius);
 
-    AnimatedSpriteDesc desc{};
+    a2de::AnimatedSpriteDesc desc{};
     desc.material = g_theRenderer->GetMaterial("asteroid");
     desc.spriteSheet = g_theGame->asteroid_sheet;
-    desc.durationSeconds = TimeUtils::FPSeconds{1.0f};
-    desc.playbackMode = AnimatedSprite::SpriteAnimMode::Looping;
+    desc.durationSeconds = a2de::TimeUtils::FPSeconds{1.0f};
+    desc.playbackMode = a2de::AnimatedSprite::SpriteAnimMode::Looping;
     desc.frameLength = 30;
     desc.startSpriteIndex = 0;
     
@@ -65,7 +65,7 @@ long long Asteroid::GetScoreFromType(Type type) {
     }
 }
 
-void Asteroid::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
+void Asteroid::Update(a2de::TimeUtils::FPSeconds deltaSeconds) noexcept {
     Entity::Update(deltaSeconds);
     _timeSinceLastHit += deltaSeconds;
 
@@ -81,43 +81,43 @@ void Asteroid::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     const auto frameWidth = static_cast<float>(_sprite->GetFrameDimensions().x);
     const auto frameHeight = static_cast<float>(_sprite->GetFrameDimensions().y);
     const auto extent_scale = _type == Type::Large ? 1.0f : (_type == Type::Medium ? 0.75f : (_type == Type::Small ? 0.50f : 1.0f));
-    const auto half_extents = Vector2{frameWidth, frameHeight} * extent_scale;
+    const auto half_extents = a2de::Vector2{frameWidth, frameHeight} * extent_scale;
     {
-        const auto S = Matrix4::CreateScaleMatrix(half_extents);
-        const auto R = Matrix4::Create2DRotationDegreesMatrix(90.0f + GetOrientationDegrees());
-        const auto T = Matrix4::CreateTranslationMatrix(GetPosition());
-        transform = Matrix4::MakeSRT(S, R, T);
+        const auto S = a2de::Matrix4::CreateScaleMatrix(half_extents);
+        const auto R = a2de::Matrix4::Create2DRotationDegreesMatrix(90.0f + GetOrientationDegrees());
+        const auto T = a2de::Matrix4::CreateTranslationMatrix(GetPosition());
+        transform = a2de::Matrix4::MakeSRT(S, R, T);
     }
 
     auto& builder = mesh_builder;
-    builder.Begin(PrimitiveType::Triangles);
-    builder.SetColor(Rgba::White);
+    builder.Begin(a2de::PrimitiveType::Triangles);
+    builder.SetColor(a2de::Rgba::White);
 
-    builder.SetUV(Vector2{uvs.maxs.x, uvs.maxs.y});
-    builder.AddVertex(Vector2{+0.5f, +0.5f});
+    builder.SetUV(a2de::Vector2{uvs.maxs.x, uvs.maxs.y});
+    builder.AddVertex(a2de::Vector2{+0.5f, +0.5f});
 
-    builder.SetUV(Vector2{uvs.mins.x, uvs.maxs.y});
-    builder.AddVertex(Vector2{-0.5f, +0.5f});
+    builder.SetUV(a2de::Vector2{uvs.mins.x, uvs.maxs.y});
+    builder.AddVertex(a2de::Vector2{-0.5f, +0.5f});
 
-    builder.SetUV(Vector2{uvs.mins.x, uvs.mins.y});
-    builder.AddVertex(Vector2{-0.5f, -0.5f});
+    builder.SetUV(a2de::Vector2{uvs.mins.x, uvs.mins.y});
+    builder.AddVertex(a2de::Vector2{-0.5f, -0.5f});
 
-    builder.SetUV(Vector2{uvs.maxs.x, uvs.mins.y});
-    builder.AddVertex(Vector2{+0.5f, -0.5f});
+    builder.SetUV(a2de::Vector2{uvs.maxs.x, uvs.mins.y});
+    builder.AddVertex(a2de::Vector2{+0.5f, -0.5f});
 
-    builder.AddIndicies(Mesh::Builder::Primitive::Quad);
+    builder.AddIndicies(a2de::Mesh::Builder::Primitive::Quad);
     builder.End(material);
 
 }
 
-void Asteroid::Render(Renderer& renderer) const noexcept {
+void Asteroid::Render(a2de::Renderer& renderer) const noexcept {
     asteroid_state.wasHit = WasHit();
     asteroid_state_cb->Update(*renderer.GetDeviceContext(), &asteroid_state);
     Entity::Render(renderer);
 }
 
-Vector4 Asteroid::WasHit() const noexcept {
-    return _timeSinceLastHit.count() == 0.0f ? Vector4::X_AXIS : Vector4::ZERO;
+a2de::Vector4 Asteroid::WasHit() const noexcept {
+    return _timeSinceLastHit.count() == 0.0f ? a2de::Vector4::X_AXIS : a2de::Vector4::ZERO;
 }
 
 
@@ -182,7 +182,7 @@ void Asteroid::OnFire() noexcept {
 }
 
 void Asteroid::OnHit() noexcept {
-    if(TimeUtils::FPFrames{1.0f} < _timeSinceLastHit) {
+    if(a2de::TimeUtils::FPFrames{1.0f} < _timeSinceLastHit) {
         _timeSinceLastHit = _timeSinceLastHit.zero();
     }
     g_theAudioSystem->Play(g_sound_hitpath);
@@ -251,11 +251,11 @@ float Asteroid::CalcChildHeadingFromDifficulty() const noexcept {
     const auto currentHeading = GetVelocity().CalcHeadingDegrees();
     switch(g_theGame->gameOptions.difficulty) {
     case Difficulty::Easy:
-        return MathUtils::GetRandomFloatZeroToOne() * 360.0f;
+        return a2de::MathUtils::GetRandomFloatZeroToOne() * 360.0f;
     case Difficulty::Normal:
-        return currentHeading + MathUtils::GetRandomFloatNegOneToOne() * 90.0f;
+        return currentHeading + a2de::MathUtils::GetRandomFloatNegOneToOne() * 90.0f;
     case Difficulty::Hard:
-        return currentHeading + MathUtils::GetRandomFloatNegOneToOne() * 45.0f;
+        return currentHeading + a2de::MathUtils::GetRandomFloatNegOneToOne() * 45.0f;
     default:
         return currentHeading;
     }
@@ -279,9 +279,9 @@ float Asteroid::CalcChildSpeedFromSize() const noexcept {
     const auto currentSpeed = GetVelocity().CalcLength();
     switch(_type) {
     case Type::Large:
-        return currentSpeed * MathUtils::GetRandomFloatInRange(2.0f, 2.2f);
+        return currentSpeed * a2de::MathUtils::GetRandomFloatInRange(2.0f, 2.2f);
     case Type::Medium:
-        return currentSpeed * MathUtils::GetRandomFloatInRange(2.5f, 2.6f);
+        return currentSpeed * a2de::MathUtils::GetRandomFloatInRange(2.5f, 2.6f);
     case Type::Small:
         return currentSpeed;
     default:
@@ -289,12 +289,12 @@ float Asteroid::CalcChildSpeedFromSize() const noexcept {
     }
 }
 
-std::tuple<Vector2, Vector2, float> Asteroid::CalcChildPhysicsParameters() const noexcept {
+std::tuple<a2de::Vector2, a2de::Vector2, float> Asteroid::CalcChildPhysicsParameters() const noexcept {
     const auto heading = CalcChildHeadingFromDifficulty();
     const auto speed = CalcChildSpeedFromSizeAndDifficulty();
     auto v = GetVelocity();
     v.SetLengthAndHeadingDegrees(heading, speed);
-    const auto r = MathUtils::GetRandomFloatZeroToOne() * 360.0f;
-    const auto p = MathUtils::GetRandomPointInside(Disc2{GetPosition(), GetCosmeticRadius()});
+    const auto r = a2de::MathUtils::GetRandomFloatZeroToOne() * 360.0f;
+    const auto p = a2de::MathUtils::GetRandomPointInside(a2de::Disc2{GetPosition(), GetCosmeticRadius()});
     return std::make_tuple(p,v,r);
 }

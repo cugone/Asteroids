@@ -43,10 +43,10 @@ enum class Difficulty {
 };
 
 template<>
-struct TypeUtils::is_incrementable_enum_type<Difficulty> : std::true_type {};
+struct a2de::TypeUtils::is_incrementable_enum_type<Difficulty> : std::true_type {};
 
 template<>
-struct TypeUtils::is_decrementable_enum_type<Difficulty> : std::true_type {};
+struct a2de::TypeUtils::is_decrementable_enum_type<Difficulty> : std::true_type {};
 
 enum class ControlPreference {
     First_,
@@ -57,10 +57,10 @@ enum class ControlPreference {
 };
 
 template<>
-struct TypeUtils::is_incrementable_enum_type<ControlPreference> : std::true_type {};
+struct a2de::TypeUtils::is_incrementable_enum_type<ControlPreference> : std::true_type {};
 
 template<>
-struct TypeUtils::is_decrementable_enum_type<ControlPreference> : std::true_type {};
+struct a2de::TypeUtils::is_decrementable_enum_type<ControlPreference> : std::true_type {};
 
 struct GameOptions {
     int windowWidth{1600};
@@ -83,7 +83,7 @@ public:
 
     void Initialize();
     void BeginFrame();
-    void Update(TimeUtils::FPSeconds deltaSeconds);
+    void Update(a2de::TimeUtils::FPSeconds deltaSeconds);
     void Render() const;
     void EndFrame();
     void PostFrameCleanup() noexcept;
@@ -92,22 +92,22 @@ public:
 
     Ship* GetShip() const noexcept;
 
-    void MakeExplosion(Vector2 position) noexcept;
-    void MakeBullet(const Entity* parent, Vector2 pos, Vector2 vel) noexcept;
-    void MakeMine(const Entity* parent, Vector2 position) noexcept;
-    void MakeSmallUfo(AABB2 world_bounds) noexcept;
-    void MakeBigUfo(AABB2 world_bounds) noexcept;
-    void MakeBossUfo(AABB2 world_bounds) noexcept;
+    void MakeExplosion(a2de::Vector2 position) noexcept;
+    void MakeBullet(const Entity* parent, a2de::Vector2 pos, a2de::Vector2 vel) noexcept;
+    void MakeMine(const Entity* parent, a2de::Vector2 position) noexcept;
+    void MakeSmallUfo(a2de::AABB2 world_bounds) noexcept;
+    void MakeBigUfo(a2de::AABB2 world_bounds) noexcept;
+    void MakeBossUfo(a2de::AABB2 world_bounds) noexcept;
 
     void AddNewUfoToWorld(std::unique_ptr<Ufo> newUfo) noexcept;
     void AddNewAsteroidToWorld(std::unique_ptr<Asteroid> newAsteroid);
-    void MakeLargeAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
-    void MakeLargeAsteroidAt(Vector2 pos) noexcept;
-    void MakeLargeAsteroidOffScreen(AABB2 world_bounds) noexcept;
-    void MakeMediumAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
-    void MakeSmallAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
+    void MakeLargeAsteroid(a2de::Vector2 pos, a2de::Vector2 vel, float rotationSpeed) noexcept;
+    void MakeLargeAsteroidAt(a2de::Vector2 pos) noexcept;
+    void MakeLargeAsteroidOffScreen(a2de::AABB2 world_bounds) noexcept;
+    void MakeMediumAsteroid(a2de::Vector2 pos, a2de::Vector2 vel, float rotationSpeed) noexcept;
+    void MakeSmallAsteroid(a2de::Vector2 pos, a2de::Vector2 vel, float rotationSpeed) noexcept;
 
-    void DoCameraShake(OrthographicCameraController& controller) const noexcept;
+    void DoCameraShake(a2de::OrthographicCameraController& controller) const noexcept;
 
     void SetControlType() noexcept;
     bool IsControllerActive() const noexcept;
@@ -121,11 +121,12 @@ public:
     void SetMineSpriteSheet() noexcept;
     void SetExplosionSpriteSheet() noexcept;
     void SetUfoSpriteSheets() noexcept;
+    void SetLaserChargeSpriteSheet() noexcept;
 
-    AABB2 CalcOrthoBounds(const OrthographicCameraController& controller) const noexcept;
-    AABB2 CalcViewBounds(const OrthographicCameraController& controller) const noexcept;
-    AABB2 CalcCullBounds(const OrthographicCameraController& controller) const noexcept;
-    AABB2 CalcCullBoundsFromOrthoBounds(const OrthographicCameraController& controller) const noexcept;
+    a2de::AABB2 CalcOrthoBounds(const a2de::OrthographicCameraController& controller) const noexcept;
+    a2de::AABB2 CalcViewBounds(const a2de::OrthographicCameraController& controller) const noexcept;
+    a2de::AABB2 CalcCullBounds(const a2de::OrthographicCameraController& controller) const noexcept;
+    a2de::AABB2 CalcCullBoundsFromOrthoBounds(const a2de::OrthographicCameraController& controller) const noexcept;
 
     GameOptions gameOptions{};
     Player player{};
@@ -135,12 +136,13 @@ public:
     std::vector<Bullet*> bullets{};
     std::vector<Explosion*> explosions{};
     std::vector<Mine*> mines{};
-    std::shared_ptr<SpriteSheet> asteroid_sheet{};
-    std::shared_ptr<SpriteSheet> mine_sheet{};
-    std::shared_ptr<SpriteSheet> explosion_sheet{};
-    std::shared_ptr<SpriteSheet> ufo_sheet{};
+    std::shared_ptr<a2de::SpriteSheet> asteroid_sheet{};
+    std::shared_ptr<a2de::SpriteSheet> lasercharge_sheet{};
+    std::shared_ptr<a2de::SpriteSheet> mine_sheet{};
+    std::shared_ptr<a2de::SpriteSheet> explosion_sheet{};
+    std::shared_ptr<a2de::SpriteSheet> ufo_sheet{};
 
-    Stopwatch respawnTimer{TimeUtils::FPSeconds{1.0f}};
+    a2de::Stopwatch respawnTimer{a2de::TimeUtils::FPSeconds{1.0f}};
     bool easyMode{false};
 
 protected:
@@ -153,7 +155,7 @@ private:
     void CreateOptionsFile() const noexcept;
     void LoadOptionsFile() const noexcept;
 
-    void MakeUfo(Ufo::Type type, AABB2 world_bounds) noexcept;
+    void MakeUfo(Ufo::Type type, a2de::AABB2 world_bounds) noexcept;
 
     std::unique_ptr<GameState> _current_state{nullptr};
     std::unique_ptr<GameState> _next_state{nullptr};

@@ -32,7 +32,7 @@ void OptionsState::BeginFrame() noexcept {
     g_theGame->SetControlType();
 }
 
-void OptionsState::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) {
+void OptionsState::Update([[maybe_unused]] a2de::TimeUtils::FPSeconds deltaSeconds) {
     if(auto newState = HandleInput(deltaSeconds)) {
         g_theGame->ChangeState(std::move(newState));
     }
@@ -43,67 +43,67 @@ void OptionsState::Render() const noexcept {
     g_theRenderer->SetRenderTargetsToBackBuffer();
     g_theRenderer->ClearDepthStencilBuffer();
 
-    g_theRenderer->ClearColor(Rgba::Black);
+    g_theRenderer->ClearColor(a2de::Rgba::Black);
 
     g_theRenderer->SetViewportAsPercent();
 
     //2D View / HUD
     const float ui_view_height = currentGraphicsOptions.WindowHeight;
     const float ui_view_width = ui_view_height * m_ui_camera.GetAspectRatio();
-    const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
+    const auto ui_view_extents = a2de::Vector2{ui_view_width, ui_view_height};
     const auto ui_view_half_extents = ui_view_extents * 0.5f;
-    auto ui_leftBottom = Vector2{-ui_view_half_extents.x, ui_view_half_extents.y};
-    auto ui_rightTop = Vector2{ui_view_half_extents.x, -ui_view_half_extents.y};
-    auto ui_nearFar = Vector2{0.0f, 1.0f};
+    auto ui_leftBottom = a2de::Vector2{-ui_view_half_extents.x, ui_view_half_extents.y};
+    auto ui_rightTop = a2de::Vector2{ui_view_half_extents.x, -ui_view_half_extents.y};
+    auto ui_nearFar = a2de::Vector2{0.0f, 1.0f};
     auto ui_cam_pos = ui_view_half_extents;
     m_ui_camera.position = ui_cam_pos;
     m_ui_camera.orientation_degrees = 0.0f;
-    m_ui_camera.SetupView(ui_leftBottom, ui_rightTop, ui_nearFar, MathUtils::M_16_BY_9_RATIO);
+    m_ui_camera.SetupView(ui_leftBottom, ui_rightTop, ui_nearFar, a2de::MathUtils::M_16_BY_9_RATIO);
     g_theRenderer->SetCamera(m_ui_camera);
 
     const auto* font = g_theRenderer->GetFont("System32");
-    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x, ui_view_half_extents.y * 0.25f}));
+    g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x, ui_view_half_extents.y * 0.25f}));
     g_theRenderer->DrawTextLine(font, "OPTIONS");
 
-    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.35f}));
-    g_theRenderer->DrawTextLine(font, "Difficulty:", m_selected_item == OptionsMenu::DifficultySelection ? Rgba::Yellow : Rgba::White);
+    g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.35f}));
+    g_theRenderer->DrawTextLine(font, "Difficulty:", m_selected_item == OptionsMenu::DifficultySelection ? a2de::Rgba::Yellow : a2de::Rgba::White);
 
-    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.35f}));
-    g_theRenderer->DrawTextLine(font, DifficultyToString(m_temp_options.difficulty), m_selected_item == OptionsMenu::DifficultySelection ? Rgba::Yellow : Rgba::White);
+    g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.35f}));
+    g_theRenderer->DrawTextLine(font, DifficultyToString(m_temp_options.difficulty), m_selected_item == OptionsMenu::DifficultySelection ? a2de::Rgba::Yellow : a2de::Rgba::White);
 
-    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.45f}));
-    g_theRenderer->DrawTextLine(font, "Control Preference:", m_selected_item == OptionsMenu::ControlSelection ? Rgba::Yellow : Rgba::White);
+    g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.45f}));
+    g_theRenderer->DrawTextLine(font, "Control Preference:", m_selected_item == OptionsMenu::ControlSelection ? a2de::Rgba::Yellow : a2de::Rgba::White);
 
-    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.45f}));
-    g_theRenderer->DrawTextLine(font, ControlPreferenceToString(m_temp_options.controlPref), m_selected_item == OptionsMenu::ControlSelection ? Rgba::Yellow : Rgba::White);
+    g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.45f}));
+    g_theRenderer->DrawTextLine(font, ControlPreferenceToString(m_temp_options.controlPref), m_selected_item == OptionsMenu::ControlSelection ? a2de::Rgba::Yellow : a2de::Rgba::White);
 
-    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.55f}));
-    g_theRenderer->DrawTextLine(font, "Camera Shake:", m_selected_item == OptionsMenu::CameraShake ? Rgba::Yellow : Rgba::White);
+    g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.55f}));
+    g_theRenderer->DrawTextLine(font, "Camera Shake:", m_selected_item == OptionsMenu::CameraShake ? a2de::Rgba::Yellow : a2de::Rgba::White);
 
-    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.55f}));
+    g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.55f}));
     {
         std::ostringstream ss;
         ss << std::setprecision(2) << m_temp_options.cameraShakeStrength;
-        g_theRenderer->DrawTextLine(font, ss.str(), m_selected_item == OptionsMenu::CameraShake ? Rgba::Yellow : Rgba::White);
+        g_theRenderer->DrawTextLine(font, ss.str(), m_selected_item == OptionsMenu::CameraShake ? a2de::Rgba::Yellow : a2de::Rgba::White);
     }
 
-    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.65f}));
-    g_theRenderer->DrawTextLine(font, "Sound Volume:", m_selected_item == OptionsMenu::SoundVolume ? Rgba::Yellow : Rgba::White);
+    g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.65f}));
+    g_theRenderer->DrawTextLine(font, "Sound Volume:", m_selected_item == OptionsMenu::SoundVolume ? a2de::Rgba::Yellow : a2de::Rgba::White);
 
-    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.65f}));
-    g_theRenderer->DrawTextLine(font, std::to_string(m_temp_options.soundVolume), m_selected_item == OptionsMenu::SoundVolume ? Rgba::Yellow : Rgba::White);
+    g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.65f}));
+    g_theRenderer->DrawTextLine(font, std::to_string(m_temp_options.soundVolume), m_selected_item == OptionsMenu::SoundVolume ? a2de::Rgba::Yellow : a2de::Rgba::White);
     
-    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.75f}));
-    g_theRenderer->DrawTextLine(font, "Music Volume:", m_selected_item == OptionsMenu::MusicVolume ? Rgba::Yellow : Rgba::White);
+    g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.75f}));
+    g_theRenderer->DrawTextLine(font, "Music Volume:", m_selected_item == OptionsMenu::MusicVolume ? a2de::Rgba::Yellow : a2de::Rgba::White);
 
-    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.75f}));
-    g_theRenderer->DrawTextLine(font, std::to_string(m_temp_options.musicVolume), m_selected_item == OptionsMenu::MusicVolume ? Rgba::Yellow : Rgba::White);
+    g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.75f}));
+    g_theRenderer->DrawTextLine(font, std::to_string(m_temp_options.musicVolume), m_selected_item == OptionsMenu::MusicVolume ? a2de::Rgba::Yellow : a2de::Rgba::White);
 
-    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.95f}));
-    g_theRenderer->DrawTextLine(font, "Back", m_selected_item == OptionsMenu::Cancel ? Rgba::Yellow : Rgba::White);
+    g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.95f}));
+    g_theRenderer->DrawTextLine(font, "Back", m_selected_item == OptionsMenu::Cancel ? a2de::Rgba::Yellow : a2de::Rgba::White);
 
-    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 1.05f}));
-    g_theRenderer->DrawTextLine(font, "Accept", m_selected_item == OptionsMenu::Accept ? Rgba::Yellow : Rgba::White);
+    g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 1.05f}));
+    g_theRenderer->DrawTextLine(font, "Accept", m_selected_item == OptionsMenu::Accept ? a2de::Rgba::Yellow : a2de::Rgba::White);
 
 }
 
@@ -111,7 +111,7 @@ void OptionsState::EndFrame() noexcept {
     /* DO NOTHING */
 }
 
-std::unique_ptr<GameState> OptionsState::HandleInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
+std::unique_ptr<GameState> OptionsState::HandleInput([[maybe_unused]] a2de::TimeUtils::FPSeconds deltaSeconds) noexcept {
     if(auto kb_state = HandleKeyboardInput()) {
         return kb_state;
     }
@@ -125,23 +125,23 @@ std::unique_ptr<GameState> OptionsState::HandleKeyboardInput() noexcept {
     if(!g_theGame->IsKeyboardActive()) {
         return {};
     }
-    const bool up = g_theInputSystem->WasKeyJustPressed(KeyCode::W) || g_theInputSystem->WasKeyJustPressed(KeyCode::Up);
-    const bool down = g_theInputSystem->WasKeyJustPressed(KeyCode::S) || g_theInputSystem->WasKeyJustPressed(KeyCode::Down);
-    const bool left = g_theInputSystem->WasKeyJustPressed(KeyCode::A) || g_theInputSystem->WasKeyJustPressed(KeyCode::Left);
-    const bool right = g_theInputSystem->WasKeyJustPressed(KeyCode::D) || g_theInputSystem->WasKeyJustPressed(KeyCode::Right);
-    const bool select = g_theInputSystem->WasKeyJustPressed(KeyCode::Enter) || g_theInputSystem->WasKeyJustPressed(KeyCode::NumPadEnter);
-    const bool cancel = g_theInputSystem->WasKeyJustPressed(KeyCode::Esc);
+    const bool up = g_theInputSystem->WasKeyJustPressed(a2de::KeyCode::W) || g_theInputSystem->WasKeyJustPressed(a2de::KeyCode::Up);
+    const bool down = g_theInputSystem->WasKeyJustPressed(a2de::KeyCode::S) || g_theInputSystem->WasKeyJustPressed(a2de::KeyCode::Down);
+    const bool left = g_theInputSystem->WasKeyJustPressed(a2de::KeyCode::A) || g_theInputSystem->WasKeyJustPressed(a2de::KeyCode::Left);
+    const bool right = g_theInputSystem->WasKeyJustPressed(a2de::KeyCode::D) || g_theInputSystem->WasKeyJustPressed(a2de::KeyCode::Right);
+    const bool select = g_theInputSystem->WasKeyJustPressed(a2de::KeyCode::Enter) || g_theInputSystem->WasKeyJustPressed(a2de::KeyCode::NumPadEnter);
+    const bool cancel = g_theInputSystem->WasKeyJustPressed(a2de::KeyCode::Esc);
     return HandleOptionsMenuState(up, down, left, right, cancel, select);
 }
 
 std::unique_ptr<GameState> OptionsState::HandleControllerInput() noexcept {
     if(const auto& controller = g_theInputSystem->GetXboxController(0); g_theGame->IsControllerActive() && controller.IsConnected()) {
-        const bool up = controller.WasButtonJustPressed(XboxController::Button::Up) || MathUtils::IsEquivalent(1.0f, controller.GetLeftThumbPosition().y);
-        const bool down = controller.WasButtonJustPressed(XboxController::Button::Down) || MathUtils::IsEquivalent(-1.0f, controller.GetLeftThumbPosition().y);
-        const bool left = controller.WasButtonJustPressed(XboxController::Button::Left) || MathUtils::IsEquivalent(-1.0f, controller.GetLeftThumbPosition().x);
-        const bool right = controller.WasButtonJustPressed(XboxController::Button::Right) || MathUtils::IsEquivalent(1.0f, controller.GetLeftThumbPosition().x);
-        const bool select = controller.WasButtonJustPressed(XboxController::Button::A);
-        const bool cancel = controller.WasButtonJustPressed(XboxController::Button::B);
+        const bool up = controller.WasButtonJustPressed(a2de::XboxController::Button::Up) || a2de::MathUtils::IsEquivalent(1.0f, controller.GetLeftThumbPosition().y);
+        const bool down = controller.WasButtonJustPressed(a2de::XboxController::Button::Down) || a2de::MathUtils::IsEquivalent(-1.0f, controller.GetLeftThumbPosition().y);
+        const bool left = controller.WasButtonJustPressed(a2de::XboxController::Button::Left) || a2de::MathUtils::IsEquivalent(-1.0f, controller.GetLeftThumbPosition().x);
+        const bool right = controller.WasButtonJustPressed(a2de::XboxController::Button::Right) || a2de::MathUtils::IsEquivalent(1.0f, controller.GetLeftThumbPosition().x);
+        const bool select = controller.WasButtonJustPressed(a2de::XboxController::Button::A);
+        const bool cancel = controller.WasButtonJustPressed(a2de::XboxController::Button::B);
         return HandleOptionsMenuState(up, down, left, right, cancel, select);
     }
     return {};

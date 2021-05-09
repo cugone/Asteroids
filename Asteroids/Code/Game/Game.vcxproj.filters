@@ -94,6 +94,12 @@
     <ClCompile Include="Mine.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="LaserComponent.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="LaserChargeComponent.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameCommon.hpp">
@@ -148,6 +154,12 @@
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Mine.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="LaserComponent.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="LaserChargeComponent.hpp">
       <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
@@ -239,6 +251,24 @@
       <Filter>Data\Materials</Filter>
     </None>
     <None Include="..\..\Run_x64\Data\Shaders\mine.shader">
+      <Filter>Data\Shaders</Filter>
+    </None>
+    <None Include="..\..\Run_x64\Data\Materials\laser.material">
+      <Filter>Data\Materials</Filter>
+    </None>
+    <None Include="..\..\Run_x64\Data\Shaders\laser.shader">
+      <Filter>Data\Shaders</Filter>
+    </None>
+    <None Include="..\..\Run_x64\Data\Shaders\thrust.shader">
+      <Filter>Data\Shaders</Filter>
+    </None>
+    <None Include="..\..\Run_x64\Data\Materials\thrust.material">
+      <Filter>Data\Materials</Filter>
+    </None>
+    <None Include="..\..\Run_x64\Data\Materials\laserchargeup.material">
+      <Filter>Data\Materials</Filter>
+    </None>
+    <None Include="..\..\Run_x64\Data\Shaders\laserchargeup.shader">
       <Filter>Data\Shaders</Filter>
     </None>
   </ItemGroup>

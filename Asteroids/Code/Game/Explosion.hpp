@@ -13,10 +13,10 @@ class Renderer;
 
 class Explosion : public Entity {
 public:
-    explicit Explosion(Vector2 position);
+    explicit Explosion(a2de::Vector2 position);
 
     virtual ~Explosion() = default;
-    void Update(TimeUtils::FPSeconds deltaSeconds) noexcept override;
+    void Update(a2de::TimeUtils::FPSeconds deltaSeconds) noexcept override;
     void EndFrame() noexcept override;
 
     void OnCreate() noexcept override;
@@ -25,7 +25,7 @@ public:
     void OnDestroy() noexcept override;
 
 private:
-    std::unique_ptr<AnimatedSprite> _sprite{};
+    std::unique_ptr<a2de::AnimatedSprite> _sprite{};
 };
 
 

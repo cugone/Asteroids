@@ -12,9 +12,9 @@ class Renderer;
 class Bullet : public Entity {
 public:
     Bullet() = default;
-    explicit Bullet(const Entity* parent, Vector2 position, Vector2 velocity) noexcept;
+    explicit Bullet(const Entity* parent, a2de::Vector2 position, a2de::Vector2 velocity) noexcept;
     virtual ~Bullet() = default;
-    void Update(TimeUtils::FPSeconds deltaSeconds) noexcept override;
+    void Update(a2de::TimeUtils::FPSeconds deltaSeconds) noexcept override;
     void EndFrame() noexcept override;
 
     void OnCreate() noexcept override;
@@ -26,6 +26,6 @@ private:
     float CalculateTtlFromDifficulty() const noexcept;
 
     const Entity* _parent{};
-    Stopwatch ttl{};
+    a2de::Stopwatch ttl{};
 };
 

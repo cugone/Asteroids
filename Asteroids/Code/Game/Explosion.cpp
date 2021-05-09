@@ -13,14 +13,14 @@
 
 #include <algorithm>
 
-Explosion::Explosion(Vector2 position)
+Explosion::Explosion(a2de::Vector2 position)
 : Entity()
 {
-    AnimatedSpriteDesc desc{};
+    a2de::AnimatedSpriteDesc desc{};
     desc.material = g_theRenderer->GetMaterial("explosion");
     desc.spriteSheet = g_theGame->explosion_sheet;
-    desc.durationSeconds = TimeUtils::FPSeconds{0.50f};
-    desc.playbackMode = AnimatedSprite::SpriteAnimMode::Play_To_End;
+    desc.durationSeconds = a2de::TimeUtils::FPSeconds{0.50f};
+    desc.playbackMode = a2de::AnimatedSprite::SpriteAnimMode::Play_To_End;
     desc.frameLength = 25;
     desc.startSpriteIndex = 0;
     material = desc.material;
@@ -34,38 +34,38 @@ Explosion::Explosion(Vector2 position)
 
 }
 
-void Explosion::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
+void Explosion::Update(a2de::TimeUtils::FPSeconds deltaSeconds) noexcept {
     Entity::Update(deltaSeconds);
     _sprite->Update(deltaSeconds);
 
     const auto uvs = _sprite->GetCurrentTexCoords();
     const auto frameWidth = static_cast<float>(_sprite->GetFrameDimensions().x);
     const auto frameHeight = static_cast<float>(_sprite->GetFrameDimensions().y);
-    const auto half_extents = Vector2{frameWidth, frameHeight};
+    const auto half_extents = a2de::Vector2{frameWidth, frameHeight};
     {
-        const auto S = Matrix4::CreateScaleMatrix(half_extents);
-        const auto R = Matrix4::Create2DRotationDegreesMatrix(90.0f + GetOrientationDegrees());
-        const auto T = Matrix4::CreateTranslationMatrix(GetPosition());
-        transform = Matrix4::MakeSRT(S, R, T);
+        const auto S = a2de::Matrix4::CreateScaleMatrix(half_extents);
+        const auto R = a2de::Matrix4::Create2DRotationDegreesMatrix(90.0f + GetOrientationDegrees());
+        const auto T = a2de::Matrix4::CreateTranslationMatrix(GetPosition());
+        transform = a2de::Matrix4::MakeSRT(S, R, T);
     }
 
     auto& builder = mesh_builder;
-    builder.Begin(PrimitiveType::Triangles);
-    builder.SetColor(Rgba::White);
+    builder.Begin(a2de::PrimitiveType::Triangles);
+    builder.SetColor(a2de::Rgba::White);
 
-    builder.SetUV(Vector2{uvs.maxs.x, uvs.maxs.y});
-    builder.AddVertex(Vector2{+0.5f, +0.5f});
+    builder.SetUV(a2de::Vector2{uvs.maxs.x, uvs.maxs.y});
+    builder.AddVertex(a2de::Vector2{+0.5f, +0.5f});
 
-    builder.SetUV(Vector2{uvs.mins.x, uvs.maxs.y});
-    builder.AddVertex(Vector2{-0.5f, +0.5f});
+    builder.SetUV(a2de::Vector2{uvs.mins.x, uvs.maxs.y});
+    builder.AddVertex(a2de::Vector2{-0.5f, +0.5f});
 
-    builder.SetUV(Vector2{uvs.mins.x, uvs.mins.y});
-    builder.AddVertex(Vector2{-0.5f, -0.5f});
+    builder.SetUV(a2de::Vector2{uvs.mins.x, uvs.mins.y});
+    builder.AddVertex(a2de::Vector2{-0.5f, -0.5f});
 
-    builder.SetUV(Vector2{uvs.maxs.x, uvs.mins.y});
-    builder.AddVertex(Vector2{+0.5f, -0.5f});
+    builder.SetUV(a2de::Vector2{uvs.maxs.x, uvs.mins.y});
+    builder.AddVertex(a2de::Vector2{+0.5f, -0.5f});
 
-    builder.AddIndicies(Mesh::Builder::Primitive::Quad);
+    builder.AddIndicies(a2de::Mesh::Builder::Primitive::Quad);
     builder.End(material);
 
 }
