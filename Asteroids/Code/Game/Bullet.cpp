@@ -26,9 +26,9 @@ Bullet::Bullet(const Entity* parent, a2de::Vector2 position, a2de::Vector2 veloc
 
 float Bullet::CalculateTtlFromDifficulty() const noexcept {
     switch(g_theGame->gameOptions.difficulty) {
-    case Difficulty::Easy: return 3.0f;
-    case Difficulty::Normal: return 2.0f;
-    case Difficulty::Hard: return 1.0f;
+    case a2de::Difficulty::Easy: return 3.0f;
+    case a2de::Difficulty::Normal: return 2.0f;
+    case a2de::Difficulty::Hard: return 1.0f;
     default: return 0.0f;
     }
 

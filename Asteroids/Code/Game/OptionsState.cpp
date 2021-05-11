@@ -20,7 +20,7 @@
 #include <string>
 
 void OptionsState::OnEnter() noexcept {
-    m_selected_item = OptionsMenu::First_;
+    m_selected_item = a2de::OptionsMenu::First_;
     m_temp_options = g_theGame->gameOptions;
 }
 
@@ -66,44 +66,44 @@ void OptionsState::Render() const noexcept {
     g_theRenderer->DrawTextLine(font, "OPTIONS");
 
     g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.35f}));
-    g_theRenderer->DrawTextLine(font, "Difficulty:", m_selected_item == OptionsMenu::DifficultySelection ? a2de::Rgba::Yellow : a2de::Rgba::White);
+    g_theRenderer->DrawTextLine(font, "Difficulty:", m_selected_item == a2de::OptionsMenu::DifficultySelection ? a2de::Rgba::Yellow : a2de::Rgba::White);
 
     g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.35f}));
-    g_theRenderer->DrawTextLine(font, DifficultyToString(m_temp_options.difficulty), m_selected_item == OptionsMenu::DifficultySelection ? a2de::Rgba::Yellow : a2de::Rgba::White);
+    g_theRenderer->DrawTextLine(font, DifficultyToString(m_temp_options.difficulty), m_selected_item == a2de::OptionsMenu::DifficultySelection ? a2de::Rgba::Yellow : a2de::Rgba::White);
 
     g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.45f}));
-    g_theRenderer->DrawTextLine(font, "Control Preference:", m_selected_item == OptionsMenu::ControlSelection ? a2de::Rgba::Yellow : a2de::Rgba::White);
+    g_theRenderer->DrawTextLine(font, "Control Preference:", m_selected_item == a2de::OptionsMenu::ControlSelection ? a2de::Rgba::Yellow : a2de::Rgba::White);
 
     g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.45f}));
-    g_theRenderer->DrawTextLine(font, ControlPreferenceToString(m_temp_options.controlPref), m_selected_item == OptionsMenu::ControlSelection ? a2de::Rgba::Yellow : a2de::Rgba::White);
+    g_theRenderer->DrawTextLine(font, ControlPreferenceToString(m_temp_options.controlPref), m_selected_item == a2de::OptionsMenu::ControlSelection ? a2de::Rgba::Yellow : a2de::Rgba::White);
 
     g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.55f}));
-    g_theRenderer->DrawTextLine(font, "Camera Shake:", m_selected_item == OptionsMenu::CameraShake ? a2de::Rgba::Yellow : a2de::Rgba::White);
+    g_theRenderer->DrawTextLine(font, "Camera Shake:", m_selected_item == a2de::OptionsMenu::CameraShake ? a2de::Rgba::Yellow : a2de::Rgba::White);
 
     g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.55f}));
     {
         std::ostringstream ss;
         ss << std::setprecision(2) << m_temp_options.cameraShakeStrength;
-        g_theRenderer->DrawTextLine(font, ss.str(), m_selected_item == OptionsMenu::CameraShake ? a2de::Rgba::Yellow : a2de::Rgba::White);
+        g_theRenderer->DrawTextLine(font, ss.str(), m_selected_item == a2de::OptionsMenu::CameraShake ? a2de::Rgba::Yellow : a2de::Rgba::White);
     }
 
     g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.65f}));
-    g_theRenderer->DrawTextLine(font, "Sound Volume:", m_selected_item == OptionsMenu::SoundVolume ? a2de::Rgba::Yellow : a2de::Rgba::White);
+    g_theRenderer->DrawTextLine(font, "Sound Volume:", m_selected_item == a2de::OptionsMenu::SoundVolume ? a2de::Rgba::Yellow : a2de::Rgba::White);
 
     g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.65f}));
-    g_theRenderer->DrawTextLine(font, std::to_string(m_temp_options.soundVolume), m_selected_item == OptionsMenu::SoundVolume ? a2de::Rgba::Yellow : a2de::Rgba::White);
+    g_theRenderer->DrawTextLine(font, std::to_string(m_temp_options.soundVolume), m_selected_item == a2de::OptionsMenu::SoundVolume ? a2de::Rgba::Yellow : a2de::Rgba::White);
     
     g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.75f}));
-    g_theRenderer->DrawTextLine(font, "Music Volume:", m_selected_item == OptionsMenu::MusicVolume ? a2de::Rgba::Yellow : a2de::Rgba::White);
+    g_theRenderer->DrawTextLine(font, "Music Volume:", m_selected_item == a2de::OptionsMenu::MusicVolume ? a2de::Rgba::Yellow : a2de::Rgba::White);
 
     g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.75f}));
-    g_theRenderer->DrawTextLine(font, std::to_string(m_temp_options.musicVolume), m_selected_item == OptionsMenu::MusicVolume ? a2de::Rgba::Yellow : a2de::Rgba::White);
+    g_theRenderer->DrawTextLine(font, std::to_string(m_temp_options.musicVolume), m_selected_item == a2de::OptionsMenu::MusicVolume ? a2de::Rgba::Yellow : a2de::Rgba::White);
 
     g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.95f}));
-    g_theRenderer->DrawTextLine(font, "Back", m_selected_item == OptionsMenu::Cancel ? a2de::Rgba::Yellow : a2de::Rgba::White);
+    g_theRenderer->DrawTextLine(font, "Back", m_selected_item == a2de::OptionsMenu::Cancel ? a2de::Rgba::Yellow : a2de::Rgba::White);
 
     g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 1.05f}));
-    g_theRenderer->DrawTextLine(font, "Accept", m_selected_item == OptionsMenu::Accept ? a2de::Rgba::Yellow : a2de::Rgba::White);
+    g_theRenderer->DrawTextLine(font, "Accept", m_selected_item == a2de::OptionsMenu::Accept ? a2de::Rgba::Yellow : a2de::Rgba::White);
 
 }
 
@@ -150,10 +150,10 @@ std::unique_ptr<GameState> OptionsState::HandleControllerInput() noexcept {
 std::unique_ptr<GameState> OptionsState::HandleOptionsMenuState(const bool up, const bool down, const bool left, const bool right, const bool cancel, const bool select) noexcept {
     if(up) {
         --m_selected_item;
-        m_selected_item = std::clamp(m_selected_item, OptionsMenu::First_, OptionsMenu::Last_Valid_);
+        m_selected_item = std::clamp(m_selected_item, a2de::OptionsMenu::First_, a2de::OptionsMenu::Last_Valid_);
     } else if(down) {
         ++m_selected_item;
-        m_selected_item = std::clamp(m_selected_item, OptionsMenu::First_, OptionsMenu::Last_Valid_);
+        m_selected_item = std::clamp(m_selected_item, a2de::OptionsMenu::First_, a2de::OptionsMenu::Last_Valid_);
     }
     if(left) {
         CycleSelectedOptionDown(m_selected_item);
@@ -165,8 +165,8 @@ std::unique_ptr<GameState> OptionsState::HandleOptionsMenuState(const bool up, c
     }
     if(select) {
         switch(m_selected_item) {
-        case OptionsMenu::Cancel: return std::make_unique<TitleState>();
-        case OptionsMenu::Accept:
+        case a2de::OptionsMenu::Cancel: return std::make_unique<TitleState>();
+        case a2de::OptionsMenu::Accept:
             SaveCurrentOptions();
             return std::make_unique<TitleState>(); 
         default: return {};
@@ -175,25 +175,25 @@ std::unique_ptr<GameState> OptionsState::HandleOptionsMenuState(const bool up, c
     return {};
 }
 
-void OptionsState::CycleSelectedOptionDown(OptionsMenu selectedItem) noexcept {
+void OptionsState::CycleSelectedOptionDown(a2de::OptionsMenu selectedItem) noexcept {
     switch(selectedItem) {
-    case OptionsMenu::DifficultySelection:
+    case a2de::OptionsMenu::DifficultySelection:
     {
-        if(m_temp_options.difficulty == Difficulty::First_) {
-            m_temp_options.difficulty = Difficulty::Last_;
+        if(m_temp_options.difficulty == a2de::Difficulty::First_) {
+            m_temp_options.difficulty = a2de::Difficulty::Last_;
         }
         --m_temp_options.difficulty;
         break;
     }
-    case OptionsMenu::ControlSelection:
+    case a2de::OptionsMenu::ControlSelection:
     {
-        if(m_temp_options.controlPref == ControlPreference::First_) {
-            m_temp_options.controlPref = ControlPreference::Last_;
+        if(m_temp_options.controlPref == a2de::ControlPreference::First_) {
+            m_temp_options.controlPref = a2de::ControlPreference::Last_;
         }
         --m_temp_options.controlPref;
         break;
     }
-    case OptionsMenu::SoundVolume:
+    case a2de::OptionsMenu::SoundVolume:
     {
         --m_temp_options.soundVolume;
         m_temp_options.soundVolume = std::clamp(m_temp_options.soundVolume, m_min_sound_volume, m_max_sound_volume);
@@ -203,7 +203,7 @@ void OptionsState::CycleSelectedOptionDown(OptionsMenu selectedItem) noexcept {
         g_theAudioSystem->Play(g_sound_shootpath);
         break;
     }
-    case OptionsMenu::MusicVolume:
+    case a2de::OptionsMenu::MusicVolume:
     {
         --m_temp_options.musicVolume;
         m_temp_options.musicVolume = std::clamp(m_temp_options.musicVolume, m_min_music_volume, m_max_music_volume);
@@ -213,7 +213,7 @@ void OptionsState::CycleSelectedOptionDown(OptionsMenu selectedItem) noexcept {
         //TODO: Fix setting actual volume of playing music.
         break;
     }
-    case OptionsMenu::CameraShake:
+    case a2de::OptionsMenu::CameraShake:
     {
         m_temp_options.cameraShakeStrength -= 0.1f;
         m_temp_options.cameraShakeStrength = std::clamp(m_temp_options.cameraShakeStrength, m_min_camera_shake, m_max_camera_shake);
@@ -225,25 +225,25 @@ void OptionsState::CycleSelectedOptionDown(OptionsMenu selectedItem) noexcept {
     }
 }
 
-void OptionsState::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
+void OptionsState::CycleSelectedOptionUp(a2de::OptionsMenu selectedItem) noexcept {
     switch(selectedItem) {
-    case OptionsMenu::DifficultySelection:
+    case a2de::OptionsMenu::DifficultySelection:
     {
         ++m_temp_options.difficulty;
-        if(m_temp_options.difficulty == Difficulty::Last_) {
-            m_temp_options.difficulty = Difficulty::First_;
+        if(m_temp_options.difficulty == a2de::Difficulty::Last_) {
+            m_temp_options.difficulty = a2de::Difficulty::First_;
         }
         break;
     }
-    case OptionsMenu::ControlSelection:
+    case a2de::OptionsMenu::ControlSelection:
     {
         ++m_temp_options.controlPref;
-        if(m_temp_options.controlPref == ControlPreference::Last_) {
-            m_temp_options.controlPref = ControlPreference::First_;
+        if(m_temp_options.controlPref == a2de::ControlPreference::Last_) {
+            m_temp_options.controlPref = a2de::ControlPreference::First_;
         }
         break;
     }
-    case OptionsMenu::SoundVolume:
+    case a2de::OptionsMenu::SoundVolume:
     {
         ++m_temp_options.soundVolume;
         m_temp_options.soundVolume = std::clamp(m_temp_options.soundVolume, m_min_sound_volume, m_max_sound_volume);
@@ -253,7 +253,7 @@ void OptionsState::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
         g_theAudioSystem->Play(g_sound_shootpath);
         break;
     }
-    case OptionsMenu::MusicVolume:
+    case a2de::OptionsMenu::MusicVolume:
     {
         ++m_temp_options.musicVolume;
         m_temp_options.musicVolume = std::clamp(m_temp_options.musicVolume, m_min_music_volume, m_max_music_volume);
@@ -263,7 +263,7 @@ void OptionsState::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
         //TODO: Fix setting actual volume of playing music.
         break;
     }
-    case OptionsMenu::CameraShake:
+    case a2de::OptionsMenu::CameraShake:
     {
         m_temp_options.cameraShakeStrength += 0.1f;
         m_temp_options.cameraShakeStrength = std::clamp(m_temp_options.cameraShakeStrength, m_min_camera_shake, m_max_camera_shake);
@@ -292,20 +292,20 @@ void OptionsState::SaveCurrentOptions() noexcept {
     ofs.close();
 }
 
-std::string OptionsState::DifficultyToString(Difficulty difficulty) const noexcept {
+std::string OptionsState::DifficultyToString(a2de::Difficulty difficulty) const noexcept {
     switch(difficulty) {
-    case Difficulty::Easy: return "Easy";
-    case Difficulty::Normal: return "Normal";
-    case Difficulty::Hard: return "Hard";
+    case a2de::Difficulty::Easy: return "Easy";
+    case a2de::Difficulty::Normal: return "Normal";
+    case a2de::Difficulty::Hard: return "Hard";
     default: return "";
     }
 }
 
-std::string OptionsState::ControlPreferenceToString(ControlPreference preference) const noexcept {
+std::string OptionsState::ControlPreferenceToString(a2de::ControlPreference preference) const noexcept {
     switch(preference) {
-    case ControlPreference::Keyboard: return "Keyboard";
-    case ControlPreference::Mouse: return "Mouse";
-    case ControlPreference::XboxController: return "Xbox Controller";
+    case a2de::ControlPreference::Keyboard: return "Keyboard";
+    case a2de::ControlPreference::Mouse: return "Mouse";
+    case a2de::ControlPreference::XboxController: return "Xbox Controller";
     default: return "";
     }
 }

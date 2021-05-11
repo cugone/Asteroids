@@ -9,24 +9,26 @@
 
 #include <memory>
 
-enum class OptionsMenu {
-    First_,
-    DifficultySelection = First_,
-    ControlSelection,
-    CameraShake,
-    SoundVolume,
-    MusicVolume,
-    Cancel,
-    Last_Valid_,
-    Accept = Last_Valid_,
-    Last_
-};
+namespace a2de {
+    enum class OptionsMenu {
+        First_,
+        DifficultySelection = First_,
+        ControlSelection,
+        CameraShake,
+        SoundVolume,
+        MusicVolume,
+        Cancel,
+        Last_Valid_,
+        Accept = Last_Valid_,
+        Last_
+    };
+}
 
 template<>
-struct a2de::TypeUtils::is_incrementable_enum_type<OptionsMenu> : std::true_type {};
+struct a2de::TypeUtils::is_incrementable_enum_type<a2de::OptionsMenu> : std::true_type {};
 
 template<>
-struct a2de::TypeUtils::is_decrementable_enum_type<OptionsMenu> : std::true_type {};
+struct a2de::TypeUtils::is_decrementable_enum_type<a2de::OptionsMenu> : std::true_type {};
 
 class OptionsState : public GameState {
 public:
@@ -46,14 +48,14 @@ private:
 
     std::unique_ptr<GameState> HandleOptionsMenuState(const bool up, const bool down, const bool left, const bool right, const bool cancel, const bool select) noexcept;
 
-    void CycleSelectedOptionDown(OptionsMenu selectedItem) noexcept;
-    void CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept;
+    void CycleSelectedOptionDown(a2de::OptionsMenu selectedItem) noexcept;
+    void CycleSelectedOptionUp(a2de::OptionsMenu selectedItem) noexcept;
     void SaveCurrentOptions() noexcept;
-    std::string DifficultyToString(Difficulty difficulty) const noexcept;
-    std::string ControlPreferenceToString(ControlPreference preference) const noexcept;
+    std::string DifficultyToString(a2de::Difficulty difficulty) const noexcept;
+    std::string ControlPreferenceToString(a2de::ControlPreference preference) const noexcept;
 
     mutable a2de::Camera2D m_ui_camera{};
-    OptionsMenu m_selected_item{OptionsMenu::First_};
+    a2de::OptionsMenu m_selected_item{a2de::OptionsMenu::First_};
     GameOptions m_temp_options{};
     float m_min_camera_shake{0.0f};
     float m_max_camera_shake{1.0f};

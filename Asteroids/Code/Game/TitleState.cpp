@@ -63,13 +63,13 @@ void TitleState::Render() const noexcept {
     g_theRenderer->DrawTextLine(font, "ASTEROIDS");
 
     g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x, ui_view_half_extents.y + line_height * 2.0f}));
-    g_theRenderer->DrawTextLine(font, "START", m_selected_item == TitleMenu::Start ? a2de::Rgba::Yellow : a2de::Rgba::White);
+    g_theRenderer->DrawTextLine(font, "START", m_selected_item == a2de::TitleMenu::Start ? a2de::Rgba::Yellow : a2de::Rgba::White);
 
     g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x, ui_view_half_extents.y + line_height * 4.0f}));
-    g_theRenderer->DrawTextLine(font, "OPTIONS", m_selected_item == TitleMenu::Options ? a2de::Rgba::Yellow : a2de::Rgba::White);
+    g_theRenderer->DrawTextLine(font, "OPTIONS", m_selected_item == a2de::TitleMenu::Options ? a2de::Rgba::Yellow : a2de::Rgba::White);
 
     g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(a2de::Vector2{ui_view_half_extents.x, ui_view_half_extents.y + line_height * 6.0f}));
-    g_theRenderer->DrawTextLine(font, "EXIT", m_selected_item == TitleMenu::Exit ? a2de::Rgba::Yellow : a2de::Rgba::White);
+    g_theRenderer->DrawTextLine(font, "EXIT", m_selected_item == a2de::TitleMenu::Exit ? a2de::Rgba::Yellow : a2de::Rgba::White);
 
 }
 
@@ -97,21 +97,21 @@ std::unique_ptr<GameState> TitleState::HandleKeyboardInput() noexcept {
     const bool cancel = g_theInputSystem->WasKeyJustPressed(a2de::KeyCode::Esc);
     if(up) {
         --m_selected_item;
-        m_selected_item = std::clamp(m_selected_item, TitleMenu::First_, TitleMenu::Last_Valid_);
+        m_selected_item = std::clamp(m_selected_item, a2de::TitleMenu::First_, a2de::TitleMenu::Last_Valid_);
     } else if(down) {
         ++m_selected_item;
-        m_selected_item = std::clamp(m_selected_item, TitleMenu::First_, TitleMenu::Last_Valid_);
+        m_selected_item = std::clamp(m_selected_item, a2de::TitleMenu::First_, a2de::TitleMenu::Last_Valid_);
     }
     if(cancel) {
-        m_selected_item = TitleMenu::Exit;
+        m_selected_item = a2de::TitleMenu::Exit;
     }
     if(select) {
         switch(m_selected_item) {
-        case TitleMenu::Start:
+        case a2de::TitleMenu::Start:
             return std::make_unique<MainState>();
-        case TitleMenu::Options:
+        case a2de::TitleMenu::Options:
             return std::make_unique<OptionsState>();
-        case TitleMenu::Exit:
+        case a2de::TitleMenu::Exit:
             g_theApp->SetIsQuitting(true);
             return {};
         default:
@@ -134,15 +134,15 @@ std::unique_ptr<GameState> TitleState::HandleControllerInput() noexcept {
             ++m_selected_item;
         }
         if(cancel) {
-            m_selected_item = TitleMenu::Exit;
+            m_selected_item = a2de::TitleMenu::Exit;
         }
         if(select) {
             switch(m_selected_item) {
-            case TitleMenu::Start:
+            case a2de::TitleMenu::Start:
                 return std::make_unique<MainState>();
-            case TitleMenu::Options:
+            case a2de::TitleMenu::Options:
                 return std::make_unique<OptionsState>();
-            case TitleMenu::Exit:
+            case a2de::TitleMenu::Exit:
                 g_theApp->SetIsQuitting(true);
                 return {};
             default:

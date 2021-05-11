@@ -518,18 +518,18 @@ void MainState::KillAll() noexcept {
 
 unsigned int MainState::GetWaveMultiplierFromDifficulty() const noexcept {
     switch(g_theGame->gameOptions.difficulty) {
-    case Difficulty::Easy: return 3u;
-    case Difficulty::Normal: return 5u;
-    case Difficulty::Hard: return 7u;
+    case a2de::Difficulty::Easy: return 3u;
+    case a2de::Difficulty::Normal: return 5u;
+    case a2de::Difficulty::Hard: return 7u;
     default: return 5u;
     }
 }
 
 long long MainState::GetLivesFromDifficulty() const noexcept {
     switch(g_theGame->gameOptions.difficulty) {
-    case Difficulty::Easy: return 5LL;
-    case Difficulty::Normal: return 4LL;
-    case Difficulty::Hard: return 3LL;
+    case a2de::Difficulty::Easy: return 5LL;
+    case a2de::Difficulty::Normal: return 4LL;
+    case a2de::Difficulty::Hard: return 3LL;
     default: return 4;
     }
 }

@@ -34,39 +34,43 @@ class Explosion;
 class Ship;
 class Mine;
 
-enum class Difficulty {
-    First_,
-    Easy = First_,
-    Normal,
-    Hard,
-    Last_,
-};
+namespace a2de {
+    enum class Difficulty {
+        First_,
+        Easy = First_,
+        Normal,
+        Hard,
+        Last_,
+    };
+}
 
 template<>
-struct a2de::TypeUtils::is_incrementable_enum_type<Difficulty> : std::true_type {};
+struct a2de::TypeUtils::is_incrementable_enum_type<a2de::Difficulty> : std::true_type {};
 
 template<>
-struct a2de::TypeUtils::is_decrementable_enum_type<Difficulty> : std::true_type {};
+struct a2de::TypeUtils::is_decrementable_enum_type<a2de::Difficulty> : std::true_type {};
 
-enum class ControlPreference {
-    First_,
-    Keyboard = First_,
-    Mouse,
-    XboxController,
-    Last_,
-};
+namespace a2de {
+    enum class ControlPreference {
+        First_,
+        Keyboard = First_,
+        Mouse,
+        XboxController,
+        Last_,
+    };
+}
 
 template<>
-struct a2de::TypeUtils::is_incrementable_enum_type<ControlPreference> : std::true_type {};
+struct a2de::TypeUtils::is_incrementable_enum_type<a2de::ControlPreference> : std::true_type {};
 
 template<>
-struct a2de::TypeUtils::is_decrementable_enum_type<ControlPreference> : std::true_type {};
+struct a2de::TypeUtils::is_decrementable_enum_type<a2de::ControlPreference> : std::true_type {};
 
 struct GameOptions {
     int windowWidth{1600};
     int windowHeight{900};
-    Difficulty difficulty{Difficulty::Normal};
-    ControlPreference controlPref{ControlPreference::Mouse};
+    a2de::Difficulty difficulty{a2de::Difficulty::Normal};
+    a2de::ControlPreference controlPref{a2de::ControlPreference::Mouse};
     uint8_t soundVolume{5};
     uint8_t musicVolume{5};
     float cameraShakeStrength{1.0f};

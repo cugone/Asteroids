@@ -303,9 +303,9 @@ const a2de::Vector2 Ship::CalcBulletDirectionFromDifficulty() const noexcept {
     const auto current_angle = GetForward().CalcHeadingDegrees();
     const auto angle_bias = []() {
         switch(g_theGame->gameOptions.difficulty) {
-        case Difficulty::Easy: return a2de::MathUtils::GetRandomFloatNegOneToOne() * 2.5f;
-        case Difficulty::Normal: return a2de::MathUtils::GetRandomFloatNegOneToOne() * 5.0f;
-        case Difficulty::Hard: return a2de::MathUtils::GetRandomFloatNegOneToOne() * 10.0f;
+        case a2de::Difficulty::Easy: return a2de::MathUtils::GetRandomFloatNegOneToOne() * 2.5f;
+        case a2de::Difficulty::Normal: return a2de::MathUtils::GetRandomFloatNegOneToOne() * 5.0f;
+        case a2de::Difficulty::Hard: return a2de::MathUtils::GetRandomFloatNegOneToOne() * 10.0f;
         default: return 0.0f;
         }
     }();

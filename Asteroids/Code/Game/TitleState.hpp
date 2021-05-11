@@ -8,20 +8,22 @@
 
 #include <memory>
 
-enum class TitleMenu {
-    First_,
-    Start = First_,
-    Options,
-    Last_Valid_,
-    Exit = Last_Valid_,
-    Last_,
-};
+namespace a2de {
+    enum class TitleMenu {
+        First_,
+        Start = First_,
+        Options,
+        Last_Valid_,
+        Exit = Last_Valid_,
+        Last_,
+    };
+}
 
 template<>
-struct a2de::TypeUtils::is_incrementable_enum_type<TitleMenu> : std::true_type {};
+struct a2de::TypeUtils::is_incrementable_enum_type<a2de::TitleMenu> : std::true_type {};
 
 template<>
-struct a2de::TypeUtils::is_decrementable_enum_type<TitleMenu> : std::true_type {};
+struct a2de::TypeUtils::is_decrementable_enum_type<a2de::TitleMenu> : std::true_type {};
 
 class TitleState : public GameState {
 public:
@@ -40,5 +42,5 @@ private:
     std::unique_ptr<GameState> HandleControllerInput() noexcept;
 
     mutable a2de::Camera2D m_ui_camera{};
-    TitleMenu m_selected_item{TitleMenu::First_};
+    a2de::TitleMenu m_selected_item{a2de::TitleMenu::First_};
 };
