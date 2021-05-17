@@ -29,41 +29,41 @@ void LaserComponent::BeginFrame() noexcept {
     }
 }
 
-void LaserComponent::Update([[maybe_unused]] a2de::TimeUtils::FPSeconds deltaSeconds) noexcept {
+void LaserComponent::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
     if(m_isfiring) {
-        const auto tex = material->GetTexture(a2de::Material::TextureID::Diffuse);
+        const auto tex = material->GetTexture(Material::TextureID::Diffuse);
         const auto frameWidth = static_cast<float>(tex->GetDimensions().x);
         const auto frameHeight = static_cast<float>(tex->GetDimensions().y);
-        const auto half_extents = a2de::Vector2{frameWidth, frameHeight} * 0.5f;
+        const auto half_extents = Vector2{frameWidth, frameHeight} * 0.5f;
         auto forward = m_parent->GetForward();
         m_positionOffset = forward * m_parent->GetCosmeticRadius();
-        const auto S = a2de::Matrix4::CreateScaleMatrix(a2de::Vector2{m_parent->GetCosmeticRadius() * 0.2f, frameHeight});
-        const auto R = a2de::Matrix4::Create2DRotationDegreesMatrix(90.f + m_ray.direction.CalcHeadingDegrees());
-        const auto T = a2de::Matrix4::CreateTranslationMatrix(m_positionOffset + a2de::Vector2{half_extents.x, half_extents.y});
-        transform = a2de::Matrix4::MakeRT(m_parent->GetTransform(), a2de::Matrix4::MakeSRT(S, R, T));
+        const auto S = Matrix4::CreateScaleMatrix(Vector2{m_parent->GetCosmeticRadius() * 0.2f, frameHeight});
+        const auto R = Matrix4::Create2DRotationDegreesMatrix(90.f + m_ray.direction.CalcHeadingDegrees());
+        const auto T = Matrix4::CreateTranslationMatrix(m_positionOffset + Vector2{half_extents.x, half_extents.y});
+        transform = Matrix4::MakeRT(m_parent->GetTransform(), Matrix4::MakeSRT(S, R, T));
 
-        const auto uvs = a2de::AABB2::ZERO_TO_ONE;
+        const auto uvs = AABB2::ZERO_TO_ONE;
         auto& builder = mesh_builder;
-        builder.Begin(a2de::PrimitiveType::Triangles);
-        builder.SetColor(a2de::Rgba::White);
+        builder.Begin(PrimitiveType::Triangles);
+        builder.SetColor(Rgba::White);
 
-        builder.SetUV(a2de::Vector2{uvs.maxs.x, uvs.maxs.y});
-        builder.AddVertex(a2de::Vector2{+0.5f, +0.5f});
+        builder.SetUV(Vector2{uvs.maxs.x, uvs.maxs.y});
+        builder.AddVertex(Vector2{+0.5f, +0.5f});
 
-        builder.SetUV(a2de::Vector2{uvs.mins.x, uvs.maxs.y});
-        builder.AddVertex(a2de::Vector2{-0.5f, +0.5f});
+        builder.SetUV(Vector2{uvs.mins.x, uvs.maxs.y});
+        builder.AddVertex(Vector2{-0.5f, +0.5f});
 
-        builder.SetUV(a2de::Vector2{uvs.mins.x, uvs.mins.y});
-        builder.AddVertex(a2de::Vector2{-0.5f, -0.5f});
+        builder.SetUV(Vector2{uvs.mins.x, uvs.mins.y});
+        builder.AddVertex(Vector2{-0.5f, -0.5f});
 
-        builder.SetUV(a2de::Vector2{uvs.maxs.x, uvs.mins.y});
-        builder.AddVertex(a2de::Vector2{+0.5f, -0.5f});
+        builder.SetUV(Vector2{uvs.maxs.x, uvs.mins.y});
+        builder.AddVertex(Vector2{+0.5f, -0.5f});
 
-        builder.AddIndicies(a2de::Mesh::Builder::Primitive::Quad);
+        builder.AddIndicies(Mesh::Builder::Primitive::Quad);
         builder.End(material);
 
         for(auto& asteroid : g_theGame->asteroids) {
-            if(a2de::MathUtils::DoLineSegmentOverlap(a2de::Disc2{asteroid->GetPosition(), asteroid->GetPhysicalRadius()}, a2de::LineSegment2{m_ray.position, m_ray.direction, 1000.0f})) {
+            if(MathUtils::DoLineSegmentOverlap(Disc2{asteroid->GetPosition(), asteroid->GetPhysicalRadius()}, LineSegment2{m_ray.position, m_ray.direction, 1000.0f})) {
                 asteroid->DecrementHealth();
             }
         }

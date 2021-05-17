@@ -18,7 +18,7 @@ public:
     virtual ~LaserChargeComponent() = default;
 
     void BeginFrame() noexcept override;
-    void Update([[maybe_unused]] a2de::TimeUtils::FPSeconds deltaSeconds) noexcept override;
+    void Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept override;
     void EndFrame() noexcept override;
 
     void OnDestroy() noexcept override;
@@ -31,9 +31,9 @@ public:
 protected:
 private:
     Entity* m_parent{nullptr};
-    std::unique_ptr<a2de::AnimatedSprite> _sprite{};
-    a2de::Vector2 m_positionOffset{};
-    a2de::Ray2 m_ray{};
+    std::unique_ptr<AnimatedSprite> _sprite{};
+    Vector2 m_positionOffset{};
+    Ray2 m_ray{};
     bool m_ischarging{true};
-    a2de::Stopwatch m_chargeTime{a2de::TimeUtils::FPSeconds{1.0f}};
+    Stopwatch m_chargeTime{TimeUtils::FPSeconds{1.0f}};
 };

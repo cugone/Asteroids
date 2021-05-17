@@ -18,7 +18,7 @@ public:
     virtual ~LaserComponent() = default;
 
     void BeginFrame() noexcept override;
-    void Update([[maybe_unused]] a2de::TimeUtils::FPSeconds deltaSeconds) noexcept override;
+    void Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept override;
     void EndFrame() noexcept override;
 
     void OnDestroy() noexcept override;
@@ -31,8 +31,8 @@ public:
 protected:
 private:
     Entity* m_parent{nullptr};
-    a2de::Vector2 m_positionOffset{};
-    a2de::Ray2 m_ray{};
-    a2de::Stopwatch m_fireTime{a2de::TimeUtils::FPSeconds{5.0f}};
+    Vector2 m_positionOffset{};
+    Ray2 m_ray{};
+    Stopwatch m_fireTime{TimeUtils::FPSeconds{5.0f}};
     bool m_isfiring{true};
 };

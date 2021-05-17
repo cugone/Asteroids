@@ -19,13 +19,13 @@ void GameOverState::BeginFrame() noexcept {
     g_theGame->SetControlType();
 }
 
-void GameOverState::Update([[maybe_unused]] a2de::TimeUtils::FPSeconds deltaSeconds) {
+void GameOverState::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) {
     if(auto newState = HandleInput(deltaSeconds)) {
         g_theGame->ChangeState(std::move(newState));
     }
 }
 
-std::unique_ptr<GameState> GameOverState::HandleInput([[maybe_unused]] a2de::TimeUtils::FPSeconds deltaSeconds) noexcept {
+std::unique_ptr<GameState> GameOverState::HandleInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
     if(auto kb_state = HandleKeyboardInput()) {
         return kb_state;
     }
@@ -64,26 +64,26 @@ void GameOverState::Render() const noexcept {
     g_theRenderer->SetRenderTargetsToBackBuffer();
     g_theRenderer->ClearDepthStencilBuffer();
 
-    g_theRenderer->ClearColor(a2de::Rgba::Black);
+    g_theRenderer->ClearColor(Rgba::Black);
 
     g_theRenderer->SetViewportAsPercent();
 
     //2D View / HUD
     const float ui_view_height = currentGraphicsOptions.WindowHeight;
     const float ui_view_width = ui_view_height * m_ui_camera.GetAspectRatio();
-    const auto ui_view_extents = a2de::Vector2{ui_view_width, ui_view_height};
+    const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
     const auto ui_view_half_extents = ui_view_extents * 0.5f;
-    auto ui_leftBottom = a2de::Vector2{-ui_view_half_extents.x, ui_view_half_extents.y};
-    auto ui_rightTop = a2de::Vector2{ui_view_half_extents.x, -ui_view_half_extents.y};
-    auto ui_nearFar = a2de::Vector2{0.0f, 1.0f};
+    auto ui_leftBottom = Vector2{-ui_view_half_extents.x, ui_view_half_extents.y};
+    auto ui_rightTop = Vector2{ui_view_half_extents.x, -ui_view_half_extents.y};
+    auto ui_nearFar = Vector2{0.0f, 1.0f};
     auto ui_cam_pos = ui_view_half_extents;
     m_ui_camera.position = ui_cam_pos;
     m_ui_camera.orientation_degrees = 0.0f;
-    m_ui_camera.SetupView(ui_leftBottom, ui_rightTop, ui_nearFar, a2de::MathUtils::M_16_BY_9_RATIO);
+    m_ui_camera.SetupView(ui_leftBottom, ui_rightTop, ui_nearFar, MathUtils::M_16_BY_9_RATIO);
     g_theRenderer->SetCamera(m_ui_camera);
 
     const auto* font = g_theRenderer->GetFont("System32");
-    g_theRenderer->SetModelMatrix(a2de::Matrix4::CreateTranslationMatrix(ui_view_half_extents));
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(ui_view_half_extents));
     g_theRenderer->DrawTextLine(font, "GAME OVER");
 
 }

@@ -6,10 +6,10 @@
 
 class Mine : public Entity {
 public:
-    explicit Mine(const Entity* parent, a2de::Vector2 position);
+    explicit Mine(const Entity* parent, Vector2 position);
     virtual ~Mine() = default;
 
-    void Update(a2de::TimeUtils::FPSeconds deltaSeconds) noexcept override;
+    void Update(TimeUtils::FPSeconds deltaSeconds) noexcept override;
     void EndFrame() noexcept override;
 
     void OnCreate() noexcept override;
@@ -19,6 +19,6 @@ public:
 
 protected:
 private:
-    std::unique_ptr<a2de::AnimatedSprite> _sprite{};
-    std::weak_ptr<a2de::SpriteSheet> GetSpriteSheet() const noexcept;
+    std::unique_ptr<AnimatedSprite> _sprite{};
+    std::weak_ptr<SpriteSheet> GetSpriteSheet() const noexcept;
 };

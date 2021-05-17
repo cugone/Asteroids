@@ -8,22 +8,20 @@
 
 #include <memory>
 
-namespace a2de {
-    enum class TitleMenu {
-        First_,
-        Start = First_,
-        Options,
-        Last_Valid_,
-        Exit = Last_Valid_,
-        Last_,
-    };
-}
+enum class TitleMenu {
+    First_,
+    Start = First_,
+    Options,
+    Last_Valid_,
+    Exit = Last_Valid_,
+    Last_,
+};
 
 template<>
-struct a2de::TypeUtils::is_incrementable_enum_type<a2de::TitleMenu> : std::true_type {};
+struct TypeUtils::is_incrementable_enum_type<TitleMenu> : std::true_type {};
 
 template<>
-struct a2de::TypeUtils::is_decrementable_enum_type<a2de::TitleMenu> : std::true_type {};
+struct TypeUtils::is_decrementable_enum_type<TitleMenu> : std::true_type {};
 
 class TitleState : public GameState {
 public:
@@ -32,15 +30,15 @@ public:
     void OnEnter() noexcept override;
     void OnExit() noexcept override;
     void BeginFrame() noexcept override;
-    void Update([[maybe_unused]] a2de::TimeUtils::FPSeconds deltaSeconds) override;
+    void Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) override;
     void Render() const noexcept override;
     void EndFrame() noexcept override;
 protected:
 private:
-    std::unique_ptr<GameState> HandleInput([[maybe_unused]] a2de::TimeUtils::FPSeconds deltaSeconds) noexcept override;
+    std::unique_ptr<GameState> HandleInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept override;
     std::unique_ptr<GameState> HandleKeyboardInput() noexcept;
     std::unique_ptr<GameState> HandleControllerInput() noexcept;
 
-    mutable a2de::Camera2D m_ui_camera{};
-    a2de::TitleMenu m_selected_item{a2de::TitleMenu::First_};
+    mutable Camera2D m_ui_camera{};
+    TitleMenu m_selected_item{TitleMenu::First_};
 };

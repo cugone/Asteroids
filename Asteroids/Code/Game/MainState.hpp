@@ -32,25 +32,25 @@ public:
     void OnEnter() noexcept override;
     void OnExit() noexcept override;
     void BeginFrame() noexcept override;
-    void Update([[maybe_unused]] a2de::TimeUtils::FPSeconds deltaSeconds) override;
+    void Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) override;
     void Render() const noexcept override;
     void EndFrame() noexcept override;
 
     mutable Ship* ship{nullptr};
 protected:
 private:
-    std::unique_ptr<GameState> HandleInput([[maybe_unused]] a2de::TimeUtils::FPSeconds deltaSeconds) noexcept override;
-    std::unique_ptr<GameState> HandleKeyboardInput([[maybe_unused]] a2de::TimeUtils::FPSeconds deltaSeconds) noexcept;
-    std::unique_ptr<GameState> HandleControllerInput([[maybe_unused]] a2de::TimeUtils::FPSeconds deltaSeconds) noexcept;
-    std::unique_ptr<GameState> HandleMouseInput([[maybe_unused]] a2de::TimeUtils::FPSeconds deltaSeconds) noexcept;
+    std::unique_ptr<GameState> HandleInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept override;
+    std::unique_ptr<GameState> HandleKeyboardInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept;
+    std::unique_ptr<GameState> HandleControllerInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept;
+    std::unique_ptr<GameState> HandleMouseInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept;
 
-    void HandleDebugInput([[maybe_unused]] a2de::TimeUtils::FPSeconds deltaSeconds);
-    void HandleDebugKeyboardInput([[maybe_unused]] a2de::TimeUtils::FPSeconds deltaSeconds);
-    void HandlePlayerInput([[maybe_unused]] a2de::TimeUtils::FPSeconds deltaSeconds);
+    void HandleDebugInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds);
+    void HandleDebugKeyboardInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds);
+    void HandlePlayerInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds);
     void ClampCameraToWorld() noexcept;
 
     void WrapAroundWorld(Entity* e) noexcept;
-    void UpdateEntities(a2de::TimeUtils::FPSeconds deltaSeconds) noexcept;
+    void UpdateEntities(TimeUtils::FPSeconds deltaSeconds) noexcept;
     void StartNewWave(unsigned int wave_number) noexcept;
 
     void MakeUfo() noexcept;
@@ -79,16 +79,16 @@ private:
     void RenderEntities() const noexcept;
     void DebugRenderEntities() const noexcept;
 
-    a2de::AABB2 CalculateCameraBounds() const noexcept;
+    AABB2 CalculateCameraBounds() const noexcept;
 
     void RenderStatus() const noexcept;
 
     void DoCameraShake() noexcept;
 
-    a2de::AABB2 world_bounds = a2de::AABB2::ZERO_TO_ONE;
+    AABB2 world_bounds = AABB2::ZERO_TO_ONE;
 
-    a2de::OrthographicCameraController m_cameraController{};
-    a2de::Vector2 _auto_target_location{};
+    OrthographicCameraController m_cameraController{};
+    Vector2 _auto_target_location{};
     float m_thrust_force{100.0f};
     bool m_debug_render{false};
 };

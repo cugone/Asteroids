@@ -14,7 +14,7 @@ public:
     ThrustComponent& operator=(ThrustComponent&& other) = default;
     virtual ~ThrustComponent() = default;
 
-    void Update([[maybe_unused]] a2de::TimeUtils::FPSeconds deltaSeconds) noexcept override;
+    void Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept override;
 
     void OnCreate() noexcept override;
     void OnCollision(Entity* a, Entity* b) noexcept override;
@@ -29,7 +29,7 @@ public:
 protected:
 private:
     Entity* m_parent{nullptr};
-    a2de::Vector2 m_positionOffset{};
+    Vector2 m_positionOffset{};
     float m_thrustDirectionAngleOffset{0.0f};
     float m_thrust{0.0f};
     float m_maxThrust{100.0f};

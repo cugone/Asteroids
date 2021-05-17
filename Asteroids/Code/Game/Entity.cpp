@@ -9,18 +9,18 @@ void Entity::BeginFrame() noexcept {
     mesh_builder.Clear();
 }
 
-void Entity::Update(a2de::TimeUtils::FPSeconds deltaSeconds) noexcept {
+void Entity::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     auto accel = CalcAcceleration();
     auto vel = GetVelocity();
     auto pos = GetPosition();
     const auto r = GetCosmeticRadius();
-    a2de::Vector2 new_accel = accel;
-    a2de::Vector2 new_vel = vel + new_accel * deltaSeconds.count();
-    a2de::Vector2 new_pos = pos + new_vel * deltaSeconds.count();
+    Vector2 new_accel = accel;
+    Vector2 new_vel = vel + new_accel * deltaSeconds.count();
+    Vector2 new_pos = pos + new_vel * deltaSeconds.count();
     position_orientation_speed.x = new_pos.x;
     position_orientation_speed.y = new_pos.y;
     position_orientation_speed.w = new_vel.CalcLength();
-    auto new_direction = a2de::Vector2::X_AXIS;
+    auto new_direction = Vector2::X_AXIS;
     new_direction.SetUnitLengthAndHeadingDegrees(new_vel.CalcHeadingDegrees());
     cosmeticphysicalradius_velocitydirection.z = new_direction.x;
     cosmeticphysicalradius_velocitydirection.w = new_direction.y;
@@ -28,30 +28,30 @@ void Entity::Update(a2de::TimeUtils::FPSeconds deltaSeconds) noexcept {
     acceleration_force.y = new_accel.y;
 }
 
-void Entity::Render(a2de::Renderer& renderer) const noexcept {
+void Entity::Render(Renderer& renderer) const noexcept {
     renderer.SetModelMatrix(transform);
-    a2de::Mesh::Render(renderer, mesh_builder);
+    Mesh::Render(renderer, mesh_builder);
 }
 
 void Entity::EndFrame() noexcept {
     ClearForce();
 }
 
-a2de::Vector2 Entity::GetForward() const noexcept {
-    auto front = a2de::Vector2::X_AXIS;
+Vector2 Entity::GetForward() const noexcept {
+    auto front = Vector2::X_AXIS;
     front.SetHeadingDegrees(GetOrientationDegrees());
     return front;
 }
 
-a2de::Vector2 Entity::GetBackward() const noexcept {
+Vector2 Entity::GetBackward() const noexcept {
     return -GetForward();
 }
 
-a2de::Vector2 Entity::GetRight() const noexcept {
+Vector2 Entity::GetRight() const noexcept {
     return GetForward().GetRightHandNormal();
 }
 
-a2de::Vector2 Entity::GetLeft() const noexcept {
+Vector2 Entity::GetLeft() const noexcept {
     return GetForward().GetLeftHandNormal();
 }
 
@@ -75,11 +75,11 @@ bool Entity::IsDead() const noexcept {
     return invmass_rotationspeed_health_padding.z <= 0;
 }
 
-const a2de::Matrix4& Entity::GetTransform() const noexcept {
+const Matrix4& Entity::GetTransform() const noexcept {
     return transform;
 }
 
-a2de::Material* Entity::GetMaterial() const noexcept {
+Material* Entity::GetMaterial() const noexcept {
     return material;
 }
 
@@ -95,38 +95,38 @@ void Entity::SetHealth(int newHealth) noexcept {
     invmass_rotationspeed_health_padding.z = static_cast<float>(newHealth);
 }
 
-void Entity::SetPosition(a2de::Vector2 newPosition) noexcept {
+void Entity::SetPosition(Vector2 newPosition) noexcept {
     position_orientation_speed.x = newPosition.x;
     position_orientation_speed.y = newPosition.y;
 }
 
-a2de::Vector2 Entity::GetPosition() const noexcept {
+Vector2 Entity::GetPosition() const noexcept {
     return position_orientation_speed.GetXY();
 }
 
-void Entity::SetVelocity(a2de::Vector2 newVelocity) noexcept {
+void Entity::SetVelocity(Vector2 newVelocity) noexcept {
     position_orientation_speed.w = newVelocity.Normalize();
     cosmeticphysicalradius_velocitydirection.z = newVelocity.x;
     cosmeticphysicalradius_velocitydirection.w = newVelocity.y;
 }
 
-a2de::Vector2 Entity::GetVelocity() const noexcept {
+Vector2 Entity::GetVelocity() const noexcept {
     return cosmeticphysicalradius_velocitydirection.GetZW() * position_orientation_speed.w;
 }
 
-a2de::Vector2 Entity::GetAcceleration() const noexcept {
+Vector2 Entity::GetAcceleration() const noexcept {
     return acceleration_force.GetXY();
 }
 
-a2de::Vector2 Entity::CalcAcceleration() noexcept {
+Vector2 Entity::CalcAcceleration() noexcept {
     return acceleration_force.GetZW() * GetInvMass();
 }
 
-a2de::Vector2 Entity::GetForce() const noexcept {
-    return a2de::Vector2{acceleration_force.z, acceleration_force.w};
+Vector2 Entity::GetForce() const noexcept {
+    return Vector2{acceleration_force.z, acceleration_force.w};
 }
 
-void Entity::AddForce(const a2de::Vector2& force) noexcept {
+void Entity::AddForce(const Vector2& force) noexcept {
     acceleration_force.z += force.x;
     acceleration_force.w += force.y;
 }
@@ -149,7 +149,7 @@ void Entity::SetOrientationDegrees(float newDegrees) noexcept {
 }
 
 void Entity::SetOrientationRadians(float newRadians) noexcept {
-    SetOrientationDegrees(a2de::MathUtils::ConvertRadiansToDegrees(newRadians));
+    SetOrientationDegrees(MathUtils::ConvertRadiansToDegrees(newRadians));
 }
 
 float Entity::GetOrientationDegrees() const noexcept {
@@ -157,7 +157,7 @@ float Entity::GetOrientationDegrees() const noexcept {
 }
 
 float Entity::GetOrientationRadians() const noexcept {
-    return a2de::MathUtils::ConvertDegreesToRadians(GetOrientationDegrees());
+    return MathUtils::ConvertDegreesToRadians(GetOrientationDegrees());
 }
 
 void Entity::OnDestroy() noexcept {
@@ -174,7 +174,7 @@ void Entity::RotateClockwise(float speed) noexcept {
 
 void Entity::AdjustOrientation(float value) noexcept {
     position_orientation_speed.z += value;
-    position_orientation_speed.z = a2de::MathUtils::Wrap(position_orientation_speed.z, 0.0f, 360.0f);
+    position_orientation_speed.z = MathUtils::Wrap(position_orientation_speed.z, 0.0f, 360.0f);
 }
 
 float Entity::GetRotationSpeed() const noexcept {

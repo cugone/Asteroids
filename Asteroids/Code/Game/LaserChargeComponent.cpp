@@ -20,11 +20,11 @@ LaserChargeComponent::LaserChargeComponent(Entity* parent)
     m_ray.SetOrientationDegrees(m_parent->GetOrientationDegrees());
 
 
-    a2de::AnimatedSpriteDesc desc{};
+    AnimatedSpriteDesc desc{};
     desc.material = g_theRenderer->GetMaterial("laserchargeup");
     desc.spriteSheet = g_theGame->asteroid_sheet;
-    desc.durationSeconds = a2de::TimeUtils::FPSeconds{1.0f};
-    desc.playbackMode = a2de::AnimatedSprite::SpriteAnimMode::Play_To_End;
+    desc.durationSeconds = TimeUtils::FPSeconds{1.0f};
+    desc.playbackMode = AnimatedSprite::SpriteAnimMode::Play_To_End;
     desc.frameLength = 16;
     desc.startSpriteIndex = 0;
 
@@ -41,37 +41,37 @@ void LaserChargeComponent::BeginFrame() noexcept {
     }
 }
 
-void LaserChargeComponent::Update([[maybe_unused]] a2de::TimeUtils::FPSeconds deltaSeconds) noexcept {
+void LaserChargeComponent::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
     if(m_ischarging) {
         _sprite->Update(deltaSeconds);
         const auto frameWidth = static_cast<float>(_sprite->GetFrameDimensions().x);
         const auto frameHeight = static_cast<float>(_sprite->GetFrameDimensions().y);
-        const auto half_extents = a2de::Vector2{frameWidth, frameHeight};
+        const auto half_extents = Vector2{frameWidth, frameHeight};
         auto forward = m_parent->GetForward();
         m_positionOffset = forward * m_parent->GetCosmeticRadius();
-        const auto S = a2de::Matrix4::I;
-        const auto R = a2de::Matrix4::I;
-        const auto T = a2de::Matrix4::CreateTranslationMatrix(m_positionOffset);
-        transform = a2de::Matrix4::MakeRT(m_parent->GetTransform(), a2de::Matrix4::MakeSRT(S, R, T));
+        const auto S = Matrix4::I;
+        const auto R = Matrix4::I;
+        const auto T = Matrix4::CreateTranslationMatrix(m_positionOffset);
+        transform = Matrix4::MakeRT(m_parent->GetTransform(), Matrix4::MakeSRT(S, R, T));
 
         const auto uvs = _sprite->GetCurrentTexCoords();
         auto& builder = mesh_builder;
-        builder.Begin(a2de::PrimitiveType::Triangles);
-        builder.SetColor(a2de::Rgba::White);
+        builder.Begin(PrimitiveType::Triangles);
+        builder.SetColor(Rgba::White);
 
-        builder.SetUV(a2de::Vector2{uvs.maxs.x, uvs.maxs.y});
-        builder.AddVertex(a2de::Vector2{+0.5f, +0.5f});
+        builder.SetUV(Vector2{uvs.maxs.x, uvs.maxs.y});
+        builder.AddVertex(Vector2{+0.5f, +0.5f});
 
-        builder.SetUV(a2de::Vector2{uvs.mins.x, uvs.maxs.y});
-        builder.AddVertex(a2de::Vector2{-0.5f, +0.5f});
+        builder.SetUV(Vector2{uvs.mins.x, uvs.maxs.y});
+        builder.AddVertex(Vector2{-0.5f, +0.5f});
 
-        builder.SetUV(a2de::Vector2{uvs.mins.x, uvs.mins.y});
-        builder.AddVertex(a2de::Vector2{-0.5f, -0.5f});
+        builder.SetUV(Vector2{uvs.mins.x, uvs.mins.y});
+        builder.AddVertex(Vector2{-0.5f, -0.5f});
 
-        builder.SetUV(a2de::Vector2{uvs.maxs.x, uvs.mins.y});
-        builder.AddVertex(a2de::Vector2{+0.5f, -0.5f});
+        builder.SetUV(Vector2{uvs.maxs.x, uvs.mins.y});
+        builder.AddVertex(Vector2{+0.5f, -0.5f});
 
-        builder.AddIndicies(a2de::Mesh::Builder::Primitive::Quad);
+        builder.AddIndicies(Mesh::Builder::Primitive::Quad);
         builder.End(material);
     }
 }

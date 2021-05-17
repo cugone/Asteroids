@@ -7,7 +7,7 @@
 #include "Game/Game.hpp"
 #include "Game/Bullet.hpp"
 
-Mine::Mine(const Entity* parent, a2de::Vector2 position)
+Mine::Mine(const Entity* parent, Vector2 position)
     : Entity()
 {
     faction = parent->faction;
@@ -15,11 +15,11 @@ Mine::Mine(const Entity* parent, a2de::Vector2 position)
     SetCosmeticRadius(25.0f);
     SetPhysicalRadius(25.0f);
 
-    a2de::AnimatedSpriteDesc desc{};
+    AnimatedSpriteDesc desc{};
     desc.material = g_theRenderer->GetMaterial("mine");
     desc.spriteSheet = GetSpriteSheet();
-    desc.durationSeconds = a2de::TimeUtils::FPSeconds{1.0f};
-    desc.playbackMode = a2de::AnimatedSprite::SpriteAnimMode::Looping;
+    desc.durationSeconds = TimeUtils::FPSeconds{1.0f};
+    desc.playbackMode = AnimatedSprite::SpriteAnimMode::Looping;
     desc.frameLength = 12;
     desc.startSpriteIndex = 0;
 
@@ -29,38 +29,38 @@ Mine::Mine(const Entity* parent, a2de::Vector2 position)
 
 }
 
-void Mine::Update(a2de::TimeUtils::FPSeconds deltaSeconds) noexcept {
+void Mine::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     Entity::Update(deltaSeconds);
     _sprite->Update(deltaSeconds);
 
     const auto uvs = _sprite->GetCurrentTexCoords();
     const auto frameWidth = static_cast<float>(_sprite->GetFrameDimensions().x);
     const auto frameHeight = static_cast<float>(_sprite->GetFrameDimensions().y);
-    const auto half_extents = a2de::Vector2{frameWidth, frameHeight};
+    const auto half_extents = Vector2{frameWidth, frameHeight};
     {
-        const auto S = a2de::Matrix4::CreateScaleMatrix(half_extents);
-        const auto R = a2de::Matrix4::I;
-        const auto T = a2de::Matrix4::CreateTranslationMatrix(GetPosition());
-        transform = a2de::Matrix4::MakeSRT(S, R, T);
+        const auto S = Matrix4::CreateScaleMatrix(half_extents);
+        const auto R = Matrix4::I;
+        const auto T = Matrix4::CreateTranslationMatrix(GetPosition());
+        transform = Matrix4::MakeSRT(S, R, T);
     }
 
     auto& builder = mesh_builder;
-    builder.Begin(a2de::PrimitiveType::Triangles);
-    builder.SetColor(a2de::Rgba::White);
+    builder.Begin(PrimitiveType::Triangles);
+    builder.SetColor(Rgba::White);
 
-    builder.SetUV(a2de::Vector2{uvs.maxs.x, uvs.maxs.y});
-    builder.AddVertex(a2de::Vector2{+0.5f, +0.5f});
+    builder.SetUV(Vector2{uvs.maxs.x, uvs.maxs.y});
+    builder.AddVertex(Vector2{+0.5f, +0.5f});
 
-    builder.SetUV(a2de::Vector2{uvs.mins.x, uvs.maxs.y});
-    builder.AddVertex(a2de::Vector2{-0.5f, +0.5f});
+    builder.SetUV(Vector2{uvs.mins.x, uvs.maxs.y});
+    builder.AddVertex(Vector2{-0.5f, +0.5f});
 
-    builder.SetUV(a2de::Vector2{uvs.mins.x, uvs.mins.y});
-    builder.AddVertex(a2de::Vector2{-0.5f, -0.5f});
+    builder.SetUV(Vector2{uvs.mins.x, uvs.mins.y});
+    builder.AddVertex(Vector2{-0.5f, -0.5f});
 
-    builder.SetUV(a2de::Vector2{uvs.maxs.x, uvs.mins.y});
-    builder.AddVertex(a2de::Vector2{+0.5f, -0.5f});
+    builder.SetUV(Vector2{uvs.maxs.x, uvs.mins.y});
+    builder.AddVertex(Vector2{+0.5f, -0.5f});
 
-    builder.AddIndicies(a2de::Mesh::Builder::Primitive::Quad);
+    builder.AddIndicies(Mesh::Builder::Primitive::Quad);
     builder.End(material);
 
 }
@@ -92,6 +92,6 @@ void Mine::OnDestroy() noexcept {
     g_theGame->MakeExplosion(GetPosition());
 }
 
-std::weak_ptr<a2de::SpriteSheet> Mine::GetSpriteSheet() const noexcept {
+std::weak_ptr<SpriteSheet> Mine::GetSpriteSheet() const noexcept {
     return g_theGame->mine_sheet;
 }

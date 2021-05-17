@@ -34,7 +34,7 @@ void Player::AdjustScore(long long amount) noexcept {
         desc.score += amount;
         _scoreRemainingForOneUp -= amount;
         if(_scoreRemainingForOneUp < 0ll) {
-            _scoreRemainingForOneUp = a2de::MathUtils::Wrap(_scoreRemainingForOneUp, 0ll, desc.oneUpScore);
+            _scoreRemainingForOneUp = MathUtils::Wrap(_scoreRemainingForOneUp, 0ll, desc.oneUpScore);
         }
     }
 }
