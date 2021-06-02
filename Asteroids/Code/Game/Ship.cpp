@@ -58,7 +58,7 @@ void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     DoScaleEaseOut(deltaSeconds);
 
     const auto S = Matrix4::CreateScaleMatrix(_scale * half_extents);
-    const auto R = Matrix4::Create2DRotationDegreesMatrix(90.0f + GetOrientationDegrees());
+    const auto R = Matrix4::Create2DRotationDegreesMatrix(GetOrientationDegrees());
     const auto T = Matrix4::CreateTranslationMatrix(GetPosition());
     transform = Matrix4::MakeSRT(S, R, T);
     

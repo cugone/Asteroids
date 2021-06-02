@@ -19,7 +19,6 @@ Ufo::Ufo(Type type, Vector2 position)
     : Entity()
     , _type(type)
 {
-    SetOrientationDegrees(-90.0f);
     SetCosmeticRadius(GetCosmeticRadiusFromType(_type));
     SetPhysicalRadius(GetPhysicalRadiusFromType(_type));
     SetPosition(position);
@@ -73,7 +72,7 @@ void Ufo::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     const auto scale = GetScaleFromType(_type);
     {
         const auto S = Matrix4::CreateScaleMatrix(scale * half_extents);
-        const auto R = Matrix4::Create2DRotationDegreesMatrix(90.0f + GetOrientationDegrees());
+        const auto R = Matrix4::Create2DRotationDegreesMatrix(GetOrientationDegrees());
         const auto T = Matrix4::CreateTranslationMatrix(GetPosition());
         transform = Matrix4::MakeSRT(S, R, T);
     }

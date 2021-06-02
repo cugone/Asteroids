@@ -170,7 +170,7 @@ std::unique_ptr<GameState> MainState::HandleControllerInput([[maybe_unused]] Tim
         ship->DropMine();
     }
     if(auto& controller = g_theInputSystem->GetXboxController(0); controller.IsConnected() && controller.GetLeftThumbPosition().CalcLengthSquared() > 0.0f) {
-        const auto newFacing = controller.GetLeftThumbPosition().CalcHeadingDegrees();
+        const auto newFacing = -controller.GetLeftThumbPosition().CalcHeadingDegrees();
         ship->SetOrientationDegrees(newFacing);
     }
     return {};

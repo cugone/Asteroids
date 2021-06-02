@@ -84,7 +84,7 @@ void Asteroid::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     const auto half_extents = Vector2{frameWidth, frameHeight} * extent_scale;
     {
         const auto S = Matrix4::CreateScaleMatrix(half_extents);
-        const auto R = Matrix4::Create2DRotationDegreesMatrix(90.0f + GetOrientationDegrees());
+        const auto R = Matrix4::Create2DRotationDegreesMatrix(GetOrientationDegrees());
         const auto T = Matrix4::CreateTranslationMatrix(GetPosition());
         transform = Matrix4::MakeSRT(S, R, T);
     }
