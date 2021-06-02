@@ -1,6 +1,0 @@
-<material name="laserchargeup">
-    <shader src="Data/Shaders/laserchargeup.shader" />
-    <textures>
-        <diffuse src="Data/Images/laser_chargeup.png" />
-    </textures>
-</material>

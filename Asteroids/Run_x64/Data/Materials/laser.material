@@ -1,6 +1,0 @@
-<material name="laser">
-    <shader src="Data/Shaders/laser.shader" />
-    <textures>
-        <diffuse src="Data/Images/laser_beam.png" />
-    </textures>
-</material>

@@ -226,9 +226,6 @@ void MainState::HandleDebugKeyboardInput([[maybe_unused]] TimeUtils::FPSeconds d
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::F4)) {
         g_theUISystem->ToggleImguiDemoWindow();
     }
-    if(g_theInputSystem->WasKeyJustPressed(KeyCode::L)) {
-        ship->Charge();
-    }
 }
 
 void MainState::HandlePlayerInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) {

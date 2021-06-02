@@ -16,8 +16,6 @@
 #include "Game/Ufo.hpp"
 
 #include "Game/ThrustComponent.hpp"
-#include "Game/LaserComponent.hpp"
-#include "Game/LaserChargeComponent.hpp"
 
 #include <algorithm>
 
@@ -40,15 +38,6 @@ Ship::Ship(Vector2 position)
 
 void Ship::BeginFrame() noexcept {
     _thrust->BeginFrame();
-    if(_laserCharge) {
-        _laserCharge->BeginFrame();
-        if(_laserCharge->DoneFiring()) {
-            Laser();
-        }
-    }
-    if(_laser) {
-        _laser->BeginFrame();
-    }
 }
 
 void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
@@ -99,24 +88,12 @@ void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 
     if(!IsRespawning()) {
         _thrust->Update(deltaSeconds);
-        if(_laser) {
-            _laser->Update(deltaSeconds);
-        }
-        if(_laserCharge) {
-            _laserCharge->Update(deltaSeconds);
-        }
     }
 
 }
 
 void Ship::Render(Renderer& renderer) const noexcept {
     _thrust->Render(renderer);
-    if(_laser) {
-        _laser->Render(renderer);
-    }
-    if(_laserCharge) {
-        _laserCharge->Render(renderer);
-    }
     Entity::Render(renderer);
 }
 
@@ -165,18 +142,6 @@ void Ship::EndFrame() noexcept {
         _canDropMine = true;
     }
     _thrust->EndFrame();
-    if(_laser) {
-        _laser->EndFrame();
-        if(_laser->DoneFiring()) {
-            _laser.reset();
-        }
-    }
-    if(_laserCharge) {
-        _laserCharge->EndFrame();
-        if(_laserCharge->DoneFiring()) {
-            _laserCharge.reset();
-        }
-    }
 }
 
 void Ship::OnDestroy() noexcept {
@@ -215,20 +180,6 @@ void Ship::Thrust(float force) noexcept {
     }
     _thrust->SetThrust(force);
     AddForce(GetForward() * force);
-}
-
-void Ship::Laser() noexcept {
-    if(IsRespawning() || _laser) {
-        return;
-    }
-    _laser = std::move(std::make_unique<LaserComponent>(this));
-}
-
-void Ship::Charge() noexcept {
-    if(IsRespawning() || _laserCharge) {
-        return;
-    }
-    _laserCharge = std::move(std::make_unique<LaserChargeComponent>(this));
 }
 
 void Ship::SetRespawning() noexcept {

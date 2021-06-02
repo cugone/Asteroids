@@ -7,8 +7,6 @@
 
 class Renderer;
 class ThrustComponent;
-class LaserComponent;
-class LaserChargeComponent;
 
 class Ship : public Entity {
 public:
@@ -27,8 +25,6 @@ public:
     void OnDestroy() noexcept override;
 
     void Thrust(float force) noexcept;
-    void Laser() noexcept;
-    void Charge() noexcept;
 
     void SetRespawning() noexcept;
     const bool IsRespawning() const noexcept;
@@ -49,8 +45,6 @@ private:
     const Vector2 CalcNewBulletPosition() const noexcept;
 
     std::unique_ptr<ThrustComponent> _thrust{};
-    std::unique_ptr<LaserComponent> _laser{};
-    std::unique_ptr<LaserChargeComponent> _laserCharge{};
     Stopwatch _fireRate;
     Stopwatch _mineFireRate;
     const float _bulletSpeed{400.0f};

@@ -94,12 +94,6 @@
     <ClCompile Include="Mine.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="LaserComponent.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
-    <ClCompile Include="LaserChargeComponent.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameCommon.hpp">
@@ -156,12 +150,6 @@
     <ClInclude Include="Mine.hpp">
       <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="LaserComponent.hpp">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="LaserChargeComponent.hpp">
-      <Filter>Game</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\Run_x64\Data\Images\asteroid.png">
@@ -180,12 +168,6 @@
       <Filter>Data\Images</Filter>
     </Image>
     <Image Include="..\..\Run_x64\Data\Images\thrust.png">
-      <Filter>Data\Images</Filter>
-    </Image>
-    <Image Include="..\..\Run_x64\Data\Images\laser_beam.png">
-      <Filter>Data\Images</Filter>
-    </Image>
-    <Image Include="..\..\Run_x64\Data\Images\laser_chargeup.png">
       <Filter>Data\Images</Filter>
     </Image>
     <Image Include="..\..\Run_x64\Data\Images\sonic_bullet.png">
@@ -253,23 +235,11 @@
     <None Include="..\..\Run_x64\Data\Shaders\mine.shader">
       <Filter>Data\Shaders</Filter>
     </None>
-    <None Include="..\..\Run_x64\Data\Materials\laser.material">
-      <Filter>Data\Materials</Filter>
-    </None>
-    <None Include="..\..\Run_x64\Data\Shaders\laser.shader">
-      <Filter>Data\Shaders</Filter>
-    </None>
     <None Include="..\..\Run_x64\Data\Shaders\thrust.shader">
       <Filter>Data\Shaders</Filter>
     </None>
     <None Include="..\..\Run_x64\Data\Materials\thrust.material">
       <Filter>Data\Materials</Filter>
-    </None>
-    <None Include="..\..\Run_x64\Data\Materials\laserchargeup.material">
-      <Filter>Data\Materials</Filter>
-    </None>
-    <None Include="..\..\Run_x64\Data\Shaders\laserchargeup.shader">
-      <Filter>Data\Shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
