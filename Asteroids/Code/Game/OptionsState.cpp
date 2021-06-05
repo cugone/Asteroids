@@ -201,7 +201,7 @@ void OptionsState::CycleSelectedOptionDown(OptionsMenu selectedItem) noexcept {
         const float volumeAsFloat = m_temp_options.soundVolume / static_cast<float>(m_max_sound_volume);
         group->SetVolume(volumeAsFloat);
         AudioSystem::SoundDesc desc{};
-        desc.groupName = "sound";
+        desc.groupName = g_audiogroup_sound;
         g_theAudioSystem->Play(g_sound_shootpath, desc);
         break;
     }
@@ -252,7 +252,7 @@ void OptionsState::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
         const float volumeAsFloat = m_temp_options.soundVolume / static_cast<float>(m_max_sound_volume);
         group->SetVolume(volumeAsFloat);
         AudioSystem::SoundDesc desc{};
-        desc.groupName = "sound";
+        desc.groupName = g_audiogroup_sound;
         g_theAudioSystem->Play(g_sound_shootpath, desc);
         break;
     }
