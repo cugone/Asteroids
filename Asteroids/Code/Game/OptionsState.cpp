@@ -200,7 +200,9 @@ void OptionsState::CycleSelectedOptionDown(OptionsMenu selectedItem) noexcept {
         auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_sound);
         const float volumeAsFloat = m_temp_options.soundVolume / static_cast<float>(m_max_sound_volume);
         group->SetVolume(volumeAsFloat);
-        g_theAudioSystem->Play(g_sound_shootpath);
+        AudioSystem::SoundDesc desc{};
+        desc.groupName = "sound";
+        g_theAudioSystem->Play(g_sound_shootpath, desc);
         break;
     }
     case OptionsMenu::MusicVolume:
@@ -210,7 +212,6 @@ void OptionsState::CycleSelectedOptionDown(OptionsMenu selectedItem) noexcept {
         auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_music);
         const float volumeAsFloat = m_temp_options.musicVolume / static_cast<float>(m_max_music_volume);
         group->SetVolume(volumeAsFloat);
-        //TODO: Fix setting actual volume of playing music.
         break;
     }
     case OptionsMenu::CameraShake:
@@ -250,7 +251,9 @@ void OptionsState::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
         auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_sound);
         const float volumeAsFloat = m_temp_options.soundVolume / static_cast<float>(m_max_sound_volume);
         group->SetVolume(volumeAsFloat);
-        g_theAudioSystem->Play(g_sound_shootpath);
+        AudioSystem::SoundDesc desc{};
+        desc.groupName = "sound";
+        g_theAudioSystem->Play(g_sound_shootpath, desc);
         break;
     }
     case OptionsMenu::MusicVolume:
@@ -260,7 +263,6 @@ void OptionsState::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
         auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_music);
         const float volumeAsFloat = m_temp_options.musicVolume / static_cast<float>(m_max_music_volume);
         group->SetVolume(volumeAsFloat);
-        //TODO: Fix setting actual volume of playing music.
         break;
     }
     case OptionsMenu::CameraShake:

@@ -44,7 +44,8 @@ void Game::InitializeAudio() noexcept {
     AudioSystem::SoundDesc desc{};
     desc.loopCount = -1;
     desc.frequency = 2.0f;
-    //g_theAudioSystem->Play(g_music_bgmpath, desc);
+    desc.groupName = "music";
+    g_theAudioSystem->Play(g_music_bgmpath, desc);
 }
 
 void Game::InitializeSounds() noexcept {
