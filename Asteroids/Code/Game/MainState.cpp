@@ -295,8 +295,10 @@ void MainState::HandlePlayerInput([[maybe_unused]] TimeUtils::FPSeconds deltaSec
                 }
             }
             _auto_target_location = closest_target->first + closest_target->second * target_speed * 2.0f;
-            ship->SetOrientationDegrees((_auto_target_location - ship->GetPosition()).CalcHeadingDegrees());
-            ship->OnFire();
+            if(deltaSeconds.count()) {
+                ship->SetOrientationDegrees((_auto_target_location - ship->GetPosition()).CalcHeadingDegrees());
+                ship->OnFire();
+            }
         }
     }
 }

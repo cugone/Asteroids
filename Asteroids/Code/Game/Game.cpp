@@ -236,7 +236,16 @@ void Game::CreateOrLoadOptionsFile() noexcept {
 }
 
 void Game::Update(TimeUtils::FPSeconds deltaSeconds) {
-    _current_state->Update(deltaSeconds);
+    static bool paused{false};
+    if(g_theInputSystem->WasKeyJustPressed(KeyCode::P)) {
+        paused = !paused;
+    }
+    _current_state->Update(paused ? TimeUtils::FPSeconds::zero() : deltaSeconds);
+    if(g_theApp->LostFocus() || paused) {
+        g_theAudioSystem->SuspendAudio();
+    } else {
+        g_theAudioSystem->ResumeAudio();
+    }
 }
 
 void Game::Render() const {
