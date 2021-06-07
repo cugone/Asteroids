@@ -75,6 +75,9 @@ void MainState::BeginFrame() noexcept {
 }
 
 void MainState::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) {
+    if(g_theGame->IsPaused()) {
+        deltaSeconds = deltaSeconds.zero();
+    }
     g_theRenderer->UpdateGameTime(deltaSeconds);
     HandleDebugInput(deltaSeconds);
     HandlePlayerInput(deltaSeconds);
@@ -101,6 +104,7 @@ void MainState::Render() const noexcept {
         DebugRenderEntities();
     }
     RenderStatus();
+    RenderPausedOverlay();
 }
 
 void MainState::EndFrame() noexcept {
@@ -125,6 +129,13 @@ std::unique_ptr<GameState> MainState::HandleInput([[maybe_unused]] TimeUtils::FP
 std::unique_ptr<GameState> MainState::HandleKeyboardInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::Esc)) {
         return std::make_unique<TitleState>();
+    }
+    if(g_theInputSystem->WasKeyJustPressed(KeyCode::P)) {
+        g_theGame->TogglePause();
+        return {};
+    }
+    if(g_theGame->IsPaused()) {
+        return {};
     }
     if(!g_theGame->IsKeyboardActive()) {
         return {};
@@ -152,7 +163,14 @@ std::unique_ptr<GameState> MainState::HandleKeyboardInput([[maybe_unused]] TimeU
 }
 
 std::unique_ptr<GameState> MainState::HandleControllerInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
+    if(auto& controller = g_theInputSystem->GetXboxController(0); controller.IsConnected() && controller.WasButtonJustPressed(XboxController::Button::Start)) {
+        g_theGame->TogglePause();
+        return {};
+    }
     if(!g_theGame->IsControllerActive()) {
+        return {};
+    }
+    if(g_theGame->IsPaused()) {
         return {};
     }
     if(!ship) {
@@ -178,6 +196,9 @@ std::unique_ptr<GameState> MainState::HandleControllerInput([[maybe_unused]] Tim
 
 std::unique_ptr<GameState> MainState::HandleMouseInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
     if(!g_theGame->IsMouseActive()) {
+        return {};
+    }
+    if(g_theGame->IsPaused()) {
         return {};
     }
     if(!ship) {
@@ -638,6 +659,23 @@ void MainState::RenderStatus() const noexcept {
 
 void MainState::DoCameraShake() noexcept {
     g_theGame->DoCameraShake(m_cameraController);
+}
+
+void MainState::RenderPausedOverlay() const noexcept {
+    if(!g_theGame->IsPaused()) {
+        return;
+    }
+    const float ui_view_height = currentGraphicsOptions.WindowHeight;
+    const float ui_view_width = ui_view_height * m_cameraController.GetAspectRatio();
+    const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
+    const auto ui_view_half_extents = ui_view_extents * 0.5f;
+    const auto S = Matrix4::CreateScaleMatrix(ui_view_half_extents * 5.0f);
+    const auto R = Matrix4::I;
+    const auto T = Matrix4::I;
+    const auto M = Matrix4::MakeSRT(S, R, T);
+    g_theRenderer->SetModelMatrix(M);
+    g_theRenderer->SetMaterial("__2D");
+    g_theRenderer->DrawQuad2D(Rgba{0.0f, 0.0f, 0.0f, 0.5f});
 }
 
 void MainState::ClampCameraToWorld() noexcept {

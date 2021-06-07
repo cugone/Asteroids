@@ -117,6 +117,8 @@ public:
     void ChangeState(std::unique_ptr<GameState> newState) noexcept;
     void DecrementLives() noexcept;
     bool IsGameOver() const noexcept;
+    void TogglePause() noexcept;
+    bool IsPaused() const noexcept;
     void SetAsteroidSpriteSheet() noexcept;
     void SetMineSpriteSheet() noexcept;
     void SetExplosionSpriteSheet() noexcept;
@@ -165,5 +167,6 @@ private:
     bool _mouse_control_active{false};
     bool _controller_control_active{false};
     bool _controlling_camera{false};
+    bool _paused{false};
 };
 

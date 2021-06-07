@@ -78,6 +78,7 @@ private:
     void RenderBackground() const noexcept;
     void RenderEntities() const noexcept;
     void DebugRenderEntities() const noexcept;
+    void RenderPausedOverlay() const noexcept;
 
     AABB2 CalculateCameraBounds() const noexcept;
 

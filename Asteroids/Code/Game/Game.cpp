@@ -92,6 +92,14 @@ bool Game::IsGameOver() const noexcept {
     return player.desc.lives == 0;
 }
 
+void Game::TogglePause() noexcept {
+    _paused = !_paused;
+}
+
+bool Game::IsPaused() const noexcept {
+    return _paused;
+}
+
 void Game::SetAsteroidSpriteSheet() noexcept {
     if(!asteroid_sheet) {
         asteroid_sheet = g_theRenderer->CreateSpriteSheet("Data/Images/asteroid.png", 6, 5);
@@ -236,12 +244,8 @@ void Game::CreateOrLoadOptionsFile() noexcept {
 }
 
 void Game::Update(TimeUtils::FPSeconds deltaSeconds) {
-    static bool paused{false};
-    if(g_theInputSystem->WasKeyJustPressed(KeyCode::P)) {
-        paused = !paused;
-    }
-    _current_state->Update(paused ? TimeUtils::FPSeconds::zero() : deltaSeconds);
-    if(g_theApp->LostFocus() || paused) {
+    _current_state->Update(deltaSeconds);
+    if(g_theApp->LostFocus() || g_theGame->IsPaused()) {
         g_theAudioSystem->SuspendAudio();
     } else {
         g_theAudioSystem->ResumeAudio();
