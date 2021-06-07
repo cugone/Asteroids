@@ -55,11 +55,11 @@ private:
     mutable Camera2D m_ui_camera{};
     OptionsMenu m_selected_item{OptionsMenu::First_};
     GameOptions m_temp_options{};
-    float m_min_camera_shake{0.0f};
-    float m_max_camera_shake{1.0f};
-    uint8_t m_max_sound_volume{10u};
-    uint8_t m_min_sound_volume{0u};
-    uint8_t m_max_music_volume{10u};
-    uint8_t m_min_music_volume{0u};
+    const float m_min_camera_shake{0.0f};
+    const float m_max_camera_shake{1.0f};
+    const uint8_t m_max_sound_volume{10u};
+    const uint8_t m_min_sound_volume{0u};
+    const uint8_t m_max_music_volume{10u};
+    const uint8_t m_min_music_volume{0u};
 
 };
