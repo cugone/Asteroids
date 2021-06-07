@@ -195,8 +195,7 @@ void OptionsState::CycleSelectedOptionDown(OptionsMenu selectedItem) noexcept {
     }
     case OptionsMenu::SoundVolume:
     {
-        --m_temp_options.soundVolume;
-        m_temp_options.soundVolume = std::clamp(m_temp_options.soundVolume, m_min_sound_volume, m_max_sound_volume);
+        m_temp_options.soundVolume = std::clamp(m_temp_options.soundVolume ? --m_temp_options.soundVolume : m_temp_options.soundVolume, m_min_sound_volume, m_max_sound_volume);
         auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_sound);
         const float volumeAsFloat = m_temp_options.soundVolume / static_cast<float>(m_max_sound_volume);
         group->SetVolume(volumeAsFloat);
@@ -207,8 +206,7 @@ void OptionsState::CycleSelectedOptionDown(OptionsMenu selectedItem) noexcept {
     }
     case OptionsMenu::MusicVolume:
     {
-        --m_temp_options.musicVolume;
-        m_temp_options.musicVolume = std::clamp(m_temp_options.musicVolume, m_min_music_volume, m_max_music_volume);
+        m_temp_options.musicVolume = std::clamp(m_temp_options.musicVolume ? --m_temp_options.musicVolume : m_temp_options.musicVolume, m_min_music_volume, m_max_music_volume);
         auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_music);
         const float volumeAsFloat = m_temp_options.musicVolume / static_cast<float>(m_max_music_volume);
         group->SetVolume(volumeAsFloat);
@@ -246,8 +244,7 @@ void OptionsState::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
     }
     case OptionsMenu::SoundVolume:
     {
-        ++m_temp_options.soundVolume;
-        m_temp_options.soundVolume = std::clamp(m_temp_options.soundVolume, m_min_sound_volume, m_max_sound_volume);
+        m_temp_options.soundVolume = (std::min)(++m_temp_options.soundVolume, m_max_sound_volume);
         auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_sound);
         const float volumeAsFloat = m_temp_options.soundVolume / static_cast<float>(m_max_sound_volume);
         group->SetVolume(volumeAsFloat);
@@ -258,8 +255,7 @@ void OptionsState::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
     }
     case OptionsMenu::MusicVolume:
     {
-        ++m_temp_options.musicVolume;
-        m_temp_options.musicVolume = std::clamp(m_temp_options.musicVolume, m_min_music_volume, m_max_music_volume);
+        m_temp_options.musicVolume = (std::min)(++m_temp_options.musicVolume, m_max_music_volume);
         auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_music);
         const float volumeAsFloat = m_temp_options.musicVolume / static_cast<float>(m_max_music_volume);
         group->SetVolume(volumeAsFloat);
