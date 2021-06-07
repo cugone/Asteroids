@@ -136,12 +136,12 @@ std::unique_ptr<GameState> OptionsState::HandleKeyboardInput() noexcept {
 
 std::unique_ptr<GameState> OptionsState::HandleControllerInput() noexcept {
     if(const auto& controller = g_theInputSystem->GetXboxController(0); g_theGame->IsControllerActive() && controller.IsConnected()) {
-        const bool up = controller.WasButtonJustPressed(XboxController::Button::Up) || MathUtils::IsEquivalent(1.0f, controller.GetLeftThumbPosition().y);
-        const bool down = controller.WasButtonJustPressed(XboxController::Button::Down) || MathUtils::IsEquivalent(-1.0f, controller.GetLeftThumbPosition().y);
-        const bool left = controller.WasButtonJustPressed(XboxController::Button::Left) || MathUtils::IsEquivalent(-1.0f, controller.GetLeftThumbPosition().x);
-        const bool right = controller.WasButtonJustPressed(XboxController::Button::Right) || MathUtils::IsEquivalent(1.0f, controller.GetLeftThumbPosition().x);
+        const bool up = controller.WasButtonJustPressed(XboxController::Button::Up);
+        const bool down = controller.WasButtonJustPressed(XboxController::Button::Down);
+        const bool left = controller.WasButtonJustPressed(XboxController::Button::Left);
+        const bool right = controller.WasButtonJustPressed(XboxController::Button::Right);
         const bool select = controller.WasButtonJustPressed(XboxController::Button::A);
-        const bool cancel = controller.WasButtonJustPressed(XboxController::Button::B);
+        const bool cancel = controller.WasButtonJustPressed(XboxController::Button::B) || controller.WasButtonJustPressed(XboxController::Button::Back);
         return HandleOptionsMenuState(up, down, left, right, cancel, select);
     }
     return {};

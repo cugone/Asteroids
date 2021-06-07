@@ -123,13 +123,12 @@ std::unique_ptr<GameState> TitleState::HandleKeyboardInput() noexcept {
 
 std::unique_ptr<GameState> TitleState::HandleControllerInput() noexcept {
     if(const auto controller = g_theInputSystem->GetXboxController(0); g_theGame->IsControllerActive() && controller.IsConnected()) {
-        const bool up = controller.WasButtonJustPressed(XboxController::Button::Up) || MathUtils::IsEquivalent(1.0f, controller.GetLeftThumbPosition().y);
-        const bool down = controller.WasButtonJustPressed(XboxController::Button::Down) || MathUtils::IsEquivalent(-1.0f, controller.GetLeftThumbPosition().y);
-        const bool select = g_theInputSystem->WasKeyJustPressed(KeyCode::Enter) || g_theInputSystem->WasKeyJustPressed(KeyCode::NumPadEnter);
-        const bool cancel = g_theInputSystem->WasKeyJustPressed(KeyCode::Esc);
+        const bool up = controller.WasButtonJustPressed(XboxController::Button::Up);
+        const bool down = controller.WasButtonJustPressed(XboxController::Button::Down);
+        const bool select = controller.WasButtonJustPressed(XboxController::Button::A) || controller.WasButtonJustPressed(XboxController::Button::Start);
+        const bool cancel = controller.WasButtonJustPressed(XboxController::Button::Back);
         if(up) {
             --m_selected_item;
-
         } else if(down) {
             ++m_selected_item;
         }
