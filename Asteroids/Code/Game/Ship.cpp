@@ -37,6 +37,7 @@ Ship::Ship(Vector2 position)
 }
 
 void Ship::BeginFrame() noexcept {
+    Entity::BeginFrame();
     _thrust->BeginFrame();
 }
 
