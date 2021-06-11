@@ -244,6 +244,9 @@ void MainState::HandleDebugKeyboardInput([[maybe_unused]] TimeUtils::FPSeconds d
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::F2)) {
         g_theGame->easyMode = !g_theGame->easyMode;
     }
+    if(g_theInputSystem->WasKeyJustPressed(KeyCode::F3)) {
+        g_theUISystem->ToggleImguiMetricsWindow();
+    }
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::F4)) {
         g_theUISystem->ToggleImguiDemoWindow();
     }
