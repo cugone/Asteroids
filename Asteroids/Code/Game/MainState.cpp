@@ -46,6 +46,13 @@ void MainState::OnEnter() noexcept {
 }
 
 void MainState::OnExit() noexcept {
+    m_debug_render = false;
+    if(g_theUISystem->IsImguiDemoWindowVisible()) {
+        g_theUISystem->ToggleImguiDemoWindow();
+    }
+    if(g_theUISystem->IsImguiMetricsWindowVisible()) {
+        g_theUISystem->ToggleImguiMetricsWindow();
+    }
     g_theGame->asteroids.clear();
     g_theGame->asteroids.shrink_to_fit();
     g_theGame->bullets.clear();
