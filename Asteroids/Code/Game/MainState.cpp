@@ -235,6 +235,7 @@ void MainState::HandleDebugInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeco
 }
 
 void MainState::HandleDebugKeyboardInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) {
+#ifdef RENDER_DEBUG
     if(g_theUISystem->WantsInputKeyboardCapture()) {
         return;
     }
@@ -250,6 +251,7 @@ void MainState::HandleDebugKeyboardInput([[maybe_unused]] TimeUtils::FPSeconds d
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::F4)) {
         g_theUISystem->ToggleImguiDemoWindow();
     }
+#endif
 }
 
 void MainState::HandlePlayerInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) {
