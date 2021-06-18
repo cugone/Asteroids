@@ -41,11 +41,6 @@ void Game::Initialize() {
 void Game::InitializeAudio() noexcept {
     InitializeSounds();
     InitializeMusic();
-    AudioSystem::SoundDesc desc{};
-    desc.loopCount = -1;
-    desc.frequency = 2.0f;
-    desc.groupName = "music";
-    g_theAudioSystem->Play(g_music_bgmpath, desc);
 }
 
 void Game::InitializeSounds() noexcept {
@@ -68,6 +63,11 @@ void Game::InitializeMusic() noexcept {
     if(auto* music_group = g_theAudioSystem->GetChannelGroup(g_audiogroup_music)) {
         music_group->SetVolume(gameOptions.musicVolume / 10.0f);
     }
+    AudioSystem::SoundDesc desc{};
+    desc.loopCount = -1;
+    desc.frequency = 2.0f;
+    desc.groupName = g_audiogroup_music;
+    g_theAudioSystem->Play(g_music_bgmpath, desc);
 }
 
 void Game::BeginFrame() {
