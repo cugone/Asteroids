@@ -156,7 +156,9 @@ void Ufo::OnHit() {
     if(TimeUtils::FPFrames{1.0f} < _timeSinceLastHit) {
         _timeSinceLastHit = _timeSinceLastHit.zero();
     }
-    g_theAudioSystem->Play(g_sound_hitpath);
+    AudioSystem::SoundDesc desc{};
+    desc.groupName = g_audiogroup_sound;
+    g_theAudioSystem->Play(g_sound_hitpath, desc);
     ufo_state.wasHitUfoIndex.x = WasHit();
 }
 
