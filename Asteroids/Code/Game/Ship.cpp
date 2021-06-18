@@ -66,8 +66,7 @@ void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     auto& builder = mesh_builder;
     builder.Begin(PrimitiveType::Triangles);
     if(IsRespawning()) {
-        float a = DoAlphaEaseOut(deltaSeconds);
-        builder.SetColor(Vector4{1.0f, 1.0f, 1.0f, a});
+        builder.SetAlpha(DoAlphaEaseOut(deltaSeconds));
     } else {
         builder.SetColor(Rgba::White);
     }
