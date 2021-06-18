@@ -104,7 +104,7 @@ void Ship::DoScaleEaseOut(TimeUtils::FPSeconds& deltaSeconds) noexcept {
     static float endScale = 1.0f;
     if(IsRespawning()) {
         if(t < duration) {
-            _scale = MathUtils::Interpolate(startScale, endScale, t / duration);
+            _scale = MathUtils::Interpolate(endScale, startScale, MathUtils::EasingFunctions::SmoothStop<3>(t / duration));
             t += deltaSeconds.count();
         } else {
             t = 0.0f;
@@ -124,7 +124,7 @@ float Ship::DoAlphaEaseOut(TimeUtils::FPSeconds& deltaSeconds) const noexcept {
     static float end = 1.0f;
     static float a = 0.0f;
     if(t < duration) {
-        a = MathUtils::Interpolate(start, end, t / duration);
+        a = MathUtils::Interpolate(end, start, MathUtils::EasingFunctions::SmoothStop<3>(t / duration));
         t += deltaSeconds.count();
     } else {
         t = 0.0f;
