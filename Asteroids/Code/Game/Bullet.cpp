@@ -99,6 +99,8 @@ void Bullet::OnCollision(Entity* /*a*/, Entity* /*b*/) noexcept {
 }
 
 void Bullet::OnCreate() noexcept {
-    g_theAudioSystem->Play(g_sound_shootpath);
+    AudioSystem::SoundDesc desc{};
+    desc.groupName = g_audiogroup_sound;
+    g_theAudioSystem->Play(g_sound_shootpath, desc);
 }
 

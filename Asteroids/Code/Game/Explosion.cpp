@@ -97,5 +97,7 @@ void Explosion::OnCollision(Entity* /*a*/, Entity* /*b*/) noexcept {
 }
 
 void Explosion::OnCreate() noexcept {
-    g_theAudioSystem->Play(g_sound_explosionpath);
+    AudioSystem::SoundDesc desc{};
+    desc.groupName = g_audiogroup_sound;
+    g_theAudioSystem->Play(g_sound_explosionpath, desc);
 }
