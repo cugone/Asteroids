@@ -91,7 +91,9 @@ void MainState::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) {
     UpdateEntities(deltaSeconds);
 
     if(g_theGame->IsGameOver()) {
-        g_theGame->ChangeState(std::move(std::make_unique<GameOverState>()));
+        if(DoFadeOut(deltaSeconds)) {
+            g_theGame->ChangeState(std::move(std::make_unique<GameOverState>()));
+        }
     }
 
     m_cameraController.Update(deltaSeconds);
@@ -107,11 +109,27 @@ void MainState::Render() const noexcept {
 
     RenderBackground();
     RenderEntities();
-    if(m_debug_render) {
-        DebugRenderEntities();
-    }
+    DebugRenderEntities();
     RenderStatus();
+    RenderFadeOutOverlay();
     RenderPausedOverlay();
+}
+
+void MainState::RenderFadeOutOverlay() const noexcept {
+    if(!g_theGame->IsGameOver()) {
+        return;
+    }
+    const float ui_view_height = currentGraphicsOptions.WindowHeight;
+    const float ui_view_width = ui_view_height * m_cameraController.GetAspectRatio();
+    const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
+    const auto ui_view_half_extents = ui_view_extents * 0.5f;
+    const auto S = Matrix4::CreateScaleMatrix(ui_view_half_extents * 5.0f);
+    const auto R = Matrix4::I;
+    const auto T = Matrix4::I;
+    const auto M = Matrix4::MakeSRT(S, R, T);
+    g_theRenderer->SetModelMatrix(M);
+    g_theRenderer->SetMaterial("__2D");
+    g_theRenderer->DrawQuad2D(Rgba{0.0f, 0.0f, 0.0f, m_fadeOut_alpha});
 }
 
 void MainState::EndFrame() noexcept {
@@ -589,6 +607,9 @@ void MainState::RenderEntities() const noexcept {
 }
 
 void MainState::DebugRenderEntities() const noexcept {
+    if(!m_debug_render) {
+        return;
+    }
     g_theRenderer->SetModelMatrix();
     g_theRenderer->SetMaterial("__2D");
     for(const auto& e : g_theGame->GetEntities()) {
@@ -671,6 +692,13 @@ void MainState::RenderStatus() const noexcept {
 
 void MainState::DoCameraShake() noexcept {
     g_theGame->DoCameraShake(m_cameraController);
+}
+
+bool MainState::DoFadeOut(TimeUtils::FPSeconds deltaSeconds) noexcept {
+    m_fadeOut_alpha += deltaSeconds.count();
+    auto alpha = MathUtils::Interpolate(0.0f, 1.0f, m_fadeOut_alpha);
+    alpha = std::clamp(alpha, 0.0f, 1.0f);
+    return alpha == 1.0f;
 }
 
 void MainState::RenderPausedOverlay() const noexcept {

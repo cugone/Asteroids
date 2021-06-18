@@ -78,6 +78,7 @@ private:
     void RenderBackground() const noexcept;
     void RenderEntities() const noexcept;
     void DebugRenderEntities() const noexcept;
+    void RenderFadeOutOverlay() const noexcept;
     void RenderPausedOverlay() const noexcept;
 
     AABB2 CalculateCameraBounds() const noexcept;
@@ -85,11 +86,13 @@ private:
     void RenderStatus() const noexcept;
 
     void DoCameraShake() noexcept;
+    bool DoFadeOut(TimeUtils::FPSeconds deltaSeconds) noexcept;
 
     AABB2 world_bounds = AABB2::ZERO_TO_ONE;
 
     OrthographicCameraController m_cameraController{};
     Vector2 _auto_target_location{};
     float m_thrust_force{100.0f};
+    float m_fadeOut_alpha{0.0f};
     bool m_debug_render{false};
 };
