@@ -152,7 +152,7 @@ void Ufo::OnFire() noexcept {
     }
 }
 
-void Ufo::OnHit() {
+void Ufo::OnHit() noexcept {
     if(TimeUtils::FPFrames{1.0f} < _timeSinceLastHit) {
         _timeSinceLastHit = _timeSinceLastHit.zero();
     }

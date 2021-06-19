@@ -42,7 +42,8 @@ public:
 
     void OnCreate() noexcept override;
     void OnCollision(Entity* a, Entity* b) noexcept override;
-    void OnHit();    void OnFire() noexcept override;
+    void OnHit() noexcept;
+    void OnFire() noexcept override;
     void OnDestroy() noexcept override;
 
     static float GetCosmeticRadiusFromType(Type type) noexcept;
