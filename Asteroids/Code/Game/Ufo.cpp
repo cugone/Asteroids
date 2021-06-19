@@ -120,8 +120,9 @@ void Ufo::OnCreate() noexcept {
     desc.volume = 1.0f;
     desc.frequency = 1.0f;
     desc.loopCount = -1;
+    desc.groupName = g_audiogroup_sound;
     _warble_sound = g_theAudioSystem->CreateSound(g_sound_warblepath);
-    //g_theAudioSystem->Play(*_warble_sound, desc);
+    g_theAudioSystem->Play(*_warble_sound, desc);
 }
 
 void Ufo::OnCollision(Entity* a, Entity* b) noexcept {
