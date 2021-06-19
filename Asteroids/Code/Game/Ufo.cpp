@@ -164,7 +164,9 @@ void Ufo::OnHit() noexcept {
 }
 
 void Ufo::OnDestroy() noexcept {
-    //_warble_sound->Stop();
+    for(auto* channel : _warble_sound->GetChannels()) {
+        channel->Stop();
+    }
     Entity::OnDestroy();
     g_theGame->MakeExplosion(GetPosition());
 }
