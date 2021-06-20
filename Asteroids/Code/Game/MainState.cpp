@@ -278,6 +278,15 @@ void MainState::HandleDebugKeyboardInput([[maybe_unused]] TimeUtils::FPSeconds d
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::F4)) {
         g_theUISystem->ToggleImguiDemoWindow();
     }
+    if(g_theInputSystem->WasKeyJustPressed(KeyCode::J)) {
+        MakeUfo(Ufo::Type::Small);
+    }
+    if(g_theInputSystem->WasKeyJustPressed(KeyCode::K)) {
+        MakeUfo(Ufo::Type::Big);
+    }
+    if(g_theInputSystem->WasKeyJustPressed(KeyCode::L)) {
+        MakeUfo(Ufo::Type::Boss);
+    }
 #endif
 }
 
