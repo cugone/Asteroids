@@ -30,16 +30,4 @@ Asteroids is a game built using the [Abrams2019](https://github.com/cugone/Abram
 
 ## Offline compiled Shaders
 
-This project uses offline compiled shaders via Microsoft's `fxc.exe` [Effect-Compiler Tool](https://docs.microsoft.com/en-us/windows/win32/direct3dtools/fxc) for efficiency. The human-readable shader programs located in `/Data/ShaderPrograms/` are for reference only and are not actually used at run-time. The shader metadata located at `/Data/Shaders/` can be edited as follows to use the `.hlsl` files in-place but this will cause a noticable increase in initial load time because the shader has to be compiled at program start:
-
-```xml
-<shader name="example">
-    <shaderprogram src="Data/ShaderPrograms/entity.hlsl">
-        <pipelinestages>
-            <vertex entrypoint="VertexFunction" />
-            <pixel entrypoint="PixelFunction" />
-        </pipelinestages>
-    </shaderprogram>
-    <!-- Rest of meta file -->
-</shader>
-```
+This project uses offline compiled shaders via Microsoft's `fxc.exe` [Effect-Compiler Tool](https://docs.microsoft.com/en-us/windows/win32/direct3dtools/fxc) for efficiency. The human-readable shader programs located in `/Data/ShaderPrograms/` are for reference only and are not actually used at run-time.
