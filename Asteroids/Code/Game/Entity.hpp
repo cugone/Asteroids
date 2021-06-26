@@ -8,8 +8,6 @@
 
 #include "Engine/Renderer/Mesh.hpp"
 
-class Renderer;
-
 class Entity {
 public:
     enum class Faction {
@@ -22,7 +20,7 @@ public:
     virtual ~Entity() = default;
     virtual void BeginFrame() noexcept;
     virtual void Update(TimeUtils::FPSeconds deltaSeconds) noexcept;
-    virtual void Render(Renderer& renderer) const noexcept;
+    virtual void Render() const noexcept;
     virtual void EndFrame() noexcept;
     virtual void OnCreate() noexcept = 0;
     virtual void OnCollision(Entity* a, Entity* b) noexcept=0;

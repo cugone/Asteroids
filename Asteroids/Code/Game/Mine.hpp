@@ -19,6 +19,6 @@ public:
 
 protected:
 private:
-    std::unique_ptr<AnimatedSprite> _sprite{};
-    std::weak_ptr<SpriteSheet> GetSpriteSheet() const noexcept;
+    std::unique_ptr<class AnimatedSprite> _sprite{};
+    std::weak_ptr<class SpriteSheet> GetSpriteSheet() const noexcept;
 };

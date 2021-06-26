@@ -5,10 +5,13 @@
 #include "Engine/Math/Disc2.hpp"
 #include "Engine/Math/MathUtils.hpp"
 
-#include "Engine/Renderer/Renderer.hpp"
+#include "Engine/Renderer/AnimatedSprite.hpp"
 #include "Engine/Renderer/Material.hpp"
 #include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/ConstantBuffer.hpp"
+
+#include "Engine/Services/ServiceLocator.hpp"
+#include "Engine/Services/IRendererService.hpp"
 
 #include "Game/GameCommon.hpp"
 #include "Game/GameConfig.hpp"
@@ -110,10 +113,10 @@ void Asteroid::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 
 }
 
-void Asteroid::Render(Renderer& renderer) const noexcept {
+void Asteroid::Render() const noexcept {
     asteroid_state.wasHit = WasHit();
-    asteroid_state_cb->Update(*renderer.GetDeviceContext(), &asteroid_state);
-    Entity::Render(renderer);
+    asteroid_state_cb->Update(*ServiceLocator::get<IRendererService>().GetDeviceContext(), &asteroid_state);
+    Entity::Render();
 }
 
 Vector4 Asteroid::WasHit() const noexcept {

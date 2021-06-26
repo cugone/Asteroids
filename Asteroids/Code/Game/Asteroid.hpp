@@ -2,8 +2,6 @@
 
 #include "Engine/Core/TimeUtils.hpp"
 
-#include "Engine/Renderer/AnimatedSprite.hpp"
-
 #include "Game/Entity.hpp"
 
 #include <memory>
@@ -11,6 +9,7 @@
 #include <utility>
 
 class Renderer;
+class ConstantBuffer;
 
 class Asteroid : public Entity {
 public:
@@ -25,7 +24,7 @@ public:
     virtual ~Asteroid() = default;
 
     void Update(TimeUtils::FPSeconds deltaSeconds) noexcept override;
-    void Render(Renderer& renderer) const noexcept override;
+    void Render() const noexcept override;
     void EndFrame() noexcept override;
 
     void OnCreate() noexcept override;
@@ -52,7 +51,7 @@ private:
     ConstantBuffer* asteroid_state_cb{nullptr};
     mutable asteroid_state_t asteroid_state{};
     Type _type{Type::Large};
-    std::unique_ptr<AnimatedSprite> _sprite{};
+    std::unique_ptr<class AnimatedSprite> _sprite{};
     TimeUtils::FPSeconds _timeSinceLastHit{0.0f};
 };
 

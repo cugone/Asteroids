@@ -2,10 +2,15 @@
 
 #include "Engine/Audio/AudioSystem.hpp"
 
+#include "Engine/Renderer/AnimatedSprite.hpp"
+#include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Renderer/ConstantBuffer.hpp"
 #include "Engine/Renderer/Material.hpp"
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/Shader.hpp"
+
+#include "Engine/Services/ServiceLocator.hpp"
+#include "Engine/Services/IRendererService.hpp"
 
 #include "Game/Bullet.hpp"
 #include "Game/Mine.hpp"
@@ -98,11 +103,11 @@ void Ufo::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 
 }
 
-void Ufo::Render(Renderer& renderer) const noexcept {
+void Ufo::Render() const noexcept {
     ufo_state.wasHitUfoIndex.x = WasHit();
     ufo_state.wasHitUfoIndex.y = GetUfoIndexFromStyle(_style);
-    ufo_state_cb->Update(*renderer.GetDeviceContext(), &ufo_state);
-    Entity::Render(renderer);
+    ufo_state_cb->Update(*ServiceLocator::get<IRendererService>().GetDeviceContext(), &ufo_state);
+    Entity::Render();
 }
 
 void Ufo::EndFrame() noexcept {

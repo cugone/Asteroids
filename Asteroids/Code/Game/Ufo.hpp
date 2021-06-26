@@ -3,9 +3,9 @@
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Core/Stopwatch.hpp"
 
-#include "Engine/Renderer/AnimatedSprite.hpp"
-
 #include "Game/Entity.hpp"
+
+class ConstantBuffer;
 
 class Ufo : public Entity {
 public:
@@ -37,7 +37,7 @@ public:
 
     void BeginFrame() noexcept override;
     void Update(TimeUtils::FPSeconds deltaSeconds) noexcept override;
-    void Render(Renderer& renderer) const noexcept override;
+    void Render() const noexcept override;
     void EndFrame() noexcept override;
 
     void OnCreate() noexcept override;
@@ -60,7 +60,7 @@ protected:
 
     float GetBulletSpeedFromTypeAndDifficulty(Type type) const noexcept;
 
-    std::weak_ptr<SpriteSheet> GetSpriteSheet() const noexcept;
+    std::weak_ptr<class SpriteSheet> GetSpriteSheet() const noexcept;
     Vector2 CalculateFireTarget() const noexcept;
 
     float WasHit() const noexcept;
@@ -75,7 +75,7 @@ protected:
     mutable ufo_state_t ufo_state{};
     Type _type{Type::Small};
     Style _style{Style::Blue};
-    std::unique_ptr<AnimatedSprite> _sprite{};
+    std::unique_ptr<class AnimatedSprite> _sprite{};
     TimeUtils::FPSeconds _timeSinceLastHit{0.0f};
     Stopwatch _fireRate{};
     AudioSystem::Sound* _warble_sound{};

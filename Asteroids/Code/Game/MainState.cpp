@@ -612,7 +612,7 @@ void MainState::RenderBackground() const noexcept {
 void MainState::RenderEntities() const noexcept {
     for(const auto& entity : g_theGame->GetEntities()) {
         if(entity) {
-            entity->Render(*g_theRenderer);
+            entity->Render();
         }
     }
 }

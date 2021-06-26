@@ -16,7 +16,7 @@ public:
 
     void BeginFrame() noexcept override;
     void Update(TimeUtils::FPSeconds deltaSeconds) noexcept override;
-    void Render(Renderer& renderer) const noexcept override;
+    void Render() const noexcept override;
     void EndFrame() noexcept override;
 
     void OnCreate() noexcept override;
