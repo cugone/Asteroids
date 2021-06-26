@@ -92,9 +92,9 @@ void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 
 }
 
-void Ship::Render(Renderer& renderer) const noexcept {
-    _thrust->Render(renderer);
-    Entity::Render(renderer);
+void Ship::Render() const noexcept {
+    _thrust->Render();
+    Entity::Render();
 }
 
 void Ship::DoScaleEaseOut(TimeUtils::FPSeconds& deltaSeconds) noexcept {

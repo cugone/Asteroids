@@ -2,6 +2,9 @@
 
 #include "Engine/Math/MathUtils.hpp"
 
+#include "Engine/Services/ServiceLocator.hpp"
+#include "Engine/Services/IRendererService.hpp"
+
 #include "Game/GameCommon.hpp"
 #include "Game/Game.hpp"
 
@@ -28,9 +31,9 @@ void Entity::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     acceleration_force.y = new_accel.y;
 }
 
-void Entity::Render(Renderer& renderer) const noexcept {
-    renderer.SetModelMatrix(transform);
-    Mesh::Render(renderer, mesh_builder);
+void Entity::Render() const noexcept {
+    ServiceLocator::get<IRendererService>().SetModelMatrix(transform);
+    Mesh::Render(mesh_builder);
 }
 
 void Entity::EndFrame() noexcept {

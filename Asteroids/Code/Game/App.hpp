@@ -6,16 +6,6 @@
 
 #include <memory>
 
-class JobSystem;
-class FileLogger;
-class Config;
-class Renderer;
-class Console;
-class InputSystem;
-class AudioSystem;
-class UISystem;
-class Game;
-
 class App : public EngineSubsystem {
 public:
     App(const std::string& cmdString);
@@ -45,21 +35,20 @@ private:
     virtual void Render() const override;
     virtual void EndFrame() override;
     virtual bool ProcessSystemMessage(const EngineMessage& msg) noexcept override;
-
     void LogSystemDescription() const;
 
     bool _isQuitting = false;
     bool _current_focus = false;
     bool _previous_focus = false;
 
-    std::unique_ptr<JobSystem> _theJobSystem{};
-    std::unique_ptr<FileLogger> _theFileLogger{};
-    std::unique_ptr<Config> _theConfig{};
-    std::unique_ptr<Renderer> _theRenderer{};
-    std::unique_ptr<InputSystem> _theInputSystem{};
-    std::unique_ptr<UISystem> _theUI{};
-    std::unique_ptr<Console> _theConsole{};
-    std::unique_ptr<AudioSystem> _theAudioSystem{};
-    std::unique_ptr<Game> _theGame{};
+    std::unique_ptr<class Config> _theConfig{};
+    std::unique_ptr<class JobSystem> _theJobSystem{};
+    std::unique_ptr<class FileLogger> _theFileLogger{};
+    std::unique_ptr<class Renderer> _theRenderer{};
+    std::unique_ptr<class InputSystem> _theInputSystem{};
+    std::unique_ptr<class AudioSystem> _theAudioSystem{};
+    std::unique_ptr<class UISystem> _theUI{};
+    std::unique_ptr<class Console> _theConsole{};
+    std::unique_ptr<class Game> _theGame{};
 
 };

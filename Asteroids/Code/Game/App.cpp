@@ -10,6 +10,7 @@
 #include "Engine/Core/StringUtils.hpp"
 
 #include "Engine/Core/EngineSubsystem.hpp"
+#include "Engine/Services/ServiceLocator.hpp"
 
 #include "Engine/Input/InputSystem.hpp"
 
@@ -50,15 +51,7 @@ bool CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 App::App(const std::string& cmdString)
     : EngineSubsystem()
-    , _theJobSystem{std::make_unique<JobSystem>(-1, static_cast<std::size_t>(JobType::Max), new std::condition_variable)}
-    , _theFileLogger{std::make_unique<FileLogger>(*_theJobSystem.get(), "game")}
     , _theConfig{std::make_unique<Config>(KeyValueParser{cmdString})}
-    , _theRenderer{std::make_unique<Renderer>(*_theJobSystem.get(), *_theFileLogger.get(), *_theConfig.get())}
-    , _theInputSystem{std::make_unique<InputSystem>(*_theFileLogger.get(), *_theRenderer.get())}
-    , _theUI{std::make_unique<UISystem>(*_theFileLogger.get(), *_theRenderer.get(), *_theInputSystem.get())}
-    , _theConsole{std::make_unique<Console>(*_theFileLogger.get(), *_theRenderer.get())}
-    , _theAudioSystem{std::make_unique<AudioSystem>(*_theFileLogger.get()) }
-    , _theGame{std::make_unique<Game>()}
 {
     SetupEngineSystemPointers();
     SetupEngineSystemChainOfResponsibility();
@@ -70,6 +63,28 @@ App::~App() {
 }
 
 void App::SetupEngineSystemPointers() {
+    ServiceLocator::provide(*static_cast<IConfigService*>(_theConfig.get()));
+
+    _theJobSystem = std::make_unique<JobSystem>(-1, static_cast<std::size_t>(JobType::Max), new std::condition_variable);
+    ServiceLocator::provide(*static_cast<IJobSystemService*>(_theJobSystem.get()));
+
+    _theFileLogger = std::make_unique<FileLogger>("game");
+    ServiceLocator::provide(*static_cast<IFileLoggerService*>(_theFileLogger.get()));
+    
+    _theRenderer = std::make_unique<Renderer>();
+    ServiceLocator::provide(*static_cast<IRendererService*>(_theRenderer.get()));
+
+    _theInputSystem = std::make_unique<InputSystem>();
+    ServiceLocator::provide(*static_cast<IInputService*>(_theInputSystem.get()));
+
+    _theAudioSystem = std::make_unique<AudioSystem>();
+    ServiceLocator::provide(*static_cast<IAudioService*>(_theAudioSystem.get()));
+
+    _theUI = std::make_unique<UISystem>();
+    _theConsole = std::make_unique<Console>();
+    _theGame = std::make_unique<Game>();
+
+
     g_theJobSystem = _theJobSystem.get();
     g_theFileLogger = _theFileLogger.get();
     g_theConfig = _theConfig.get();
@@ -226,7 +241,7 @@ void App::LogSystemDescription() const {
     ss << std::right << std::setfill('-') << std::setw(60) << '\n';
     ss << StringUtils::to_string(system);
     ss << std::right << std::setfill('-') << std::setw(60) << '\n';
-    _theFileLogger->LogLineAndFlush(ss.str());
+    ServiceLocator::get<IFileLoggerService>().LogLineAndFlush(ss.str());
 }
 
 bool App::HasFocus() const {

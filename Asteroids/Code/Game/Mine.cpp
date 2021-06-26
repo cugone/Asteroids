@@ -2,6 +2,7 @@
 
 #include "Engine/Renderer/AnimatedSprite.hpp"
 #include "Engine/Renderer/Renderer.hpp"
+#include "Engine/Renderer/SpriteSheet.hpp"
 
 #include "Game/GameCommon.hpp"
 #include "Game/Game.hpp"
