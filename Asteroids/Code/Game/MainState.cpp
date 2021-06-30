@@ -34,7 +34,7 @@ void MainState::OnEnter() noexcept {
     world_bounds.ScalePadding(dims.x, dims.y);
     world_bounds.Translate(-world_bounds.CalcCenter());
 
-    m_cameraController = OrthographicCameraController{g_theRenderer, g_theInputSystem};
+    m_cameraController = OrthographicCameraController{};
     m_cameraController.SetPosition(world_bounds.CalcCenter());
     m_cameraController.SetZoomLevelRange(Vector2{225.0f, 450.0f});
     m_cameraController.SetZoomLevel(450.0f);
