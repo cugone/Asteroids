@@ -53,8 +53,8 @@ void MainState::OnExit() noexcept {
     if(g_theUISystem->IsImguiMetricsWindowVisible()) {
         g_theUISystem->ToggleImguiMetricsWindow();
     }
-    auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_sound);
-    group->Stop();
+    //auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_sound);
+    //group->Stop();
     g_theGame->asteroids.clear();
     g_theGame->asteroids.shrink_to_fit();
     g_theGame->bullets.clear();
