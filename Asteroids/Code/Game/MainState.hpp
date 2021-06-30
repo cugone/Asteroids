@@ -91,7 +91,6 @@ private:
     AABB2 world_bounds = AABB2::ZERO_TO_ONE;
 
     OrthographicCameraController m_cameraController{};
-    Vector2 _auto_target_location{};
     float m_thrust_force{100.0f};
     float m_fadeOut_alpha{0.0f};
     bool m_debug_render{false};

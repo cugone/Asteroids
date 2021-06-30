@@ -145,7 +145,6 @@ public:
     std::shared_ptr<SpriteSheet> ufo_sheet{};
 
     Stopwatch respawnTimer{TimeUtils::FPSeconds{1.0f}};
-    bool easyMode{false};
 
 protected:
 private:

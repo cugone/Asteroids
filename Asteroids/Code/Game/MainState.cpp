@@ -269,9 +269,6 @@ void MainState::HandleDebugKeyboardInput([[maybe_unused]] TimeUtils::FPSeconds d
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::F1)) {
         m_debug_render = !m_debug_render;
     }
-    if(g_theInputSystem->WasKeyJustPressed(KeyCode::F2)) {
-        g_theGame->easyMode = !g_theGame->easyMode;
-    }
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::F3)) {
         g_theUISystem->ToggleImguiMetricsWindow();
     }
@@ -291,77 +288,14 @@ void MainState::HandleDebugKeyboardInput([[maybe_unused]] TimeUtils::FPSeconds d
 }
 
 void MainState::HandlePlayerInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) {
-    if(!g_theGame->easyMode) {
-        if(auto kb_state = HandleKeyboardInput(deltaSeconds)) {
-            g_theGame->ChangeState(std::move(kb_state));
-        }
-        if(auto mouse_state = HandleMouseInput(deltaSeconds)) {
-            g_theGame->ChangeState(std::move(mouse_state));
-        }
-        if(auto ctrl_state = HandleControllerInput(deltaSeconds)) {
-            g_theGame->ChangeState(std::move(ctrl_state));
-        }
-    } else {
-        const auto closest_asteroid_target = [this]()->std::optional<std::pair<Vector2, Vector2>> {
-            if(ship) {
-                const auto iter = std::min_element(std::cbegin(g_theGame->asteroids), std::cend(g_theGame->asteroids),
-                [this](const Asteroid* a, const Asteroid* b) {
-                        const auto a_dist = MathUtils::CalcDistanceSquared(ship->GetPosition(), a->GetPosition());
-                        const auto b_dist = MathUtils::CalcDistanceSquared(ship->GetPosition(), b->GetPosition());
-                        return a_dist < b_dist;
-                });
-                if(iter == std::cend(g_theGame->asteroids)) {
-                    return {};
-                }
-                return std::make_optional(std::make_pair((*iter)->GetPosition(), (*iter)->GetVelocity()));
-            }
-            return {};
-        }();
-        const auto closest_ufo_target = [this]()->std::optional<std::pair<Vector2, Vector2>> {
-            if(ship) {
-                const auto iter = std::min_element(std::cbegin(g_theGame->ufos), std::cend(g_theGame->ufos),
-                    [this](const Ufo* a, const Ufo* b) {
-                        const auto a_dist = MathUtils::CalcDistanceSquared(ship->GetPosition(), a->GetPosition());
-                        const auto b_dist = MathUtils::CalcDistanceSquared(ship->GetPosition(), b->GetPosition());
-                        return a_dist < b_dist;
-                    });
-                if(iter == std::cend(g_theGame->ufos)) {
-                    return {};
-                }
-                return std::make_optional(std::make_pair((*iter)->GetPosition(), (*iter)->GetVelocity()));
-            }
-            return {};
-        }();
-        auto calculate_closest_target = [closest_asteroid_target, closest_ufo_target]()->std::optional<std::pair<Vector2, Vector2>> {
-            if(closest_asteroid_target && closest_ufo_target) {
-                if(closest_asteroid_target->first.CalcLengthSquared() < closest_ufo_target->first.CalcLengthSquared()) {
-                    return closest_asteroid_target;
-                } else {
-                    return closest_ufo_target;
-                }
-            } else if(closest_ufo_target) {
-                return closest_ufo_target;
-            } else if(closest_asteroid_target) {
-                return closest_asteroid_target;
-            } else {
-                return {};
-            }
-        };
-        if(auto closest_target = calculate_closest_target(); closest_target.has_value()) {
-            auto target_speed = closest_target->second.Normalize();
-            auto closeness = MathUtils::DotProduct(Vector2::CreateFromPolarCoordinatesDegrees(1.0f, ship->GetOrientationDegrees()), closest_target->second);
-            if(closeness > 0.5f) {
-                if(closest_target.has_value()) {
-                    target_speed = closest_target->second.Normalize();
-                    closeness = MathUtils::DotProduct(Vector2::CreateFromPolarCoordinatesDegrees(1.0f, ship->GetOrientationDegrees()), closest_target->second);
-                }
-            }
-            _auto_target_location = closest_target->first + closest_target->second * target_speed * 2.0f;
-            if(deltaSeconds.count()) {
-                ship->SetOrientationDegrees((_auto_target_location - ship->GetPosition()).CalcHeadingDegrees());
-                ship->OnFire();
-            }
-        }
+    if(auto kb_state = HandleKeyboardInput(deltaSeconds)) {
+        g_theGame->ChangeState(std::move(kb_state));
+    }
+    if(auto mouse_state = HandleMouseInput(deltaSeconds)) {
+        g_theGame->ChangeState(std::move(mouse_state));
+    }
+    if(auto ctrl_state = HandleControllerInput(deltaSeconds)) {
+        g_theGame->ChangeState(std::move(ctrl_state));
     }
 }
 
@@ -647,9 +581,6 @@ void MainState::DebugRenderEntities() const noexcept {
     g_theRenderer->DrawAABB2(g_theGame->CalcCullBounds(m_cameraController), Rgba::White, Rgba::NoAlpha);
     g_theRenderer->DrawCircle2D(m_cameraController.GetCamera().GetPosition(), 25.0f, Rgba::Pink);
     g_theRenderer->DrawAABB2(CalculateCameraBounds(), Rgba::Periwinkle, Rgba::NoAlpha);
-    if(g_theGame->easyMode) {
-        g_theRenderer->DrawCircle2D(_auto_target_location, 12.0f, Rgba::Red);
-    }
 }
 
 AABB2 MainState::CalculateCameraBounds() const noexcept {
