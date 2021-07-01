@@ -3,7 +3,7 @@
 #include "Engine/Core/TimeUtils.hpp"
 #include "Engine/Core/TypeUtils.hpp"
 #include "Engine/Core/OrthographicCameraController.hpp"
-#include "Engine/Core/Vertex3D.hpp"
+#include "Engine/Renderer/Vertex3D.hpp"
 
 #include "Engine/Input/InputSystem.hpp"
 

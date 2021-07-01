@@ -1,6 +1,6 @@
 #include "Game/Ship.hpp"
 
-#include "Engine/Core/Vertex3D.hpp"
+#include "Engine/Renderer/Vertex3D.hpp"
 #include "Engine/Core/Rgba.hpp"
 
 #include "Engine/Math/Vector3.hpp"
