@@ -94,6 +94,9 @@
     <ClCompile Include="Mine.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="Weapon.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameCommon.hpp">
@@ -148,6 +151,9 @@
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Mine.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Weapon.hpp">
       <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>

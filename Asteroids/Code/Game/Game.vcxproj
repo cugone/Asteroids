@@ -161,6 +161,7 @@
     <ClCompile Include="ThrustComponent.cpp" />
     <ClCompile Include="TitleState.cpp" />
     <ClCompile Include="Ufo.cpp" />
+    <ClCompile Include="Weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp" />
@@ -181,6 +182,7 @@
     <ClInclude Include="ThrustComponent.hpp" />
     <ClInclude Include="TitleState.hpp" />
     <ClInclude Include="Ufo.hpp" />
+    <ClInclude Include="Weapon.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Abrams2019\Engine\Code\Engine\Engine.vcxproj">
