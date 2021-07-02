@@ -12,6 +12,8 @@
 #include "Engine/Math/Vector3.hpp"
 #include "Engine/Math/Vector2.hpp"
 
+#include "Engine/Physics/Particles/ParticleSystem.hpp"
+
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/Camera2D.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
@@ -145,7 +147,7 @@ public:
     std::shared_ptr<SpriteSheet> ufo_sheet{};
 
     Stopwatch respawnTimer{TimeUtils::FPSeconds{1.0f}};
-
+    std::unique_ptr<ParticleSystem> particleSystem{};
 protected:
 private:
     void InitializeAudio() noexcept;

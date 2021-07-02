@@ -1,0 +1,45 @@
+
+<effect name="flame_emission">
+
+    <emitter name="smoke">
+        <lifetime>1.0</lifetime>
+
+        <per_second>100</per_second>
+        <particle_lifetime>0.5</particle_lifetime>
+
+        <position>[0.0,0.0,0.0]</position>
+        <velocity>[0.0,5.0,0.0]</velocity>
+        <acceleration>[0.0,0.0,0.0]</acceleration>
+
+        <color>
+            <linear start="#808080FF" end="#00000000" />
+        </color>
+        <scale>
+            <linear start="0.25" end="0.1" />
+        </scale>
+
+        <material src="Data/Materials/SmokeParticle.material" />
+    </emitter>
+
+    <emitter name="flame">
+        <lifetime>0.5</lifetime>
+
+        <per_second>100</per_second>
+        <particle_lifetime>0.5</particle_lifetime>
+      
+        <position>[0.0,0.0,0.0]</position>
+        <velocity>[0.0,1.0,0.0]</velocity>
+        <acceleration>[0.0,0.0,0.0]</acceleration>
+      
+        <color>
+            <linear start="#EE6622FF" end="#EE662200" />
+        </color>
+        <scale>
+            <linear start="0.25" end="0.1" />
+        </scale>
+        <material src="Data/Materials/FlameParticle.material" />
+    
+    </emitter>
+
+  <sound src="Data/Audio/Sound/Explosion.wav" />
+</effect>

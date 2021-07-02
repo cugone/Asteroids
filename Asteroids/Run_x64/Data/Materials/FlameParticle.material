@@ -1,0 +1,6 @@
+<material name="flameparticle">
+    <shader src="Data/Materials/FlameParticle.shader" />
+    <textures>
+        <diffuse src="Data/Images/particle.png" />
+    </textures>
+</material>

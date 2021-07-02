@@ -42,6 +42,8 @@ void MainState::OnEnter() noexcept {
     PlayerDesc playerDesc{};
     playerDesc.lives = GetLivesFromDifficulty();
     g_theGame->player = Player{playerDesc};
+
+    g_theGame->particleSystem->RegisterEffectsFromFolder(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameData) / "ParticleEffects");
     MakeShip();
 }
 
