@@ -24,6 +24,7 @@ void ThrustComponent::BeginFrame() noexcept {
 void ThrustComponent::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
     auto& rs = ServiceLocator::get<IRendererService>();
     m_thrustPS.Update(rs.GetGameTime().count(), deltaSeconds.count());
+
     const auto tex = material->GetTexture(Material::TextureID::Diffuse);
     const auto frameWidth = static_cast<float>(tex->GetDimensions().x);
     const auto frameHeight = static_cast<float>(tex->GetDimensions().y);
@@ -88,6 +89,11 @@ void ThrustComponent::OnDestroy() noexcept {
 
 void ThrustComponent::SetThrust(float thrust) noexcept {
     m_thrust = thrust;
+    if(m_thrust) {
+        m_thrustPS.SetPlay(true);
+    } else {
+        m_thrustPS.Stop();
+    }
 }
 
 float ThrustComponent::GetThrust(float thrust) const noexcept {
