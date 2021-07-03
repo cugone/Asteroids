@@ -35,6 +35,9 @@
     <Filter Include="Data\Audio\Music">
       <UniqueIdentifier>{5bf49722-054b-4365-856e-8376f44dcbbd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Data\ParticleEffects">
+      <UniqueIdentifier>{a11cbe84-0dda-4fb8-8cc7-e6ce7a2d43bc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main_Win32.cpp">
@@ -185,6 +188,9 @@
     <Image Include="..\..\Run_x64\Data\Images\mine.png">
       <Filter>Data\Images</Filter>
     </Image>
+    <Image Include="..\..\Run_x64\Data\Images\particle.png">
+      <Filter>Data\Images</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Run_x64\Data\Materials\asteroid.material">
@@ -246,6 +252,21 @@
     </None>
     <None Include="..\..\Run_x64\Data\Materials\thrust.material">
       <Filter>Data\Materials</Filter>
+    </None>
+    <None Include="..\..\Run_x64\Data\Shaders\flameparticle.shader">
+      <Filter>Data\Shaders</Filter>
+    </None>
+    <None Include="..\..\Run_x64\Data\Materials\flameparticle.material">
+      <Filter>Data\Materials</Filter>
+    </None>
+    <None Include="..\..\Run_x64\Data\ParticleEffects\flame_emission.effect">
+      <Filter>Data\ParticleEffects</Filter>
+    </None>
+    <None Include="..\..\Run_x64\Data\Materials\smokeparticle.material">
+      <Filter>Data\Materials</Filter>
+    </None>
+    <None Include="..\..\Run_x64\Data\Shaders\smokeparticle.shader">
+      <Filter>Data\Shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

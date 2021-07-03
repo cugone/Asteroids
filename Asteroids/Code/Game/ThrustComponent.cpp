@@ -3,6 +3,9 @@
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/Material.hpp"
 
+#include "Engine/Services/ServiceLocator.hpp"
+#include "Engine/Services/IRendererService.hpp"
+
 #include "Game/GameCommon.hpp"
 
 ThrustComponent::ThrustComponent(Entity* parent, float maxThrust /*= 100.0f*/)
@@ -14,7 +17,13 @@ ThrustComponent::ThrustComponent(Entity* parent, float maxThrust /*= 100.0f*/)
     SetCosmeticRadius(7.0f);
 }
 
+void ThrustComponent::BeginFrame() noexcept {
+    m_thrustPS.BeginFrame();
+}
+
 void ThrustComponent::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
+    auto& rs = ServiceLocator::get<IRendererService>();
+    m_thrustPS.Update(rs.GetGameTime().count(), deltaSeconds.count());
     const auto tex = material->GetTexture(Material::TextureID::Diffuse);
     const auto frameWidth = static_cast<float>(tex->GetDimensions().x);
     const auto frameHeight = static_cast<float>(tex->GetDimensions().y);
@@ -51,6 +60,14 @@ void ThrustComponent::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds)
         builder.End(material);
     }
 
+}
+
+void ThrustComponent::Render() const noexcept {
+    m_thrustPS.Render();
+}
+
+void ThrustComponent::EndFrame() noexcept {
+    m_thrustPS.EndFrame();
 }
 
 void ThrustComponent::OnCreate() noexcept {

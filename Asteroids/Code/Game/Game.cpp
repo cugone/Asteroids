@@ -36,6 +36,7 @@ void Game::Initialize() {
     g_theRenderer->RegisterMaterialsFromFolder(g_material_folderpath);
     g_theRenderer->SetWindowTitle(g_title_str);
     InitializeAudio();
+    particleSystem->RegisterEffectsFromFolder(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameData) / "ParticleEffects");
 }
 
 void Game::InitializeAudio() noexcept {

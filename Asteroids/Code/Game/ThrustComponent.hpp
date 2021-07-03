@@ -2,6 +2,8 @@
 
 #include "Engine/Math/Vector2.hpp"
 
+#include "Engine/Physics/Particles/ParticleEffect.hpp"
+
 #include "Game/Entity.hpp"
 
 class ThrustComponent : public Entity {
@@ -14,7 +16,10 @@ public:
     ThrustComponent& operator=(ThrustComponent&& other) = default;
     virtual ~ThrustComponent() = default;
 
+    void BeginFrame() noexcept override;
     void Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept override;
+    void Render() const noexcept override;
+    void EndFrame() noexcept override;
 
     void OnCreate() noexcept override;
     void OnCollision(Entity* a, Entity* b) noexcept override;
@@ -28,6 +33,7 @@ public:
 
 protected:
 private:
+    ParticleEffect m_thrustPS{"flame_emission"};
     Entity* m_parent{nullptr};
     Vector2 m_positionOffset{};
     float m_thrustDirectionAngleOffset{0.0f};
