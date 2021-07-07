@@ -200,6 +200,7 @@
     <Image Include="..\..\Run_x64\Data\Images\sonic_bullet.png" />
     <Image Include="..\..\Run_x64\Data\Images\thrust.png" />
     <Image Include="..\..\Run_x64\Data\Images\ufo.png" />
+    <Image Include="..\..\Run_x64\Data\Resources\Icons\icon.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Run_x64\Data\Materials\asteroid.material" />

@@ -38,6 +38,12 @@
     <Filter Include="Data\ParticleEffects">
       <UniqueIdentifier>{a11cbe84-0dda-4fb8-8cc7-e6ce7a2d43bc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Data\Resources">
+      <UniqueIdentifier>{200004fc-8690-4ccb-bbc3-7783b78c9af0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\Resources\Icons">
+      <UniqueIdentifier>{65b37891-fd17-4da9-b500-eca5ade8f32d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main_Win32.cpp">
@@ -190,6 +196,9 @@
     </Image>
     <Image Include="..\..\Run_x64\Data\Images\particle.png">
       <Filter>Data\Images</Filter>
+    </Image>
+    <Image Include="..\..\Run_x64\Data\Resources\Icons\icon.ico">
+      <Filter>Data\Resources\Icons</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
