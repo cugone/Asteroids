@@ -19,6 +19,7 @@ ThrustComponent::ThrustComponent(Entity* parent, float maxThrust /*= 100.0f*/)
 
 void ThrustComponent::BeginFrame() noexcept {
     m_thrustPS.BeginFrame();
+    mesh_builder.Clear();
 }
 
 void ThrustComponent::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
@@ -65,6 +66,10 @@ void ThrustComponent::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds)
 
 void ThrustComponent::Render() const noexcept {
     m_thrustPS.Render();
+    auto& rs = ServiceLocator::get<IRendererService>();
+    rs.SetModelMatrix(transform);
+    Mesh::Render(mesh_builder);
+
 }
 
 void ThrustComponent::EndFrame() noexcept {
