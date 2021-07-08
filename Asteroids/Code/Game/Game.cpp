@@ -245,6 +245,7 @@ void Game::CreateOrLoadOptionsFile() noexcept {
 }
 
 void Game::Update(TimeUtils::FPSeconds deltaSeconds) {
+    g_theRenderer->UpdateGameTime(deltaSeconds);
     _current_state->Update(deltaSeconds);
     if(g_theApp->LostFocus() || g_theGame->IsPaused()) {
         g_theAudioSystem->SuspendAudio();
