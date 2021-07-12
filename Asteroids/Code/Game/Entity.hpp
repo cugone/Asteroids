@@ -8,7 +8,7 @@
 
 #include "Engine/Renderer/Mesh.hpp"
 
-class Weapon;
+class IWeapon;
 
 class Entity {
 public:
@@ -34,7 +34,7 @@ public:
     float GetRotationSpeed() const noexcept;
     void SetRotationSpeed(float speed) noexcept;
 
-    Weapon* GetWeapon() const noexcept;
+    IWeapon* GetWeapon() const noexcept;
 
     Vector2 GetPosition() const noexcept;
     void SetPosition(Vector2 newPosition) noexcept;
@@ -76,7 +76,7 @@ protected:
     void SetPhysicalRadius(float value) noexcept;
 
     Material* material{};
-    Weapon* weapon{};
+    IWeapon* weapon{};
     Matrix4 transform{};
     Mesh::Builder mesh_builder{};
 private:

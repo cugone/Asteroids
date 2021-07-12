@@ -14,7 +14,7 @@
 #include "Game/Asteroid.hpp"
 #include "Game/Bullet.hpp"
 #include "Game/Ufo.hpp"
-#include "Game/Weapon.hpp"
+#include "Game/IWeapon.hpp"
 
 #include "Game/ThrustComponent.hpp"
 
@@ -33,7 +33,16 @@ Ship::Ship(Vector2 position)
     SetOrientationDegrees(-90.0f);
     SetCosmeticRadius(25.0f);
     SetPhysicalRadius(15.0f);
-    _fireRate.SetFrequency(10u);
+    
+    WeaponDesc laser_weaponDesc{};
+    laser_weaponDesc.bulletSpeed = 400.0f;
+    laser_weaponDesc.fireRate = 0.1f;
+    laser_weaponDesc.fireDelay = TimeUtils::FPSeconds{0.0f};
+    laser_weaponDesc.materialName = "bullet";
+    laser_weaponDesc.scale = 1.0f;
+
+    _laserWeapon.Initialize(laser_weaponDesc);
+
     _mineFireRate.SetFrequency(1u);
 }
 
@@ -88,6 +97,7 @@ void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     builder.End(material);
 
     if(!IsRespawning()) {
+        _laserWeapon.Update(deltaSeconds);
         _thrust->Update(deltaSeconds);
     }
 
@@ -136,9 +146,6 @@ float Ship::DoAlphaEaseOut(TimeUtils::FPSeconds& deltaSeconds) const noexcept {
 
 void Ship::EndFrame() noexcept {
     Entity::EndFrame();
-    if(!IsRespawning() && _fireRate.CheckAndReset()) {
-        _canFire = true;
-    }
     if(!IsRespawning() && _mineFireRate.CheckAndReset()) {
         _canDropMine = true;
     }
@@ -159,8 +166,7 @@ void Ship::OnFire() noexcept {
     if(IsRespawning()) {
         return;
     }
-    if(_canFire) {
-        _canFire = false;
+    if(_laserWeapon.Fire()) {
         MakeBullet();
     }
 }
@@ -244,7 +250,7 @@ void Ship::MakeMine() const noexcept {
 }
 
 const Vector2 Ship::CalcNewBulletVelocity() const noexcept {
-    return CalcBulletDirectionFromDifficulty() * _bulletSpeed;
+    return CalcBulletDirectionFromDifficulty() * _laserWeapon.GetSpeed();
 }
 
 const Vector2 Ship::CalcNewBulletPosition() const noexcept {

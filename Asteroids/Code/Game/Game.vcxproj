@@ -152,7 +152,7 @@
     <ClCompile Include="GameConfig.cpp" />
     <ClCompile Include="GameOverState.cpp" />
     <ClCompile Include="GameState.cpp" />
-    <ClCompile Include="LaserBullet.cpp" />
+    <ClCompile Include="LaserBulletWeapon.cpp" />
     <ClCompile Include="MainState.cpp" />
     <ClCompile Include="Main_Win32.cpp" />
     <ClCompile Include="Mine.cpp" />
@@ -174,7 +174,7 @@
     <ClInclude Include="GameConfig.hpp" />
     <ClInclude Include="GameOverState.hpp" />
     <ClInclude Include="GameState.hpp" />
-    <ClInclude Include="LaserBullet.hpp" />
+    <ClInclude Include="LaserBulletWeapon.hpp" />
     <ClInclude Include="MainState.hpp" />
     <ClInclude Include="Mine.hpp" />
     <ClInclude Include="OptionsState.hpp" />

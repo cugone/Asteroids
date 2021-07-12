@@ -8,7 +8,7 @@ struct WeaponDesc {
     float fireRate{1.0f};
     TimeUtils::FPMilliseconds fireDelay{0.0f};
     float scale{1.0f};
-    float velocity{1.0f};
+    float bulletSpeed{1.0f};
     std::string materialName{};
 };
 
@@ -16,14 +16,11 @@ class IWeapon {
 public:
     virtual ~IWeapon() noexcept = default;
 
-    virtual void Initialize(const WeaponDesc& desc) = 0;
-    virtual void BeginFrame() noexcept = 0;
-    virtual void Update([[maybe_unused]] TimeUtils::FPSeconds deltaTime) noexcept = 0;
-    virtual void Render() const noexcept = 0;
-    virtual void EndFrame() noexcept = 0;
+    virtual void Initialize(const WeaponDesc& desc) noexcept = 0;
+    virtual void Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept = 0;
 
-    virtual std::string GetMaterialName() const noexcept = 0;
-    virtual void SetMaterialName(const std::string& newMaterialName) noexcept = 0;
+    virtual bool Fire() noexcept = 0;
+    virtual Material* GetMaterial() const noexcept = 0;
 
     virtual float GetFireRate() const noexcept = 0;
     virtual void SetFireRate(float newFireRate) noexcept = 0;
