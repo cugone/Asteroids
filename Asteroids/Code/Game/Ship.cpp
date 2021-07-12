@@ -14,6 +14,7 @@
 #include "Game/Asteroid.hpp"
 #include "Game/Bullet.hpp"
 #include "Game/Ufo.hpp"
+#include "Game/Weapon.hpp"
 
 #include "Game/ThrustComponent.hpp"
 

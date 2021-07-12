@@ -47,7 +47,6 @@ private:
     std::unique_ptr<ThrustComponent> _thrust{};
     Stopwatch _fireRate;
     Stopwatch _mineFireRate;
-    //TODO: Refactor into "Weapon"
     const float _bulletSpeed{400.0f};
     float _maxScale{2.0f};
     float _scale{1.0f};

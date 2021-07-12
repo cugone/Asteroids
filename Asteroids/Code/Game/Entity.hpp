@@ -8,13 +8,15 @@
 
 #include "Engine/Renderer/Mesh.hpp"
 
+class Weapon;
+
 class Entity {
 public:
     enum class Faction {
         None
-        ,Player
-        ,Enemy
-        ,Asteroid
+        , Player
+        , Enemy
+        , Asteroid
     };
 
     virtual ~Entity() = default;
@@ -23,14 +25,16 @@ public:
     virtual void Render() const noexcept;
     virtual void EndFrame() noexcept;
     virtual void OnCreate() noexcept = 0;
-    virtual void OnCollision(Entity* a, Entity* b) noexcept=0;
-    virtual void OnFire() noexcept=0;
-    virtual void OnDestroy() noexcept=0;
+    virtual void OnCollision(Entity* a, Entity* b) noexcept = 0;
+    virtual void OnFire() noexcept = 0;
+    virtual void OnDestroy() noexcept = 0;
 
     void RotateCounterClockwise(float speed) noexcept;
     void RotateClockwise(float speed) noexcept;
     float GetRotationSpeed() const noexcept;
     void SetRotationSpeed(float speed) noexcept;
+
+    Weapon* GetWeapon() const noexcept;
 
     Vector2 GetPosition() const noexcept;
     void SetPosition(Vector2 newPosition) noexcept;
@@ -72,6 +76,7 @@ protected:
     void SetPhysicalRadius(float value) noexcept;
 
     Material* material{};
+    Weapon* weapon{};
     Matrix4 transform{};
     Mesh::Builder mesh_builder{};
 private:

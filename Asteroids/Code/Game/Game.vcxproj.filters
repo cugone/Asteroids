@@ -103,7 +103,7 @@
     <ClCompile Include="Mine.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="Weapon.cpp">
+    <ClCompile Include="LaserBullet.cpp">
       <Filter>Game</Filter>
     </ClCompile>
   </ItemGroup>
@@ -162,7 +162,10 @@
     <ClInclude Include="Mine.hpp">
       <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="Weapon.hpp">
+    <ClInclude Include="IWeapon.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="LaserBullet.hpp">
       <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>

@@ -188,6 +188,10 @@ void Entity::SetRotationSpeed(float speed) noexcept {
     invmass_rotationspeed_health_padding.y = speed;
 }
 
+Weapon* Entity::GetWeapon() const noexcept {
+    return _weapon;
+}
+
 void Entity::SetCosmeticRadius(float value) noexcept {
     cosmeticphysicalradius_velocitydirection.x = value;
 }
