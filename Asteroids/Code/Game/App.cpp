@@ -106,7 +106,7 @@ void App::SetupEngineSystemChainOfResponsibility() {
 }
 void App::Initialize() {
     g_theRenderer->Initialize();
-    g_theRenderer->SetVSync(currentGraphicsOptions.vsync);
+    g_theRenderer->SetVSync(_gameSettings.IsVsyncEnabled());
     g_theRenderer->GetOutput()->GetWindow()->custom_message_handler = WindowProc;
 
     g_theUISystem->Initialize();

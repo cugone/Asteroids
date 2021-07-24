@@ -4,6 +4,8 @@
 #include "Engine/Core/EngineSubsystem.hpp"
 #include "Engine/Core/TimeUtils.hpp"
 
+#include "Engine/Game/GameSettings.hpp"
+
 #include <memory>
 
 class App : public EngineSubsystem {
@@ -41,6 +43,7 @@ private:
     bool _current_focus = false;
     bool _previous_focus = false;
 
+    GameSettings _gameSettings{};
     std::unique_ptr<class Config> _theConfig{};
     std::unique_ptr<class JobSystem> _theJobSystem{};
     std::unique_ptr<class FileLogger> _theFileLogger{};
