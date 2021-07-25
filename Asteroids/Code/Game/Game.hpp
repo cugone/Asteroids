@@ -3,6 +3,9 @@
 #include "Engine/Core/TimeUtils.hpp"
 #include "Engine/Core/TypeUtils.hpp"
 #include "Engine/Core/OrthographicCameraController.hpp"
+
+#include "Engine/Game/GameSettings.hpp"
+
 #include "Engine/Renderer/Vertex3D.hpp"
 
 #include "Engine/Input/InputSystem.hpp"
@@ -64,8 +67,8 @@ struct TypeUtils::is_incrementable_enum_type<ControlPreference> : std::true_type
 template<>
 struct TypeUtils::is_decrementable_enum_type<ControlPreference> : std::true_type {};
 
-struct GameOptions {
-    int windowWidth{1600};
+class GameOptions : public GameSettings {
+public:
     GameOptions() noexcept = default;
     GameOptions(const GameOptions& other) noexcept = default;
     GameOptions(GameOptions&& other) noexcept = default;
