@@ -66,7 +66,13 @@ struct TypeUtils::is_decrementable_enum_type<ControlPreference> : std::true_type
 
 struct GameOptions {
     int windowWidth{1600};
-    int windowHeight{900};
+    GameOptions() noexcept = default;
+    GameOptions(const GameOptions& other) noexcept = default;
+    GameOptions(GameOptions&& other) noexcept = default;
+    virtual ~GameOptions() noexcept = default;
+    GameOptions& operator=(const GameOptions& rhs) noexcept = default;
+    GameOptions& operator=(GameOptions&& rhs) noexcept = default;
+
     Difficulty difficulty{Difficulty::Normal};
     ControlPreference controlPref{ControlPreference::Mouse};
     uint8_t soundVolume{5};

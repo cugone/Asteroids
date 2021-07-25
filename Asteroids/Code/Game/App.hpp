@@ -27,6 +27,8 @@ public:
     bool LostFocus() const;
     bool GainedFocus() const;
 
+    const GameSettings& GetGameSettings() const noexcept;
+    void SetGameSettings(const GameSettings& newSettings) noexcept;
 protected:
 private:
     void SetupEngineSystemPointers();

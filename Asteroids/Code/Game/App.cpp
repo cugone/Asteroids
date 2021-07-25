@@ -255,3 +255,11 @@ bool App::LostFocus() const {
 bool App::GainedFocus() const {
     return !_previous_focus && _current_focus;
 }
+
+const GameSettings& App::GetGameSettings() const noexcept {
+    return _gameSettings;
+}
+
+void App::SetGameSettings(const GameSettings& newSettings) noexcept {
+    _gameSettings = newSettings;
+}
