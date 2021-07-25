@@ -72,6 +72,9 @@ struct GameOptions {
     uint8_t soundVolume{5};
     uint8_t musicVolume{5};
     float cameraShakeStrength{1.0f};
+    float maxShakeOffsetHorizontal{50.0f};
+    float maxShakeOffsetVertical{50.0f};
+    float maxShakeAngle{10.0f};
 };
 
 class Game {

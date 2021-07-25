@@ -383,7 +383,7 @@ void Game::MakeSmallAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noex
 }
 
 void Game::DoCameraShake(OrthographicCameraController& controller) const noexcept {
-    controller.SetupCameraShake(currentGraphicsOptions.MaxShakeOffsetHorizontal, currentGraphicsOptions.MaxShakeOffsetVertical, currentGraphicsOptions.MaxShakeAngle);
+    controller.SetupCameraShake(gameOptions.maxShakeOffsetHorizontal, gameOptions.maxShakeOffsetVertical, gameOptions.maxShakeAngle);
     controller.DoCameraShake([this]() {
         const auto shakeMultiplier = gameOptions.cameraShakeStrength;
         if(const auto* ship = GetShip(); ship) {
