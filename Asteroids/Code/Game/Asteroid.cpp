@@ -254,7 +254,7 @@ int Asteroid::GetHealthFromType(Type type) const noexcept {
 
 float Asteroid::CalcChildHeadingFromDifficulty() const noexcept {
     const auto currentHeading = GetVelocity().CalcHeadingDegrees();
-    switch(g_theGame->gameOptions.difficulty) {
+    switch(g_theGame->gameOptions.GetDifficulty()) {
     case Difficulty::Easy:
         return MathUtils::GetRandomFloatZeroToOne() * 360.0f;
     case Difficulty::Normal:
@@ -268,7 +268,7 @@ float Asteroid::CalcChildHeadingFromDifficulty() const noexcept {
 
 float Asteroid::CalcChildSpeedFromSizeAndDifficulty() const noexcept{
     const auto currentSpeed = CalcChildSpeedFromSize();
-    switch(g_theGame->gameOptions.difficulty) {
+    switch(g_theGame->gameOptions.GetDifficulty()) {
     case Difficulty::Easy:
         return currentSpeed * 0.5f;
     case Difficulty::Normal:

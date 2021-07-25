@@ -237,7 +237,7 @@ float Ufo::GetBulletSpeedFromTypeAndDifficulty(Type type) const noexcept {
         }
     }();
     const auto difficultyMultiplier = []() -> float{
-        switch(g_theGame->gameOptions.difficulty) {
+        switch(g_theGame->gameOptions.GetDifficulty()) {
         case Difficulty::Easy: return 0.50f;
         case Difficulty::Normal: return 1.0f;
         case Difficulty::Hard: return 2.0f;

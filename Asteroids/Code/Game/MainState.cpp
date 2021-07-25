@@ -514,7 +514,7 @@ void MainState::KillAll() noexcept {
 }
 
 unsigned int MainState::GetWaveMultiplierFromDifficulty() const noexcept {
-    switch(g_theGame->gameOptions.difficulty) {
+    switch(g_theGame->gameOptions.GetDifficulty()) {
     case Difficulty::Easy: return 3u;
     case Difficulty::Normal: return 5u;
     case Difficulty::Hard: return 7u;
@@ -523,7 +523,7 @@ unsigned int MainState::GetWaveMultiplierFromDifficulty() const noexcept {
 }
 
 long long MainState::GetLivesFromDifficulty() const noexcept {
-    switch(g_theGame->gameOptions.difficulty) {
+    switch(g_theGame->gameOptions.GetDifficulty()) {
     case Difficulty::Easy: return 5LL;
     case Difficulty::Normal: return 4LL;
     case Difficulty::Hard: return 3LL;

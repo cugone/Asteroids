@@ -76,14 +76,50 @@ public:
     GameOptions& operator=(const GameOptions& rhs) noexcept = default;
     GameOptions& operator=(GameOptions&& rhs) noexcept = default;
 
-    Difficulty difficulty{Difficulty::Normal};
-    ControlPreference controlPref{ControlPreference::Mouse};
-    uint8_t soundVolume{5};
-    uint8_t musicVolume{5};
-    float cameraShakeStrength{1.0f};
-    float maxShakeOffsetHorizontal{50.0f};
-    float maxShakeOffsetVertical{50.0f};
-    float maxShakeAngle{10.0f};
+    virtual void SaveToConfig(Config& config) noexcept override;
+    virtual void SetToDefault() noexcept override;
+
+    void SetDifficulty(const Difficulty& newDifficulty) noexcept;
+    Difficulty GetDifficulty() const noexcept;
+    Difficulty DefaultDifficulty() const noexcept;
+
+    void SetControlPreference(const ControlPreference& newControlPreference) noexcept;
+    ControlPreference GetControlPreference() const noexcept;
+    ControlPreference DefaultControlPreference() const noexcept;
+
+    void SetSoundVolume(uint8_t newSoundVolume) noexcept;
+    uint8_t GetSoundVolume() const noexcept;
+    uint8_t DefaultSoundVolume() const noexcept;
+    
+    void SetMusicVolume(uint8_t newMusicVolume) noexcept;
+    uint8_t GetMusicVolume() const noexcept;
+    uint8_t DefaultMusicVolume() const noexcept;
+
+    void SetCameraShakeStrength(float newCameraShakeStrength) noexcept;
+    float GetCameraShakeStrength() const noexcept;
+    float DefaultCameraShakeStrength() const noexcept;
+
+    float GetMaxShakeOffsetHorizontal() const noexcept;
+    float GetMaxShakeOffsetVertical() const noexcept;
+    float GetMaxShakeAngle() const noexcept;
+
+protected:
+
+    Difficulty _difficulty{Difficulty::Normal};
+    Difficulty _defaultDifficulty{Difficulty::Normal};
+    ControlPreference _controlPref{ControlPreference::Mouse};
+    ControlPreference _defaultControlPref{ControlPreference::Mouse};
+    uint8_t _soundVolume{5};
+    uint8_t _defaultSoundVolume{5};
+    uint8_t _musicVolume{5};
+    uint8_t _defaultMusicVolume{5};
+    float _cameraShakeStrength{1.0f};
+    float _defaultCameraShakeStrength{1.0f};
+
+private:
+    float _maxShakeOffsetHorizontal{50.0f};
+    float _maxShakeOffsetVertical{50.0f};
+    float _maxShakeAngle{10.0f};
 };
 
 class Game {

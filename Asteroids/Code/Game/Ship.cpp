@@ -260,7 +260,7 @@ const Vector2 Ship::CalcNewBulletPosition() const noexcept {
 const Vector2 Ship::CalcBulletDirectionFromDifficulty() const noexcept {
     const auto current_angle = GetForward().CalcHeadingDegrees();
     const auto angle_bias = []() {
-        switch(g_theGame->gameOptions.difficulty) {
+        switch(g_theGame->gameOptions.GetDifficulty()) {
         case Difficulty::Easy: return MathUtils::GetRandomFloatNegOneToOne() * 2.5f;
         case Difficulty::Normal: return MathUtils::GetRandomFloatNegOneToOne() * 5.0f;
         case Difficulty::Hard: return MathUtils::GetRandomFloatNegOneToOne() * 10.0f;

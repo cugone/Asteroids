@@ -25,7 +25,7 @@ Bullet::Bullet(const Entity* parent, Vector2 position, Vector2 velocity) noexcep
 }
 
 float Bullet::CalculateTtlFromDifficulty() const noexcept {
-    switch(g_theGame->gameOptions.difficulty) {
+    switch(g_theGame->gameOptions.GetDifficulty()) {
     case Difficulty::Easy: return 3.0f;
     case Difficulty::Normal: return 2.0f;
     case Difficulty::Hard: return 1.0f;

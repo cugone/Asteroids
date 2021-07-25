@@ -69,13 +69,13 @@ void OptionsState::Render() const noexcept {
     g_theRenderer->DrawTextLine(font, "Difficulty:", m_selected_item == OptionsMenu::DifficultySelection ? Rgba::Yellow : Rgba::White);
 
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.35f}));
-    g_theRenderer->DrawTextLine(font, DifficultyToString(m_temp_options.difficulty), m_selected_item == OptionsMenu::DifficultySelection ? Rgba::Yellow : Rgba::White);
+    g_theRenderer->DrawTextLine(font, DifficultyToString(m_temp_options.GetDifficulty()), m_selected_item == OptionsMenu::DifficultySelection ? Rgba::Yellow : Rgba::White);
 
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.45f}));
     g_theRenderer->DrawTextLine(font, "Control Preference:", m_selected_item == OptionsMenu::ControlSelection ? Rgba::Yellow : Rgba::White);
 
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.45f}));
-    g_theRenderer->DrawTextLine(font, ControlPreferenceToString(m_temp_options.controlPref), m_selected_item == OptionsMenu::ControlSelection ? Rgba::Yellow : Rgba::White);
+    g_theRenderer->DrawTextLine(font, ControlPreferenceToString(m_temp_options.GetControlPreference()), m_selected_item == OptionsMenu::ControlSelection ? Rgba::Yellow : Rgba::White);
 
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.55f}));
     g_theRenderer->DrawTextLine(font, "Camera Shake:", m_selected_item == OptionsMenu::CameraShake ? Rgba::Yellow : Rgba::White);
@@ -83,7 +83,7 @@ void OptionsState::Render() const noexcept {
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.55f}));
     {
         std::ostringstream ss;
-        ss << std::setprecision(2) << m_temp_options.cameraShakeStrength;
+        ss << std::setprecision(2) << m_temp_options.GetCameraShakeStrength();
         g_theRenderer->DrawTextLine(font, ss.str(), m_selected_item == OptionsMenu::CameraShake ? Rgba::Yellow : Rgba::White);
     }
 
@@ -91,13 +91,13 @@ void OptionsState::Render() const noexcept {
     g_theRenderer->DrawTextLine(font, "Sound Volume:", m_selected_item == OptionsMenu::SoundVolume ? Rgba::Yellow : Rgba::White);
 
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.65f}));
-    g_theRenderer->DrawTextLine(font, std::to_string(m_temp_options.soundVolume), m_selected_item == OptionsMenu::SoundVolume ? Rgba::Yellow : Rgba::White);
+    g_theRenderer->DrawTextLine(font, std::to_string(m_temp_options.GetSoundVolume()), m_selected_item == OptionsMenu::SoundVolume ? Rgba::Yellow : Rgba::White);
     
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.75f}));
     g_theRenderer->DrawTextLine(font, "Music Volume:", m_selected_item == OptionsMenu::MusicVolume ? Rgba::Yellow : Rgba::White);
 
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.75f}));
-    g_theRenderer->DrawTextLine(font, std::to_string(m_temp_options.musicVolume), m_selected_item == OptionsMenu::MusicVolume ? Rgba::Yellow : Rgba::White);
+    g_theRenderer->DrawTextLine(font, std::to_string(m_temp_options.GetMusicVolume()), m_selected_item == OptionsMenu::MusicVolume ? Rgba::Yellow : Rgba::White);
 
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.95f}));
     g_theRenderer->DrawTextLine(font, "Back", m_selected_item == OptionsMenu::Cancel ? Rgba::Yellow : Rgba::White);
@@ -179,25 +179,30 @@ void OptionsState::CycleSelectedOptionDown(OptionsMenu selectedItem) noexcept {
     switch(selectedItem) {
     case OptionsMenu::DifficultySelection:
     {
-        if(m_temp_options.difficulty == Difficulty::First_) {
-            m_temp_options.difficulty = Difficulty::Last_;
+        if(m_temp_options.GetDifficulty() == Difficulty::First_) {
+            m_temp_options.SetDifficulty(Difficulty::Last_);
         }
-        --m_temp_options.difficulty;
+        auto cur_difficulty = m_temp_options.GetDifficulty();
+        --cur_difficulty;
+        m_temp_options.SetDifficulty(cur_difficulty);
         break;
     }
     case OptionsMenu::ControlSelection:
     {
-        if(m_temp_options.controlPref == ControlPreference::First_) {
-            m_temp_options.controlPref = ControlPreference::Last_;
+        if(m_temp_options.GetControlPreference() == ControlPreference::First_) {
+            m_temp_options.SetControlPreference(ControlPreference::Last_);
         }
-        --m_temp_options.controlPref;
+        auto cur_pref = m_temp_options.GetControlPreference();
+        --cur_pref;
+        m_temp_options.SetControlPreference(cur_pref);
         break;
     }
     case OptionsMenu::SoundVolume:
     {
-        m_temp_options.soundVolume = std::clamp(m_temp_options.soundVolume ? --m_temp_options.soundVolume : m_temp_options.soundVolume, m_min_sound_volume, m_max_sound_volume);
+        auto cur_soundVolume = m_temp_options.GetSoundVolume();
+        m_temp_options.SetSoundVolume(std::clamp(cur_soundVolume ? --cur_soundVolume : cur_soundVolume, m_min_sound_volume, m_max_sound_volume));
         auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_sound);
-        const float volumeAsFloat = m_temp_options.soundVolume / static_cast<float>(m_max_sound_volume);
+        const float volumeAsFloat = m_temp_options.GetSoundVolume() / static_cast<float>(m_max_sound_volume);
         group->SetVolume(volumeAsFloat);
         AudioSystem::SoundDesc desc{};
         desc.groupName = g_audiogroup_sound;
@@ -206,16 +211,18 @@ void OptionsState::CycleSelectedOptionDown(OptionsMenu selectedItem) noexcept {
     }
     case OptionsMenu::MusicVolume:
     {
-        m_temp_options.musicVolume = std::clamp(m_temp_options.musicVolume ? --m_temp_options.musicVolume : m_temp_options.musicVolume, m_min_music_volume, m_max_music_volume);
+        auto cur_musicVolume = m_temp_options.GetMusicVolume();
+        m_temp_options.SetMusicVolume(std::clamp(cur_musicVolume ? --cur_musicVolume : cur_musicVolume, m_min_music_volume, m_max_music_volume));
         auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_music);
-        const float volumeAsFloat = m_temp_options.musicVolume / static_cast<float>(m_max_music_volume);
+        const float volumeAsFloat = m_temp_options.GetMusicVolume() / static_cast<float>(m_max_music_volume);
         group->SetVolume(volumeAsFloat);
         break;
     }
     case OptionsMenu::CameraShake:
     {
-        m_temp_options.cameraShakeStrength -= 0.1f;
-        m_temp_options.cameraShakeStrength = std::clamp(m_temp_options.cameraShakeStrength, m_min_camera_shake, m_max_camera_shake);
+        auto cur_cameraShake = m_temp_options.GetCameraShakeStrength();
+        cur_cameraShake -= 0.1f;
+        m_temp_options.SetCameraShakeStrength(std::clamp(cur_cameraShake, m_min_camera_shake, m_max_camera_shake));
         break;
     }
     default:
@@ -228,25 +235,30 @@ void OptionsState::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
     switch(selectedItem) {
     case OptionsMenu::DifficultySelection:
     {
-        ++m_temp_options.difficulty;
-        if(m_temp_options.difficulty == Difficulty::Last_) {
-            m_temp_options.difficulty = Difficulty::First_;
+        auto cur_difficulty = m_temp_options.GetDifficulty();
+        ++cur_difficulty;
+        if(cur_difficulty == Difficulty::Last_) {
+            cur_difficulty = Difficulty::First_;
         }
+        m_temp_options.SetDifficulty(cur_difficulty);
         break;
     }
     case OptionsMenu::ControlSelection:
     {
-        ++m_temp_options.controlPref;
-        if(m_temp_options.controlPref == ControlPreference::Last_) {
-            m_temp_options.controlPref = ControlPreference::First_;
+        auto cur_pref = m_temp_options.GetControlPreference();
+        ++cur_pref;
+        if(cur_pref == ControlPreference::Last_) {
+            cur_pref = ControlPreference::First_;
         }
+        m_temp_options.SetControlPreference(cur_pref);
         break;
     }
     case OptionsMenu::SoundVolume:
     {
-        m_temp_options.soundVolume = (std::min)(++m_temp_options.soundVolume, m_max_sound_volume);
+        auto cur_soundVolume = m_temp_options.GetSoundVolume();
+        m_temp_options.SetSoundVolume((std::min)(++cur_soundVolume, m_max_sound_volume));
         auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_sound);
-        const float volumeAsFloat = m_temp_options.soundVolume / static_cast<float>(m_max_sound_volume);
+        const float volumeAsFloat = m_temp_options.GetSoundVolume() / static_cast<float>(m_max_sound_volume);
         group->SetVolume(volumeAsFloat);
         AudioSystem::SoundDesc desc{};
         desc.groupName = g_audiogroup_sound;
@@ -255,16 +267,18 @@ void OptionsState::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
     }
     case OptionsMenu::MusicVolume:
     {
-        m_temp_options.musicVolume = (std::min)(++m_temp_options.musicVolume, m_max_music_volume);
+        auto cur_musicVolume = m_temp_options.GetMusicVolume();
+        m_temp_options.SetMusicVolume((std::min)(++cur_musicVolume, m_max_music_volume));
         auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_music);
-        const float volumeAsFloat = m_temp_options.musicVolume / static_cast<float>(m_max_music_volume);
+        const float volumeAsFloat = m_temp_options.GetMusicVolume() / static_cast<float>(m_max_music_volume);
         group->SetVolume(volumeAsFloat);
         break;
     }
     case OptionsMenu::CameraShake:
     {
-        m_temp_options.cameraShakeStrength += 0.1f;
-        m_temp_options.cameraShakeStrength = std::clamp(m_temp_options.cameraShakeStrength, m_min_camera_shake, m_max_camera_shake);
+        auto cur_cameraShake = m_temp_options.GetCameraShakeStrength();
+        cur_cameraShake += 0.1f;
+        m_temp_options.SetCameraShakeStrength(std::clamp(cur_cameraShake, m_min_camera_shake, m_max_camera_shake));
         break;
     }
     default:
@@ -275,19 +289,20 @@ void OptionsState::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
 
 void OptionsState::SaveCurrentOptions() noexcept {
     g_theGame->gameOptions = m_temp_options;
-    g_theConfig->SetValue("difficulty", DifficultyToString(g_theGame->gameOptions.difficulty));
-    g_theConfig->SetValue("controlpref", ControlPreferenceToString(g_theGame->gameOptions.controlPref));
-    g_theConfig->SetValue("sound", static_cast<int>(g_theGame->gameOptions.soundVolume));
-    g_theConfig->SetValue("music", static_cast<int>(g_theGame->gameOptions.musicVolume));
-    g_theConfig->SetValue("cameraShakeStrength", g_theGame->gameOptions.cameraShakeStrength);
+    g_theGame->gameOptions.SaveToConfig(*g_theConfig);
+    g_theConfig->SetValue("difficulty", DifficultyToString(g_theGame->gameOptions.GetDifficulty()));
+    g_theConfig->SetValue("controlpref", ControlPreferenceToString(g_theGame->gameOptions.GetControlPreference()));
+    g_theConfig->SetValue("sound", static_cast<int>(g_theGame->gameOptions.GetSoundVolume()));
+    g_theConfig->SetValue("music", static_cast<int>(g_theGame->gameOptions.GetMusicVolume()));
+    g_theConfig->SetValue("cameraShakeStrength", g_theGame->gameOptions.GetCameraShakeStrength());
     std::ofstream ofs(g_options_filepath);
-    g_theConfig->PrintConfig("difficulty", ofs);
-    g_theConfig->PrintConfig("controlpref", ofs);
-    g_theConfig->PrintConfig("sound", ofs);
-    g_theConfig->PrintConfig("music", ofs);
-    g_theConfig->PrintConfig("cameraShakeStrength", ofs);
+    g_theConfig->PrintConfigs(ofs);
     ofs.flush();
     ofs.close();
+}
+
+void OptionsState::SetOptionsToDefault() noexcept {
+    g_theGame->gameOptions.SetToDefault();
 }
 
 std::string OptionsState::DifficultyToString(Difficulty difficulty) const noexcept {

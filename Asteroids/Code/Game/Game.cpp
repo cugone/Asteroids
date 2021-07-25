@@ -30,6 +30,90 @@
 #include <algorithm>
 #include <cmath>
 
+void GameOptions::SaveToConfig(Config& config) noexcept {
+    GameSettings::SaveToConfig(config);
+}
+
+void GameOptions::SetToDefault() noexcept {
+    _difficulty = _defaultDifficulty;
+    _controlPref = _defaultControlPref;
+    _soundVolume = _defaultSoundVolume;
+    _musicVolume = _defaultMusicVolume;
+    _cameraShakeStrength = _defaultCameraShakeStrength;
+}
+
+void GameOptions::SetDifficulty(const Difficulty& newDifficulty) noexcept {
+    _difficulty = newDifficulty;
+}
+
+Difficulty GameOptions::GetDifficulty() const noexcept {
+    return _difficulty;
+}
+
+Difficulty GameOptions::DefaultDifficulty() const noexcept {
+    return _defaultDifficulty;
+}
+
+void GameOptions::SetControlPreference(const ControlPreference& newControlPreference) noexcept {
+    _controlPref = newControlPreference;
+}
+
+ControlPreference GameOptions::GetControlPreference() const noexcept {
+    return _controlPref;
+}
+
+ControlPreference GameOptions::DefaultControlPreference() const noexcept {
+    return _defaultControlPref;
+}
+
+void GameOptions::SetSoundVolume(uint8_t newSoundVolume) noexcept {
+    _soundVolume = newSoundVolume;
+}
+
+uint8_t GameOptions::GetSoundVolume() const noexcept {
+    return _soundVolume;
+}
+
+uint8_t GameOptions::DefaultSoundVolume() const noexcept {
+    return _defaultSoundVolume;
+}
+
+void GameOptions::SetMusicVolume(uint8_t newMusicVolume) noexcept {
+    _musicVolume = newMusicVolume;
+}
+
+uint8_t GameOptions::GetMusicVolume() const noexcept {
+    return _musicVolume;
+}
+
+uint8_t GameOptions::DefaultMusicVolume() const noexcept {
+    return _defaultMusicVolume;
+}
+
+void GameOptions::SetCameraShakeStrength(float newCameraShakeStrength) noexcept {
+    _cameraShakeStrength = newCameraShakeStrength;
+}
+
+float GameOptions::GetCameraShakeStrength() const noexcept {
+    return _cameraShakeStrength;
+}
+
+float GameOptions::DefaultCameraShakeStrength() const noexcept {
+    return _defaultCameraShakeStrength;
+}
+
+float GameOptions::GetMaxShakeOffsetHorizontal() const noexcept {
+    return _maxShakeOffsetHorizontal;
+}
+
+float GameOptions::GetMaxShakeOffsetVertical() const noexcept {
+    return _maxShakeOffsetVertical;
+}
+
+float GameOptions::GetMaxShakeAngle() const noexcept {
+    return _maxShakeAngle;
+}
+
 void Game::Initialize() {
     _current_state = std::move(std::make_unique<TitleState>());
     CreateOrLoadOptionsFile();
@@ -51,7 +135,7 @@ void Game::InitializeSounds() noexcept {
         g_theAudioSystem->AddSoundToChannelGroup(g_audiogroup_sound, filepath);
     }
     if(auto* sound_group = g_theAudioSystem->GetChannelGroup(g_audiogroup_sound)) {
-        sound_group->SetVolume(gameOptions.soundVolume / 10.0f);
+        sound_group->SetVolume(gameOptions.GetSoundVolume() / 10.0f);
     }
 }
 
@@ -62,7 +146,7 @@ void Game::InitializeMusic() noexcept {
         g_theAudioSystem->AddSoundToChannelGroup(g_audiogroup_music, filepath);
     }
     if(auto* music_group = g_theAudioSystem->GetChannelGroup(g_audiogroup_music)) {
-        music_group->SetVolume(gameOptions.musicVolume / 10.0f);
+        music_group->SetVolume(gameOptions.GetMusicVolume() / 10.0f);
     }
     AudioSystem::SoundDesc desc{};
     desc.loopCount = -1;
@@ -235,12 +319,12 @@ void Game::CreateOrLoadOptionsFile() noexcept {
         CreateOptionsFile();
         LoadOptionsFile();
     }
-    g_theConfig->GetValue("cameraShakeStrength", gameOptions.cameraShakeStrength);
-    g_theConfig->GetValue("maxShakeOffsetHorizontal", currentGraphicsOptions.MaxShakeOffsetHorizontal);
-    g_theConfig->GetValue("maxShakeOffsetVertical", currentGraphicsOptions.MaxShakeOffsetVertical);
-    g_theConfig->GetValue("maxShakeAngle", currentGraphicsOptions.MaxShakeAngle);
-    g_theConfig->GetValue("sound", gameOptions.soundVolume);
-    g_theConfig->GetValue("music", gameOptions.musicVolume);
+    auto shake = gameOptions.GetCameraShakeStrength();
+    g_theConfig->GetValue("cameraShakeStrength", shake);
+    auto soundV = gameOptions.GetSoundVolume();
+    g_theConfig->GetValue("sound", soundV);
+    auto musicV = gameOptions.GetMusicVolume();
+    g_theConfig->GetValue("music", musicV);
 
 }
 
@@ -383,9 +467,9 @@ void Game::MakeSmallAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noex
 }
 
 void Game::DoCameraShake(OrthographicCameraController& controller) const noexcept {
-    controller.SetupCameraShake(gameOptions.maxShakeOffsetHorizontal, gameOptions.maxShakeOffsetVertical, gameOptions.maxShakeAngle);
+    controller.SetupCameraShake(gameOptions.GetMaxShakeOffsetHorizontal(), gameOptions.GetMaxShakeOffsetVertical(), gameOptions.GetMaxShakeAngle());
     controller.DoCameraShake([this]() {
-        const auto shakeMultiplier = gameOptions.cameraShakeStrength;
+        const auto shakeMultiplier = gameOptions.GetCameraShakeStrength();
         if(const auto* ship = GetShip(); ship) {
             const auto speed = ship->GetVelocity().CalcLength();
             return speed;
