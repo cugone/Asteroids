@@ -256,7 +256,7 @@ void Game::MakeUfo(Ufo::Type type, AABB2 world_bounds) noexcept {
         const auto world_height = world_dims.y;
         const auto cr = Ufo::GetCosmeticRadiusFromType(type);
         const auto y = [world_height, cr]() {
-            const auto r = MathUtils::GetRandomFloatNegOneToOne();
+            const auto r = MathUtils::GetRandomNegOneToOne<float>();
             if(r < 0.0f) {
                 return r * world_height + cr;
             }
@@ -420,11 +420,11 @@ void Game::MakeLargeAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noex
 }
 
 void Game::MakeLargeAsteroidAt(Vector2 pos) noexcept {
-    const auto vx = MathUtils::GetRandomFloatNegOneToOne();
-    const auto vy = MathUtils::GetRandomFloatNegOneToOne();
-    const auto s = MathUtils::GetRandomFloatInRange(20.0f, 100.0f);
+    const auto vx = MathUtils::GetRandomNegOneToOne<float>();
+    const auto vy = MathUtils::GetRandomNegOneToOne<float>();
+    const auto s = MathUtils::GetRandomInRange<float>(20.0f, 100.0f);
     const auto vel = Vector2{vx, vy} * s;
-    const auto rot = MathUtils::GetRandomFloatNegOneToOne() * 180.0f;
+    const auto rot = MathUtils::GetRandomNegOneToOne<float>() * 180.0f;
     MakeLargeAsteroid(pos, vel, rot);
 }
 
@@ -433,11 +433,11 @@ void Game::MakeLargeAsteroidOffScreen(AABB2 world_bounds) noexcept {
         const auto world_dims = world_bounds.CalcDimensions();
         const auto world_width = world_dims.x;
         const auto world_height = world_dims.y;
-        const auto left = Vector2{world_bounds.mins.x, MathUtils::GetRandomFloatNegOneToOne() * world_height};
-        const auto right = Vector2{world_bounds.maxs.x, MathUtils::GetRandomFloatNegOneToOne() * world_height};
-        const auto top = Vector2{MathUtils::GetRandomFloatNegOneToOne() * world_width, world_bounds.mins.y};
-        const auto bottom = Vector2{MathUtils::GetRandomFloatNegOneToOne() * world_width, world_bounds.maxs.y};
-        const auto i = MathUtils::GetRandomIntLessThan(4);
+        const auto left = Vector2{world_bounds.mins.x, MathUtils::GetRandomNegOneToOne<float>() * world_height};
+        const auto right = Vector2{world_bounds.maxs.x, MathUtils::GetRandomNegOneToOne<float>() * world_height};
+        const auto top = Vector2{MathUtils::GetRandomNegOneToOne<float>() * world_width, world_bounds.mins.y};
+        const auto bottom = Vector2{MathUtils::GetRandomNegOneToOne<float>() * world_width, world_bounds.maxs.y};
+        const auto i = MathUtils::GetRandomLessThan(4);
         switch(i) {
         case 0:
             return left;

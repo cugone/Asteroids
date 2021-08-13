@@ -256,11 +256,11 @@ float Asteroid::CalcChildHeadingFromDifficulty() const noexcept {
     const auto currentHeading = GetVelocity().CalcHeadingDegrees();
     switch(g_theGame->gameOptions.GetDifficulty()) {
     case Difficulty::Easy:
-        return MathUtils::GetRandomFloatZeroToOne() * 360.0f;
+        return MathUtils::GetRandomZeroToOne<float>() * 360.0f;
     case Difficulty::Normal:
-        return currentHeading + MathUtils::GetRandomFloatNegOneToOne() * 90.0f;
+        return currentHeading + MathUtils::GetRandomNegOneToOne<float>() * 90.0f;
     case Difficulty::Hard:
-        return currentHeading + MathUtils::GetRandomFloatNegOneToOne() * 45.0f;
+        return currentHeading + MathUtils::GetRandomNegOneToOne<float>() * 45.0f;
     default:
         return currentHeading;
     }
@@ -284,9 +284,9 @@ float Asteroid::CalcChildSpeedFromSize() const noexcept {
     const auto currentSpeed = GetVelocity().CalcLength();
     switch(_type) {
     case Type::Large:
-        return currentSpeed * MathUtils::GetRandomFloatInRange(2.0f, 2.2f);
+        return currentSpeed * MathUtils::GetRandomInRange<float>(2.0f, 2.2f);
     case Type::Medium:
-        return currentSpeed * MathUtils::GetRandomFloatInRange(2.5f, 2.6f);
+        return currentSpeed * MathUtils::GetRandomInRange<float>(2.5f, 2.6f);
     case Type::Small:
         return currentSpeed;
     default:
@@ -299,7 +299,7 @@ std::tuple<Vector2, Vector2, float> Asteroid::CalcChildPhysicsParameters() const
     const auto speed = CalcChildSpeedFromSizeAndDifficulty();
     auto v = GetVelocity();
     v.SetLengthAndHeadingDegrees(heading, speed);
-    const auto r = MathUtils::GetRandomFloatZeroToOne() * 360.0f;
+    const auto r = MathUtils::GetRandomZeroToOne<float>() * 360.0f;
     const auto p = MathUtils::GetRandomPointInside(Disc2{GetPosition(), GetCosmeticRadius()});
     return std::make_tuple(p,v,r);
 }

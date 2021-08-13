@@ -253,12 +253,12 @@ Vector2 Ufo::CalculateFireTarget() const noexcept {
         if(auto ship = g_theGame->GetShip()) {
             return ship->GetPosition();
         } else {
-            return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, MathUtils::GetRandomFloatInRange(0.0f, 359.0f));
+            return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, MathUtils::GetRandomInRange<float>(0.0f, 359.0f));
         }
     }
     case Type::Big:
     {
-        return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, MathUtils::GetRandomFloatInRange(0.0f, 359.0f));
+        return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, MathUtils::GetRandomInRange<float>(0.0f, 359.0f));
     }
     case Type::Boss:
     {
@@ -267,13 +267,13 @@ Vector2 Ufo::CalculateFireTarget() const noexcept {
             const auto source = GetPosition();
             const auto angle = (target - source).CalcHeadingDegrees();
             const auto offset_range = 90.0f;
-            const auto offset = MathUtils::GetRandomFloatNegOneToOne() * offset_range;
+            const auto offset = MathUtils::GetRandomNegOneToOne<float>() * offset_range;
             return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, angle + offset);
         } else {
-            return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, MathUtils::GetRandomFloatInRange(0.0f, 359.0f));
+            return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, MathUtils::GetRandomInRange<float>(0.0f, 359.0f));
         }
     }
-    default: return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, MathUtils::GetRandomFloatInRange(0.0f, 359.0f));
+    default: return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, MathUtils::GetRandomInRange<float>(0.0f, 359.0f));
     }
 }
 
@@ -379,17 +379,17 @@ Ufo::Style Ufo::GetStyleFromType(Type type) noexcept {
     switch(type) {
     case Type::Small:
     {
-        const auto i = MathUtils::GetRandomIntInRange(static_cast<int>(Style::First_Small), static_cast<int>(Style::Last_Small));
+        const auto i = MathUtils::GetRandomInRange<int>(static_cast<int>(Style::First_Small), static_cast<int>(Style::Last_Small));
         return static_cast<Style>(i);
     }
     case Type::Big:
     {
-        const auto i = MathUtils::GetRandomIntInRange(static_cast<int>(Style::First_Big), static_cast<int>(Style::Last_Big));
+        const auto i = MathUtils::GetRandomInRange<int>(static_cast<int>(Style::First_Big), static_cast<int>(Style::Last_Big));
         return static_cast<Style>(i);
     }
     case Type::Boss:
     {
-        const auto i = MathUtils::GetRandomIntInRange(static_cast<int>(Style::First_Boss), static_cast<int>(Style::Last_Boss));
+        const auto i = MathUtils::GetRandomInRange<int>(static_cast<int>(Style::First_Boss), static_cast<int>(Style::Last_Boss));
         return static_cast<Style>(i);
     }
     default:
