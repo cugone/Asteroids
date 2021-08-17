@@ -1,5 +1,6 @@
 #include "Game/MainState.hpp"
 
+#include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/KerningFont.hpp"
 #include "Engine/Core/Utilities.hpp"
 
@@ -26,6 +27,8 @@
 #include "Game/TitleState.hpp"
 #include "Game/GameOverState.hpp"
 
+#include <utility>
+
 void MainState::OnEnter() noexcept {
 
     world_bounds = AABB2::ZERO_TO_ONE;
@@ -41,9 +44,11 @@ void MainState::OnEnter() noexcept {
 
     PlayerDesc playerDesc{};
     playerDesc.lives = GetLivesFromDifficulty();
-    g_theGame->player = Player{playerDesc};
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        game->player = Player{playerDesc};
 
-    g_theGame->particleSystem->RegisterEffectsFromFolder(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameData) / "ParticleEffects");
+        game->particleSystem->RegisterEffectsFromFolder(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameData) / "ParticleEffects");
+    }
     MakeShip();
 }
 
@@ -57,50 +62,56 @@ void MainState::OnExit() noexcept {
     }
     //auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_sound);
     //group->Stop();
-    g_theGame->asteroids.clear();
-    g_theGame->asteroids.shrink_to_fit();
-    g_theGame->bullets.clear();
-    g_theGame->bullets.shrink_to_fit();
-    g_theGame->explosions.clear();
-    g_theGame->explosions.shrink_to_fit();
-    g_theGame->ufos.clear();
-    g_theGame->ufos.shrink_to_fit();
-    g_theGame->GetEntities().clear();
-    g_theGame->GetEntities().shrink_to_fit();
-    g_theGame->m_current_wave = 1u;
-    ship = nullptr;
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        game->asteroids.clear();
+        game->asteroids.shrink_to_fit();
+        game->bullets.clear();
+        game->bullets.shrink_to_fit();
+        game->explosions.clear();
+        game->explosions.shrink_to_fit();
+        game->ufos.clear();
+        game->ufos.shrink_to_fit();
+        game->GetEntities().clear();
+        game->GetEntities().shrink_to_fit();
+        game->m_current_wave = 1u;
+        ship = nullptr;
+    }
 }
 
 void MainState::BeginFrame() noexcept {
-    g_theGame->SetControlType();
-    for(auto& entity : g_theGame->GetEntities()) {
-        if(entity) {
-            entity->BeginFrame();
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        game->SetControlType();
+        for(auto& entity : game->GetEntities()) {
+            if(entity) {
+                entity->BeginFrame();
+            }
         }
-    }
-    if(!ship) {
-        if(g_theGame->respawnTimer.CheckAndReset()) {
-            Respawn();
+        if(!ship) {
+            if(game->respawnTimer.CheckAndReset()) {
+                Respawn();
+            }
         }
     }
 }
 
 void MainState::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) {
-    if(g_theGame->IsPaused()) {
-        deltaSeconds = deltaSeconds.zero();
-    }
-    g_theRenderer->UpdateGameTime(deltaSeconds);
-    HandleDebugInput(deltaSeconds);
-    HandlePlayerInput(deltaSeconds);
-    UpdateEntities(deltaSeconds);
-
-    if(g_theGame->IsGameOver()) {
-        if(DoFadeOut(deltaSeconds)) {
-            g_theGame->ChangeState(std::move(std::make_unique<GameOverState>()));
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        if(game->IsPaused()) {
+            deltaSeconds = deltaSeconds.zero();
         }
-    }
+        g_theRenderer->UpdateGameTime(deltaSeconds);
+        HandleDebugInput(deltaSeconds);
+        HandlePlayerInput(deltaSeconds);
+        UpdateEntities(deltaSeconds);
 
-    m_cameraController.Update(deltaSeconds);
+        if(game->IsGameOver()) {
+            if(DoFadeOut(deltaSeconds)) {
+                game->ChangeState(std::move(std::make_unique<GameOverState>()));
+            }
+        }
+
+        m_cameraController.Update(deltaSeconds);
+    }
 }
 
 void MainState::Render() const noexcept {
@@ -120,35 +131,39 @@ void MainState::Render() const noexcept {
 }
 
 void MainState::RenderFadeOutOverlay() const noexcept {
-    if(!g_theGame->IsGameOver()) {
-        return;
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        if(!game->IsGameOver()) {
+            return;
+        }
+        const auto ui_view_height = static_cast<float>(game->gameOptions.GetWindowHeight());
+        const auto ui_view_width = ui_view_height * m_cameraController.GetAspectRatio();
+        const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
+        const auto ui_view_half_extents = ui_view_extents * 0.5f;
+        const auto S = Matrix4::CreateScaleMatrix(ui_view_half_extents * 5.0f);
+        const auto R = Matrix4::I;
+        const auto T = Matrix4::I;
+        const auto M = Matrix4::MakeSRT(S, R, T);
+        g_theRenderer->SetModelMatrix(M);
+        g_theRenderer->SetMaterial("__2D");
+        g_theRenderer->DrawQuad2D(Rgba{0.0f, 0.0f, 0.0f, m_fadeOut_alpha});
     }
-    const float ui_view_height = currentGraphicsOptions.WindowHeight;
-    const float ui_view_width = ui_view_height * m_cameraController.GetAspectRatio();
-    const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
-    const auto ui_view_half_extents = ui_view_extents * 0.5f;
-    const auto S = Matrix4::CreateScaleMatrix(ui_view_half_extents * 5.0f);
-    const auto R = Matrix4::I;
-    const auto T = Matrix4::I;
-    const auto M = Matrix4::MakeSRT(S, R, T);
-    g_theRenderer->SetModelMatrix(M);
-    g_theRenderer->SetMaterial("__2D");
-    g_theRenderer->DrawQuad2D(Rgba{0.0f, 0.0f, 0.0f, m_fadeOut_alpha});
 }
 
 void MainState::EndFrame() noexcept {
-    for(auto& entity : g_theGame->GetEntities()) {
-        if(entity) {
-            entity->EndFrame();
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        for(auto& entity : game->GetEntities()) {
+            if(entity) {
+                entity->EndFrame();
+            }
         }
-    }
-    for(auto& entity : g_theGame->GetEntities()) {
-        if(entity && entity->IsDead()) {
-            entity->OnDestroy();
-            entity.reset();
+        for(auto& entity : game->GetEntities()) {
+            if(entity && entity->IsDead()) {
+                entity->OnDestroy();
+                entity.reset();
+            }
         }
+        game->PostFrameCleanup();
     }
-    g_theGame->PostFrameCleanup();
 }
 
 std::unique_ptr<GameState> MainState::HandleInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
@@ -159,15 +174,17 @@ std::unique_ptr<GameState> MainState::HandleKeyboardInput([[maybe_unused]] TimeU
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::Esc)) {
         return std::make_unique<TitleState>();
     }
-    if(g_theInputSystem->WasKeyJustPressed(KeyCode::P)) {
-        g_theGame->TogglePause();
-        return {};
-    }
-    if(g_theGame->IsPaused()) {
-        return {};
-    }
-    if(!g_theGame->IsKeyboardActive()) {
-        return {};
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        if(g_theInputSystem->WasKeyJustPressed(KeyCode::P)) {
+            game->TogglePause();
+            return {};
+        }
+        if(game->IsPaused()) {
+            return {};
+        }
+        if(!game->IsKeyboardActive()) {
+            return {};
+        }
     }
     if(!ship) {
         return {};
@@ -192,15 +209,17 @@ std::unique_ptr<GameState> MainState::HandleKeyboardInput([[maybe_unused]] TimeU
 }
 
 std::unique_ptr<GameState> MainState::HandleControllerInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
-    if(auto& controller = g_theInputSystem->GetXboxController(0); controller.IsConnected() && controller.WasButtonJustPressed(XboxController::Button::Start)) {
-        g_theGame->TogglePause();
-        return {};
-    }
-    if(!g_theGame->IsControllerActive()) {
-        return {};
-    }
-    if(g_theGame->IsPaused()) {
-        return {};
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        if(auto& controller = g_theInputSystem->GetXboxController(0); controller.IsConnected() && controller.WasButtonJustPressed(XboxController::Button::Start)) {
+            game->TogglePause();
+            return {};
+        }
+        if(!game->IsControllerActive()) {
+            return {};
+        }
+        if(game->IsPaused()) {
+            return {};
+        }
     }
     if(!ship) {
         return {};
@@ -224,11 +243,13 @@ std::unique_ptr<GameState> MainState::HandleControllerInput([[maybe_unused]] Tim
 }
 
 std::unique_ptr<GameState> MainState::HandleMouseInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
-    if(!g_theGame->IsMouseActive()) {
-        return {};
-    }
-    if(g_theGame->IsPaused()) {
-        return {};
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        if(!game->IsMouseActive()) {
+            return {};
+        }
+        if(game->IsPaused()) {
+            return {};
+        }
     }
     if(!ship) {
         return {};
@@ -290,14 +311,16 @@ void MainState::HandleDebugKeyboardInput([[maybe_unused]] TimeUtils::FPSeconds d
 }
 
 void MainState::HandlePlayerInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) {
-    if(auto kb_state = HandleKeyboardInput(deltaSeconds)) {
-        g_theGame->ChangeState(std::move(kb_state));
-    }
-    if(auto mouse_state = HandleMouseInput(deltaSeconds)) {
-        g_theGame->ChangeState(std::move(mouse_state));
-    }
-    if(auto ctrl_state = HandleControllerInput(deltaSeconds)) {
-        g_theGame->ChangeState(std::move(ctrl_state));
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        if(auto kb_state = HandleKeyboardInput(deltaSeconds)) {
+            game->ChangeState(std::move(kb_state));
+        }
+        if(auto mouse_state = HandleMouseInput(deltaSeconds)) {
+            game->ChangeState(std::move(mouse_state));
+        }
+        if(auto ctrl_state = HandleControllerInput(deltaSeconds)) {
+            game->ChangeState(std::move(ctrl_state));
+        }
     }
 }
 
@@ -331,13 +354,15 @@ void MainState::WrapAroundWorld(Entity* e) noexcept {
 }
 
 void MainState::UpdateEntities(TimeUtils::FPSeconds deltaSeconds) noexcept {
-    if(g_theGame->asteroids.empty()) {
-        StartNewWave(g_theGame->m_current_wave++);
-    }
-    for(auto& entity : g_theGame->GetEntities()) {
-        if(entity) {
-            WrapAroundWorld(entity.get());
-            entity->Update(deltaSeconds);
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        if(game->asteroids.empty()) {
+            StartNewWave(game->m_current_wave++);
+        }
+        for(auto& entity : game->GetEntities()) {
+            if(entity) {
+                WrapAroundWorld(entity.get());
+                entity->Update(deltaSeconds);
+            }
         }
     }
     HandleBulletCollision();
@@ -347,8 +372,10 @@ void MainState::UpdateEntities(TimeUtils::FPSeconds deltaSeconds) noexcept {
 }
 
 void MainState::StartNewWave(unsigned int wave_number) noexcept {
-    for(unsigned int i = 0; i < wave_number * GetWaveMultiplierFromDifficulty(); ++i) {
-        g_theGame->MakeLargeAsteroidOffScreen(world_bounds);
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        for(unsigned int i = 0; i < wave_number * GetWaveMultiplierFromDifficulty(); ++i) {
+            game->MakeLargeAsteroidOffScreen(world_bounds);
+        }
     }
 }
 
@@ -357,32 +384,37 @@ void MainState::MakeUfo() noexcept {
 }
 
 void MainState::MakeUfo(Ufo::Type type) noexcept {
-    switch(type) {
-    case Ufo::Type::Small: g_theGame->MakeSmallUfo(world_bounds); break;
-    case Ufo::Type::Big: g_theGame->MakeBigUfo(world_bounds); break;
-    case Ufo::Type::Boss: g_theGame->MakeBossUfo(world_bounds); break;
-    default: break;
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        switch(type) {
+        case Ufo::Type::Small: game->MakeSmallUfo(world_bounds); break;
+        case Ufo::Type::Big: game->MakeBigUfo(world_bounds); break;
+        case Ufo::Type::Boss: game->MakeBossUfo(world_bounds); break;
+        default: break;
+        }
     }
-
 }
 
 void MainState::MakeShip() noexcept {
     if(!ship) {
-        if(g_theGame->GetEntities().empty()) {
-            g_theGame->GetEntities().emplace_back(std::make_unique<Ship>(world_bounds.CalcCenter()));
-        } else {
-            auto iter = g_theGame->GetEntities().begin();
-            *iter = std::move(std::make_unique<Ship>(world_bounds.CalcCenter()));
+        if(auto* game = GetGameAs<Game>(); game != nullptr) {
+            if(game->GetEntities().empty()) {
+                game->GetEntities().emplace_back(std::make_unique<Ship>(world_bounds.CalcCenter()));
+            } else {
+                auto iter = game->GetEntities().begin();
+                *iter = std::move(std::make_unique<Ship>(world_bounds.CalcCenter()));
+            }
+            ship = reinterpret_cast<Ship*>(game->GetEntities().begin()->get());
+            ship->OnCreate();
         }
-        ship = reinterpret_cast<Ship*>(g_theGame->GetEntities().begin()->get());
-        ship->OnCreate();
     }
 }
 
 void MainState::MakeLargeAsteroidAtMouse() noexcept {
     const auto& camera = m_cameraController.GetCamera();
     const auto mouseWorldCoords = g_theRenderer->ConvertScreenToWorldCoords(camera, g_theInputSystem->GetCursorScreenPosition());
-    g_theGame->MakeLargeAsteroidAt(mouseWorldCoords);
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        game->MakeLargeAsteroidAt(mouseWorldCoords);
+    }
 }
 
 void MainState::Respawn() noexcept {
@@ -395,27 +427,31 @@ void MainState::HandleBulletCollision() const noexcept {
 }
 
 void MainState::HandleBulletAsteroidCollision() const noexcept {
-    for(auto& bullet : g_theGame->bullets) {
-        Disc2 bulletCollisionMesh{bullet->GetPosition(), bullet->GetPhysicalRadius()};
-        for(auto& asteroid : g_theGame->asteroids) {
-            Disc2 asteroidCollisionMesh{asteroid->GetPosition(), asteroid->GetPhysicalRadius()};
-            if(MathUtils::DoDiscsOverlap(bulletCollisionMesh, asteroidCollisionMesh)) {
-                asteroid->OnCollision(asteroid, bullet);
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        for(auto& bullet : game->bullets) {
+            Disc2 bulletCollisionMesh{bullet->GetPosition(), bullet->GetPhysicalRadius()};
+            for(auto& asteroid : game->asteroids) {
+                Disc2 asteroidCollisionMesh{asteroid->GetPosition(), asteroid->GetPhysicalRadius()};
+                if(MathUtils::DoDiscsOverlap(bulletCollisionMesh, asteroidCollisionMesh)) {
+                    asteroid->OnCollision(asteroid, bullet);
+                }
             }
         }
     }
 }
 
 void MainState::HandleBulletUfoCollision() const noexcept {
-    for(auto& ufo : g_theGame->ufos) {
-        Disc2 ufoCollisionMesh{ufo->GetPosition(), ufo->GetPhysicalRadius()};
-        for(auto& bullet : g_theGame->bullets) {
-            if(bullet->faction == ufo->faction) {
-                continue;
-            }
-            Disc2 bulletCollisionMesh{bullet->GetPosition(), bullet->GetPhysicalRadius()};
-            if(MathUtils::DoDiscsOverlap(bulletCollisionMesh, ufoCollisionMesh)) {
-                ufo->OnCollision(ufo, bullet);
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        for(auto& ufo : game->ufos) {
+            Disc2 ufoCollisionMesh{ufo->GetPosition(), ufo->GetPhysicalRadius()};
+            for(auto& bullet : game->bullets) {
+                if(bullet->faction == ufo->faction) {
+                    continue;
+                }
+                Disc2 bulletCollisionMesh{bullet->GetPosition(), bullet->GetPhysicalRadius()};
+                if(MathUtils::DoDiscsOverlap(bulletCollisionMesh, ufoCollisionMesh)) {
+                    ufo->OnCollision(ufo, bullet);
+                }
             }
         }
     }
@@ -431,15 +467,17 @@ void MainState::HandleShipAsteroidCollision() noexcept {
         return;
     }
     Disc2 shipCollisionMesh{ship->GetPosition(), ship->GetPhysicalRadius()};
-    for(auto& asteroid : g_theGame->asteroids) {
-        Disc2 asteroidCollisionMesh{asteroid->GetPosition(), asteroid->GetPhysicalRadius()};
-        if(MathUtils::DoDiscsOverlap(shipCollisionMesh, asteroidCollisionMesh)) {
-            ship->OnCollision(ship, asteroid);
-            asteroid->OnCollision(asteroid, ship);
-            if(ship && ship->IsDead()) {
-                DoCameraShake();
-                ship = nullptr;
-                break;
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        for(auto& asteroid : game->asteroids) {
+            Disc2 asteroidCollisionMesh{asteroid->GetPosition(), asteroid->GetPhysicalRadius()};
+            if(MathUtils::DoDiscsOverlap(shipCollisionMesh, asteroidCollisionMesh)) {
+                ship->OnCollision(ship, asteroid);
+                asteroid->OnCollision(asteroid, ship);
+                if(ship && ship->IsDead()) {
+                    DoCameraShake();
+                    ship = nullptr;
+                    break;
+                }
             }
         }
     }
@@ -450,14 +488,16 @@ void MainState::HandleShipBulletCollision() noexcept {
         return;
     }
     const auto shipCollisionMesh = Disc2{ship->GetPosition(), ship->GetPhysicalRadius()};
-    for(auto& bullet : g_theGame->bullets) {
-        const auto bulletCollisionMesh = Disc2{bullet->GetPosition(), bullet->GetPhysicalRadius()};
-        if(MathUtils::DoDiscsOverlap(shipCollisionMesh, bulletCollisionMesh)) {
-            ship->OnCollision(ship, bullet);
-            if(ship && ship->IsDead()) {
-                DoCameraShake();
-                ship = nullptr;
-                break;
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        for(auto& bullet : game->bullets) {
+            const auto bulletCollisionMesh = Disc2{bullet->GetPosition(), bullet->GetPhysicalRadius()};
+            if(MathUtils::DoDiscsOverlap(shipCollisionMesh, bulletCollisionMesh)) {
+                ship->OnCollision(ship, bullet);
+                if(ship && ship->IsDead()) {
+                    DoCameraShake();
+                    ship = nullptr;
+                    break;
+                }
             }
         }
     }
@@ -469,43 +509,49 @@ void MainState::HandleMineCollision() noexcept {
 }
 
 void MainState::HandleMineAsteroidCollision() noexcept {
-    for(const auto& mine : g_theGame->mines) {
-        const auto mineCollisionMesh = Disc2{mine->GetPosition(), mine->GetPhysicalRadius()};
-        for(const auto& asteroid : g_theGame->asteroids) {
-            const auto asteroidCollisionMesh = Disc2{asteroid->GetPosition(), asteroid->GetPhysicalRadius()};
-            if(MathUtils::DoDiscsOverlap(mineCollisionMesh, asteroidCollisionMesh)) {
-                asteroid->OnCollision(asteroid, mine);
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        for(const auto& mine : game->mines) {
+            const auto mineCollisionMesh = Disc2{mine->GetPosition(), mine->GetPhysicalRadius()};
+            for(const auto& asteroid : game->asteroids) {
+                const auto asteroidCollisionMesh = Disc2{asteroid->GetPosition(), asteroid->GetPhysicalRadius()};
+                if(MathUtils::DoDiscsOverlap(mineCollisionMesh, asteroidCollisionMesh)) {
+                    asteroid->OnCollision(asteroid, mine);
+                }
             }
         }
     }
 }
 
 void MainState::HandleMineUfoCollision() noexcept {
-    for(const auto& mine : g_theGame->mines) {
-        const auto mineCollisionMesh = Disc2{mine->GetPosition(), mine->GetPhysicalRadius()};
-        for(const auto& ufo : g_theGame->ufos) {
-            const auto ufoCollisionMesh = Disc2{ufo->GetPosition(), ufo->GetPhysicalRadius()};
-            if(MathUtils::DoDiscsOverlap(mineCollisionMesh, ufoCollisionMesh)) {
-                ufo->OnCollision(ufo, mine);
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        for(const auto& mine : game->mines) {
+            const auto mineCollisionMesh = Disc2{mine->GetPosition(), mine->GetPhysicalRadius()};
+            for(const auto& ufo : game->ufos) {
+                const auto ufoCollisionMesh = Disc2{ufo->GetPosition(), ufo->GetPhysicalRadius()};
+                if(MathUtils::DoDiscsOverlap(mineCollisionMesh, ufoCollisionMesh)) {
+                    ufo->OnCollision(ufo, mine);
+                }
             }
         }
     }
 }
 
 void MainState::KillAll() noexcept {
-    for(auto* asteroid : g_theGame->asteroids) {
-        if(asteroid) {
-            asteroid->Kill();
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        for(auto* asteroid : game->asteroids) {
+            if(asteroid) {
+                asteroid->Kill();
+            }
         }
-    }
-    for(auto* bullet : g_theGame->bullets) {
-        if(bullet) {
-            bullet->Kill();
+        for(auto* bullet : game->bullets) {
+            if(bullet) {
+                bullet->Kill();
+            }
         }
-    }
-    for(auto* explosion : g_theGame->explosions) {
-        if(explosion) {
-            explosion->Kill();
+        for(auto* explosion : game->explosions) {
+            if(explosion) {
+                explosion->Kill();
+            }
         }
     }
     if(ship) {
@@ -514,41 +560,51 @@ void MainState::KillAll() noexcept {
 }
 
 unsigned int MainState::GetWaveMultiplierFromDifficulty() const noexcept {
-    switch(g_theGame->gameOptions.GetDifficulty()) {
-    case Difficulty::Easy: return 3u;
-    case Difficulty::Normal: return 5u;
-    case Difficulty::Hard: return 7u;
-    default: return 5u;
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        switch(game->gameOptions.GetDifficulty()) {
+        case Difficulty::Easy: return 3u;
+        case Difficulty::Normal: return 5u;
+        case Difficulty::Hard: return 7u;
+        default: return 5u;
+        }
     }
+    return 5u;
 }
 
 long long MainState::GetLivesFromDifficulty() const noexcept {
-    switch(g_theGame->gameOptions.GetDifficulty()) {
-    case Difficulty::Easy: return 5LL;
-    case Difficulty::Normal: return 4LL;
-    case Difficulty::Hard: return 3LL;
-    default: return 4;
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        switch(game->gameOptions.GetDifficulty()) {
+        case Difficulty::Easy: return 5LL;
+        case Difficulty::Normal: return 4LL;
+        case Difficulty::Hard: return 3LL;
+        default: return 4LL;
+        }
     }
+    return 4LL;
 }
 
 void MainState::RenderBackground() const noexcept {
-    const float ui_view_height = currentGraphicsOptions.WindowHeight;
-    const float ui_view_width = ui_view_height * m_cameraController.GetAspectRatio();
-    const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
-    const auto ui_view_half_extents = ui_view_extents * 0.5f;
-    const auto S = Matrix4::CreateScaleMatrix(ui_view_half_extents * 5.0f);
-    const auto R = Matrix4::I;
-    const auto T = Matrix4::I;
-    const auto M = Matrix4::MakeSRT(S, R, T);
-    g_theRenderer->SetModelMatrix(M);
-    g_theRenderer->SetMaterial("background");
-    g_theRenderer->DrawQuad2D();
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        const auto ui_view_height = static_cast<float>(game->gameOptions.GetWindowHeight());
+        const auto ui_view_width = ui_view_height * m_cameraController.GetAspectRatio();
+        const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
+        const auto ui_view_half_extents = ui_view_extents * 0.5f;
+        const auto S = Matrix4::CreateScaleMatrix(ui_view_half_extents * 5.0f);
+        const auto R = Matrix4::I;
+        const auto T = Matrix4::I;
+        const auto M = Matrix4::MakeSRT(S, R, T);
+        g_theRenderer->SetModelMatrix(M);
+        g_theRenderer->SetMaterial("background");
+        g_theRenderer->DrawQuad2D();
+    }
 }
 
 void MainState::RenderEntities() const noexcept {
-    for(const auto& entity : g_theGame->GetEntities()) {
-        if(entity) {
-            entity->Render();
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        for(const auto& entity : game->GetEntities()) {
+            if(entity) {
+                entity->Render();
+            }
         }
     }
 }
@@ -559,35 +615,42 @@ void MainState::DebugRenderEntities() const noexcept {
     }
     g_theRenderer->SetModelMatrix();
     g_theRenderer->SetMaterial("__2D");
-    for(const auto& e : g_theGame->GetEntities()) {
-        if(!e) {
-            continue;
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        for(const auto& e : game->GetEntities()) {
+            if(!e) {
+                continue;
+            }
+            const auto* entity = e.get();
+            const auto center = entity->GetPosition();
+            const auto orientation = entity->GetOrientationDegrees();
+            const auto cosmetic_radius = entity->GetCosmeticRadius();
+            const auto physical_radius = entity->GetPhysicalRadius();
+            const auto facing_end = [=]()->Vector2 { auto end = Vector2::X_AXIS; end.SetLengthAndHeadingDegrees(orientation, cosmetic_radius); return center + end; }();
+            const auto velocity_end = [=]()->Vector2 { auto end = entity->GetVelocity().GetNormalize(); end.SetLengthAndHeadingDegrees(end.CalcHeadingDegrees(), cosmetic_radius); return center + end; }();
+            const auto acceleration_end = [=]()->Vector2 { auto end = entity->GetAcceleration().GetNormalize(); end.SetLengthAndHeadingDegrees(end.CalcHeadingDegrees(), cosmetic_radius); return center + end; }();
+            g_theRenderer->DrawCircle2D(center, cosmetic_radius, Rgba::Green);
+            g_theRenderer->DrawCircle2D(center, physical_radius, Rgba::Red);
+            g_theRenderer->DrawLine2D(center, facing_end, Rgba::Red);
+            g_theRenderer->DrawLine2D(center, velocity_end, Rgba::Green);
+            g_theRenderer->DrawLine2D(center, acceleration_end, Rgba::Orange);
         }
-        const auto* entity = e.get();
-        const auto center = entity->GetPosition();
-        const auto orientation = entity->GetOrientationDegrees();
-        const auto cosmetic_radius = entity->GetCosmeticRadius();
-        const auto physical_radius = entity->GetPhysicalRadius();
-        const auto facing_end = [=]()->Vector2 { auto end = Vector2::X_AXIS; end.SetLengthAndHeadingDegrees(orientation, cosmetic_radius); return center + end; }();
-        const auto velocity_end = [=]()->Vector2 { auto end = entity->GetVelocity().GetNormalize(); end.SetLengthAndHeadingDegrees(end.CalcHeadingDegrees(), cosmetic_radius); return center + end; }();
-        const auto acceleration_end = [=]()->Vector2 { auto end = entity->GetAcceleration().GetNormalize(); end.SetLengthAndHeadingDegrees(end.CalcHeadingDegrees(), cosmetic_radius); return center + end; }();
-        g_theRenderer->DrawCircle2D(center, cosmetic_radius, Rgba::Green);
-        g_theRenderer->DrawCircle2D(center, physical_radius, Rgba::Red);
-        g_theRenderer->DrawLine2D(center, facing_end, Rgba::Red);
-        g_theRenderer->DrawLine2D(center, velocity_end, Rgba::Green);
-        g_theRenderer->DrawLine2D(center, acceleration_end, Rgba::Orange);
+        g_theRenderer->DrawAABB2(world_bounds, Rgba::Green, Rgba::NoAlpha);
+        g_theRenderer->DrawAABB2(game->CalcOrthoBounds(m_cameraController), Rgba::White, Rgba::NoAlpha);
+        g_theRenderer->DrawAABB2(game->CalcViewBounds(m_cameraController), Rgba::Red, Rgba::NoAlpha);
+        g_theRenderer->DrawAABB2(game->CalcCullBounds(m_cameraController), Rgba::White, Rgba::NoAlpha);
+        g_theRenderer->DrawCircle2D(m_cameraController.GetCamera().GetPosition(), 25.0f, Rgba::Pink);
+        g_theRenderer->DrawAABB2(CalculateCameraBounds(), Rgba::Periwinkle, Rgba::NoAlpha);
     }
-    g_theRenderer->DrawAABB2(world_bounds, Rgba::Green, Rgba::NoAlpha);
-    g_theRenderer->DrawAABB2(g_theGame->CalcOrthoBounds(m_cameraController), Rgba::White, Rgba::NoAlpha);
-    g_theRenderer->DrawAABB2(g_theGame->CalcViewBounds(m_cameraController), Rgba::Red, Rgba::NoAlpha);
-    g_theRenderer->DrawAABB2(g_theGame->CalcCullBounds(m_cameraController), Rgba::White, Rgba::NoAlpha);
-    g_theRenderer->DrawCircle2D(m_cameraController.GetCamera().GetPosition(), 25.0f, Rgba::Pink);
-    g_theRenderer->DrawAABB2(CalculateCameraBounds(), Rgba::Periwinkle, Rgba::NoAlpha);
 }
 
 AABB2 MainState::CalculateCameraBounds() const noexcept {
     //TODO: Calculate clamped bounds based on view and world dimensions
-    const auto view_bounds = g_theGame->CalcViewBounds(m_cameraController);
+    const auto view_bounds = [this]() {
+        if(auto* game = GetGameAs<Game>(); game != nullptr) {
+            return game->CalcViewBounds(m_cameraController);
+        }
+        return AABB2{};
+    }(); //IIIL
     const auto zoom_ratio = m_cameraController.GetZoomLevel();
     const auto camera_bounds_dimensions = Vector2{zoom_ratio / m_cameraController.GetAspectRatio(), zoom_ratio / m_cameraController.GetAspectRatio()};
     AABB2 result{};
@@ -616,7 +679,13 @@ void MainState::RenderStatus() const noexcept {
 
     g_theRenderer->SetModelMatrix();
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(font_position));
-    g_theRenderer->DrawMultilineText(g_theRenderer->GetFont("System32"), "Score: " + std::to_string(g_theGame->player.GetScore()) + "\n      x" + std::to_string(g_theGame->player.GetLives()));
+    const auto [playerScore, playerLives] = []() {
+        if(auto* game = GetGameAs<Game>(); game != nullptr) {
+            return std::pair<const long long, const long long>(game->player.GetScore(), game->player.GetLives());
+        }
+        return std::pair<const long long, const long long>(0LL, 0LL);
+    }(); //IIIL
+    g_theRenderer->DrawMultilineText(g_theRenderer->GetFont("System32"), "Score: " + std::to_string(playerScore) + "\n      x" + std::to_string(playerLives));
 
     const auto uvs = AABB2::ZERO_TO_ONE;
     const auto mat = g_theRenderer->GetMaterial("ship");
@@ -635,7 +704,9 @@ void MainState::RenderStatus() const noexcept {
 }
 
 void MainState::DoCameraShake() noexcept {
-    g_theGame->DoCameraShake(m_cameraController);
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        game->DoCameraShake(m_cameraController);
+    }
 }
 
 bool MainState::DoFadeOut(TimeUtils::FPSeconds deltaSeconds) noexcept {
@@ -646,20 +717,22 @@ bool MainState::DoFadeOut(TimeUtils::FPSeconds deltaSeconds) noexcept {
 }
 
 void MainState::RenderPausedOverlay() const noexcept {
-    if(!g_theGame->IsPaused()) {
-        return;
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        if(!game->IsPaused()) {
+            return;
+        }
+        const auto ui_view_height = static_cast<float>(game->gameOptions.GetWindowHeight());
+        const auto ui_view_width = ui_view_height * m_cameraController.GetAspectRatio();
+        const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
+        const auto ui_view_half_extents = ui_view_extents * 0.5f;
+        const auto S = Matrix4::CreateScaleMatrix(ui_view_half_extents * 5.0f);
+        const auto R = Matrix4::I;
+        const auto T = Matrix4::I;
+        const auto M = Matrix4::MakeSRT(S, R, T);
+        g_theRenderer->SetModelMatrix(M);
+        g_theRenderer->SetMaterial("__2D");
+        g_theRenderer->DrawQuad2D(Rgba{0.0f, 0.0f, 0.0f, 0.5f});
     }
-    const float ui_view_height = currentGraphicsOptions.WindowHeight;
-    const float ui_view_width = ui_view_height * m_cameraController.GetAspectRatio();
-    const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
-    const auto ui_view_half_extents = ui_view_extents * 0.5f;
-    const auto S = Matrix4::CreateScaleMatrix(ui_view_half_extents * 5.0f);
-    const auto R = Matrix4::I;
-    const auto T = Matrix4::I;
-    const auto M = Matrix4::MakeSRT(S, R, T);
-    g_theRenderer->SetModelMatrix(M);
-    g_theRenderer->SetMaterial("__2D");
-    g_theRenderer->DrawQuad2D(Rgba{0.0f, 0.0f, 0.0f, 0.5f});
 }
 
 void MainState::ClampCameraToWorld() noexcept {

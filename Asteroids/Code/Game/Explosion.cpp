@@ -7,6 +7,9 @@
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/Material.hpp"
 
+#include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Game/GameBase.hpp"
+
 #include "Game/GameCommon.hpp"
 #include "Game/GameConfig.hpp"
 #include "Game/Game.hpp"
@@ -18,7 +21,9 @@ Explosion::Explosion(Vector2 position)
 {
     AnimatedSpriteDesc desc{};
     desc.material = g_theRenderer->GetMaterial("explosion");
-    desc.spriteSheet = g_theGame->explosion_sheet;
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        desc.spriteSheet = game->explosion_sheet;
+    }
     desc.durationSeconds = TimeUtils::FPSeconds{0.50f};
     desc.playbackMode = AnimatedSprite::SpriteAnimMode::Play_To_End;
     desc.frameLength = 25;
@@ -75,12 +80,13 @@ void Explosion::EndFrame() noexcept {
     if(_sprite->IsFinished()) {
         Kill();
     }
-
-    if(const auto& found = std::find(std::begin(g_theGame->explosions), std::end(g_theGame->explosions), this);
-        (found != std::end(g_theGame->explosions) &&
-    (*found)->IsDead()))
-    {
-        *found = nullptr;
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        if(const auto& found = std::find(std::begin(game->explosions), std::end(game->explosions), this);
+            (found != std::end(game->explosions) &&
+                (*found)->IsDead()))
+        {
+            *found = nullptr;
+        }
     }
 }
 

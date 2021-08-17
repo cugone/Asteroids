@@ -1,5 +1,7 @@
 #include "Game/Mine.hpp"
 
+#include "Engine/Core/EngineCommon.hpp"
+
 #include "Engine/Renderer/AnimatedSprite.hpp"
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
@@ -68,11 +70,13 @@ void Mine::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 
 void Mine::EndFrame() noexcept {
     Entity::EndFrame();
-    if(const auto& found = std::find(std::begin(g_theGame->mines), std::end(g_theGame->mines), this);
-        (found != std::end(g_theGame->mines) &&
-            (*found)->IsDead()))
-    {
-        *found = nullptr;
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        if(const auto& found = std::find(std::begin(game->mines), std::end(game->mines), this);
+            (found != std::end(game->mines) &&
+                (*found)->IsDead()))
+        {
+            *found = nullptr;
+        }
     }
 }
 
@@ -90,9 +94,14 @@ void Mine::OnFire() noexcept {
 
 void Mine::OnDestroy() noexcept {
     Entity::OnDestroy();
-    g_theGame->MakeExplosion(GetPosition());
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        game->MakeExplosion(GetPosition());
+    }
 }
 
 std::weak_ptr<SpriteSheet> Mine::GetSpriteSheet() const noexcept {
-    return g_theGame->mine_sheet;
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        return game->mine_sheet;
+    }
+    return {};
 }

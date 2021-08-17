@@ -2,6 +2,8 @@
 
 #include "Engine/Audio/AudioSystem.hpp"
 
+#include "Engine/Core/App.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/FileUtils.hpp"
 #include "Engine/Core/KerningFont.hpp"
 
@@ -15,7 +17,6 @@
 #include "Game/GameCommon.hpp"
 #include "Game/GameConfig.hpp"
 
-#include "Game/App.hpp"
 #include "Game/Entity.hpp"
 #include "Game/Asteroid.hpp"
 #include "Game/Bullet.hpp"
@@ -114,7 +115,7 @@ float GameOptions::GetMaxShakeAngle() const noexcept {
     return _maxShakeAngle;
 }
 
-void Game::Initialize() {
+void Game::Initialize() noexcept {
     _current_state = std::move(std::make_unique<TitleState>());
     CreateOrLoadOptionsFile();
     g_theRenderer->RegisterMaterialsFromFolder(g_material_folderpath);
@@ -155,7 +156,7 @@ void Game::InitializeMusic() noexcept {
     g_theAudioSystem->Play(g_music_bgmpath, desc);
 }
 
-void Game::BeginFrame() {
+void Game::BeginFrame() noexcept {
     if(_next_state) {
         _current_state->OnExit();
         _current_state = std::move(_next_state);
@@ -269,7 +270,9 @@ void Game::MakeUfo(Ufo::Type type, AABB2 world_bounds) noexcept {
     }();
     auto newUfo = std::make_unique<Ufo>(type, pos);
     const auto ptr = newUfo.get();
-    g_theGame->AddNewUfoToWorld(std::move(newUfo));
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        game->AddNewUfoToWorld(std::move(newUfo));
+    }
     ptr->SetVelocity(Vector2{pos.x < 0.0f ? -ptr->GetSpeed() : ptr->GetSpeed(), 0.0f});
 }
 
@@ -328,21 +331,24 @@ void Game::CreateOrLoadOptionsFile() noexcept {
 
 }
 
-void Game::Update(TimeUtils::FPSeconds deltaSeconds) {
+void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     g_theRenderer->UpdateGameTime(deltaSeconds);
     _current_state->Update(deltaSeconds);
-    if(g_theApp->LostFocus() || g_theGame->IsPaused()) {
-        g_theAudioSystem->SuspendAudio();
-    } else {
-        g_theAudioSystem->ResumeAudio();
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        auto& app = ServiceLocator::get<IAppService>();
+        if(app.LostFocus() || game->IsPaused()) {
+            g_theAudioSystem->SuspendAudio();
+        } else {
+            g_theAudioSystem->ResumeAudio();
+        }
     }
 }
 
-void Game::Render() const {
+void Game::Render() const noexcept {
     _current_state->Render();
 }
 
-void Game::EndFrame() {
+void Game::EndFrame() noexcept {
     _current_state->EndFrame();
 }
 

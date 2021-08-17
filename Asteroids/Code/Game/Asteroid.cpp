@@ -2,6 +2,8 @@
 
 #include "Engine/Audio/AudioSystem.hpp"
 
+#include "Engine/Core/EngineCommon.hpp"
+
 #include "Engine/Math/Disc2.hpp"
 #include "Engine/Math/MathUtils.hpp"
 
@@ -43,7 +45,7 @@ Asteroid::Asteroid(Type type, Vector2 position, Vector2 velocity, float rotation
 
     AnimatedSpriteDesc desc{};
     desc.material = g_theRenderer->GetMaterial("asteroid");
-    desc.spriteSheet = g_theGame->asteroid_sheet;
+    desc.spriteSheet = GetGameAs<Game>()->asteroid_sheet;
     desc.durationSeconds = TimeUtils::FPSeconds{1.0f};
     desc.playbackMode = AnimatedSprite::SpriteAnimMode::Looping;
     desc.frameLength = 30;
@@ -126,11 +128,13 @@ Vector4 Asteroid::WasHit() const noexcept {
 
 void Asteroid::EndFrame() noexcept {
     Entity::EndFrame();
-    if(const auto& found = std::find(std::begin(g_theGame->asteroids), std::end(g_theGame->asteroids), this);
-        (found != std::end(g_theGame->asteroids) &&
-    (*found)->IsDead()))
-    {
-        *found = nullptr;
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        if(const auto& found = std::find(std::begin(game->asteroids), std::end(game->asteroids), this);
+            (found != std::end(game->asteroids) &&
+                (*found)->IsDead()))
+        {
+            *found = nullptr;
+        }
     }
 }
 
@@ -165,18 +169,20 @@ void Asteroid::OnDestroy() noexcept {
 }
 
 void Asteroid::MakeChildAsteroid() const noexcept {
-    const auto [position, velocity, rotation] = CalcChildPhysicsParameters();
-    switch(_type) {
-    case Type::Large:
-        g_theGame->MakeMediumAsteroid(position, velocity, rotation);
-        break;
-    case Type::Medium:
-        g_theGame->MakeSmallAsteroid(position, velocity, rotation);
-        break;
-    case Type::Small:
-        break;
-    default:
-        break;
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        const auto [position, velocity, rotation] = CalcChildPhysicsParameters();
+        switch(_type) {
+        case Type::Large:
+            game->MakeMediumAsteroid(position, velocity, rotation);
+            break;
+        case Type::Medium:
+            game->MakeSmallAsteroid(position, velocity, rotation);
+            break;
+        case Type::Small:
+            break;
+        default:
+            break;
+        }
     }
 }
 
@@ -254,30 +260,36 @@ int Asteroid::GetHealthFromType(Type type) const noexcept {
 
 float Asteroid::CalcChildHeadingFromDifficulty() const noexcept {
     const auto currentHeading = GetVelocity().CalcHeadingDegrees();
-    switch(g_theGame->gameOptions.GetDifficulty()) {
-    case Difficulty::Easy:
-        return MathUtils::GetRandomZeroToOne<float>() * 360.0f;
-    case Difficulty::Normal:
-        return currentHeading + MathUtils::GetRandomNegOneToOne<float>() * 90.0f;
-    case Difficulty::Hard:
-        return currentHeading + MathUtils::GetRandomNegOneToOne<float>() * 45.0f;
-    default:
-        return currentHeading;
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        switch(game->gameOptions.GetDifficulty()) {
+        case Difficulty::Easy:
+            return MathUtils::GetRandomZeroToOne<float>() * 360.0f;
+        case Difficulty::Normal:
+            return currentHeading + MathUtils::GetRandomNegOneToOne<float>() * 90.0f;
+        case Difficulty::Hard:
+            return currentHeading + MathUtils::GetRandomNegOneToOne<float>() * 45.0f;
+        default:
+            return currentHeading;
+        }
     }
+    return currentHeading;
 }
 
 float Asteroid::CalcChildSpeedFromSizeAndDifficulty() const noexcept{
     const auto currentSpeed = CalcChildSpeedFromSize();
-    switch(g_theGame->gameOptions.GetDifficulty()) {
-    case Difficulty::Easy:
-        return currentSpeed * 0.5f;
-    case Difficulty::Normal:
-        return currentSpeed * 1.0f;
-    case Difficulty::Hard:
-        return currentSpeed * 1.5f;
-    default:
-        return currentSpeed;
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        switch(game->gameOptions.GetDifficulty()) {
+        case Difficulty::Easy:
+            return currentSpeed * 0.5f;
+        case Difficulty::Normal:
+            return currentSpeed * 1.0f;
+        case Difficulty::Hard:
+            return currentSpeed * 1.5f;
+        default:
+            return currentSpeed;
+        }
     }
+    return currentSpeed;
 }
 
 float Asteroid::CalcChildSpeedFromSize() const noexcept {

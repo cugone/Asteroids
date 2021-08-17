@@ -2,12 +2,13 @@
 
 #include "Engine/Audio/AudioSystem.hpp"
 
+#include "Engine/Core/App.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Core/KerningFont.hpp"
 
 #include "Engine/Renderer/Renderer.hpp"
 
-#include "Game/App.hpp"
 #include "Game/Game.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/GameConfig.hpp"
@@ -24,12 +25,16 @@ void TitleState::OnExit() noexcept {
 }
 
 void TitleState::BeginFrame() noexcept {
-    g_theGame->SetControlType();
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        game->SetControlType();
+    }
 }
 
 void TitleState::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) {
-    if(auto newState = HandleInput(deltaSeconds)) {
-        g_theGame->ChangeState(std::move(newState));
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        if(auto newState = HandleInput(deltaSeconds)) {
+            game->ChangeState(std::move(newState));
+        }
     }
 }
 
@@ -88,7 +93,11 @@ std::unique_ptr<GameState> TitleState::HandleInput([[maybe_unused]] TimeUtils::F
 }
 
 std::unique_ptr<GameState> TitleState::HandleKeyboardInput() noexcept {
-    if(!g_theGame->IsKeyboardActive()) {
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        if(!game->IsKeyboardActive()) {
+            return {};
+        }
+    } else {
         return {};
     }
     const bool up = g_theInputSystem->WasKeyJustPressed(KeyCode::W) || g_theInputSystem->WasKeyJustPressed(KeyCode::Up);
@@ -112,7 +121,7 @@ std::unique_ptr<GameState> TitleState::HandleKeyboardInput() noexcept {
         case TitleMenu::Options:
             return std::make_unique<OptionsState>();
         case TitleMenu::Exit:
-            g_theApp->SetIsQuitting(true);
+            App<Game>::GetInstance()->SetIsQuitting(true);
             return {};
         default:
             ERROR_AND_DIE("TITLE MENU ENUM HAS CHANGED.");
@@ -122,30 +131,32 @@ std::unique_ptr<GameState> TitleState::HandleKeyboardInput() noexcept {
 }
 
 std::unique_ptr<GameState> TitleState::HandleControllerInput() noexcept {
-    if(const auto controller = g_theInputSystem->GetXboxController(0); g_theGame->IsControllerActive() && controller.IsConnected()) {
-        const bool up = controller.WasButtonJustPressed(XboxController::Button::Up);
-        const bool down = controller.WasButtonJustPressed(XboxController::Button::Down);
-        const bool select = controller.WasButtonJustPressed(XboxController::Button::A) || controller.WasButtonJustPressed(XboxController::Button::Start);
-        const bool cancel = controller.WasButtonJustPressed(XboxController::Button::Back);
-        if(up) {
-            --m_selected_item;
-        } else if(down) {
-            ++m_selected_item;
-        }
-        if(cancel) {
-            m_selected_item = TitleMenu::Exit;
-        }
-        if(select) {
-            switch(m_selected_item) {
-            case TitleMenu::Start:
-                return std::make_unique<MainState>();
-            case TitleMenu::Options:
-                return std::make_unique<OptionsState>();
-            case TitleMenu::Exit:
-                g_theApp->SetIsQuitting(true);
-                return {};
-            default:
-                ERROR_AND_DIE("TITLE MENU ENUM HAS CHANGED.");
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        if(const auto controller = g_theInputSystem->GetXboxController(0); game->IsControllerActive() && controller.IsConnected()) {
+            const bool up = controller.WasButtonJustPressed(XboxController::Button::Up);
+            const bool down = controller.WasButtonJustPressed(XboxController::Button::Down);
+            const bool select = controller.WasButtonJustPressed(XboxController::Button::A) || controller.WasButtonJustPressed(XboxController::Button::Start);
+            const bool cancel = controller.WasButtonJustPressed(XboxController::Button::Back);
+            if(up) {
+                --m_selected_item;
+            } else if(down) {
+                ++m_selected_item;
+            }
+            if(cancel) {
+                m_selected_item = TitleMenu::Exit;
+            }
+            if(select) {
+                switch(m_selected_item) {
+                case TitleMenu::Start:
+                    return std::make_unique<MainState>();
+                case TitleMenu::Options:
+                    return std::make_unique<OptionsState>();
+                case TitleMenu::Exit:
+                    App<Game>::GetInstance()->SetIsQuitting(true);
+                    return {};
+                default:
+                    ERROR_AND_DIE("TITLE MENU ENUM HAS CHANGED.");
+                }
             }
         }
     }

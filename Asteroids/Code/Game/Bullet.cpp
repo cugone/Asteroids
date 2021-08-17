@@ -2,6 +2,10 @@
 
 #include "Engine/Audio/AudioSystem.hpp"
 
+#include "Engine/Core/EngineCommon.hpp"
+
+#include "Engine/Game/GameBase.hpp"
+
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/Material.hpp"
 
@@ -25,13 +29,15 @@ Bullet::Bullet(const Entity* parent, Vector2 position, Vector2 velocity) noexcep
 }
 
 float Bullet::CalculateTtlFromDifficulty() const noexcept {
-    switch(g_theGame->gameOptions.GetDifficulty()) {
-    case Difficulty::Easy: return 3.0f;
-    case Difficulty::Normal: return 2.0f;
-    case Difficulty::Hard: return 1.0f;
-    default: return 0.0f;
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        switch(game->gameOptions.GetDifficulty()) {
+        case Difficulty::Easy: return 3.0f;
+        case Difficulty::Normal: return 2.0f;
+        case Difficulty::Hard: return 1.0f;
+        default: return 0.0f;
+        }
     }
-
+    return 0.0f;
 }
 
 void Bullet::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
@@ -77,11 +83,13 @@ void Bullet::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 }
 
 void Bullet::EndFrame() noexcept {
-    if(const auto& found = std::find(std::begin(g_theGame->bullets), std::end(g_theGame->bullets), this);
-      (found != std::end(g_theGame->bullets) &&
-      (*found)->IsDead()))
-    {
-        *found = nullptr;
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        if(const auto& found = std::find(std::begin(game->bullets), std::end(game->bullets), this);
+            (found != std::end(game->bullets) &&
+                (*found)->IsDead()))
+        {
+            *found = nullptr;
+        }
     }
     Entity::EndFrame();
 }

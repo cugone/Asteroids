@@ -1,5 +1,7 @@
 #include "Game/ThrustComponent.hpp"
 
+#include "Engine/Core/EngineCommon.hpp"
+
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/Material.hpp"
 

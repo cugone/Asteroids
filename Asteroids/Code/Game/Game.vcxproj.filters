@@ -52,9 +52,6 @@
     <ClCompile Include="GameCommon.cpp">
       <Filter>General</Filter>
     </ClCompile>
-    <ClCompile Include="App.cpp">
-      <Filter>General</Filter>
-    </ClCompile>
     <ClCompile Include="Game.cpp">
       <Filter>Game</Filter>
     </ClCompile>
@@ -109,9 +106,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameCommon.hpp">
-      <Filter>General</Filter>
-    </ClInclude>
-    <ClInclude Include="App.hpp">
       <Filter>General</Filter>
     </ClInclude>
     <ClInclude Include="Game.hpp">

@@ -1,5 +1,6 @@
 #include "Game/Entity.hpp"
 
+#include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Math/MathUtils.hpp"
 
 #include "Engine/Services/ServiceLocator.hpp"
@@ -164,7 +165,9 @@ float Entity::GetOrientationRadians() const noexcept {
 }
 
 void Entity::OnDestroy() noexcept {
-    g_theGame->player.AdjustScore(scoreValue);
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        game->player.AdjustScore(scoreValue);
+    }
 }
 
 void Entity::RotateCounterClockwise(float speed) noexcept {

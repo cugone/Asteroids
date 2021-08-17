@@ -1,5 +1,7 @@
 #include "Game/GameOverState.hpp"
 
+#include "Engine/Core/EngineCommon.hpp"
+
 #include "Engine/Input/InputSystem.hpp"
 
 #include "Game/Game.hpp"
@@ -16,12 +18,16 @@ void GameOverState::OnExit() noexcept {
 }
 
 void GameOverState::BeginFrame() noexcept {
-    g_theGame->SetControlType();
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        game->SetControlType();
+    }
 }
 
 void GameOverState::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) {
     if(auto newState = HandleInput(deltaSeconds)) {
-        g_theGame->ChangeState(std::move(newState));
+        if(auto* game = GetGameAs<Game>(); game != nullptr) {
+            game->ChangeState(std::move(newState));
+        }
     }
 }
 
@@ -69,8 +75,8 @@ void GameOverState::Render() const noexcept {
     g_theRenderer->SetViewportAsPercent();
 
     //2D View / HUD
-    const float ui_view_height = currentGraphicsOptions.WindowHeight;
-    const float ui_view_width = ui_view_height * m_ui_camera.GetAspectRatio();
+    const auto ui_view_height = static_cast<float>(GetGameAs<Game>()->gameOptions.GetWindowHeight());
+    const auto ui_view_width = ui_view_height * m_ui_camera.GetAspectRatio();
     const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
     const auto ui_view_half_extents = ui_view_extents * 0.5f;
     auto ui_leftBottom = Vector2{-ui_view_half_extents.x, ui_view_half_extents.y};

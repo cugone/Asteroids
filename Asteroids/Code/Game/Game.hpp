@@ -4,6 +4,7 @@
 #include "Engine/Core/TypeUtils.hpp"
 #include "Engine/Core/OrthographicCameraController.hpp"
 
+#include "Engine/Game/GameBase.hpp"
 #include "Engine/Game/GameSettings.hpp"
 
 #include "Engine/Renderer/Vertex3D.hpp"
@@ -122,20 +123,20 @@ private:
     float _maxShakeAngle{10.0f};
 };
 
-class Game {
+class Game : public GameBase {
 public:
     Game() = default;
     Game(const Game& other) = default;
     Game(Game&& other) = default;
     Game& operator=(const Game& other) = default;
     Game& operator=(Game&& other) = default;
-    ~Game() = default;
+    ~Game() noexcept = default;
 
-    void Initialize();
-    void BeginFrame();
-    void Update(TimeUtils::FPSeconds deltaSeconds);
-    void Render() const;
-    void EndFrame();
+    void Initialize() noexcept override;
+    void BeginFrame() noexcept override;
+    void Update(TimeUtils::FPSeconds deltaSeconds) noexcept override;
+    void Render() const noexcept override;
+    void EndFrame() noexcept override;
     void PostFrameCleanup() noexcept;
 
     std::vector<std::unique_ptr<Entity>>& GetEntities() noexcept;

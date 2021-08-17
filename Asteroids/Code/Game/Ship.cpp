@@ -2,6 +2,7 @@
 
 #include "Engine/Renderer/Vertex3D.hpp"
 #include "Engine/Core/Rgba.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
 #include "Engine/Math/Vector3.hpp"
 
@@ -157,9 +158,11 @@ void Ship::OnDestroy() noexcept {
         return;
     }
     Entity::OnDestroy();
-    g_theGame->MakeExplosion(GetPosition());
-    SetRespawning();
-    g_theGame->respawnTimer.Reset();
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        game->MakeExplosion(GetPosition());
+        SetRespawning();
+        game->respawnTimer.Reset();
+    }
 }
 
 void Ship::OnFire() noexcept {
@@ -211,24 +214,28 @@ void Ship::OnCollision(Entity* a, Entity* b) noexcept {
     switch(b->faction) {
     case Entity::Faction::Enemy:
     {
-        if(auto* asBullet = dynamic_cast<Bullet*>(b); asBullet != nullptr) {
-            a->DecrementHealth();
-            asBullet->DecrementHealth();
-            if(a->IsDead()) {
-                g_theGame->DecrementLives();
+        if(auto* game = GetGameAs<Game>(); game != nullptr) {
+            if(auto* asBullet = dynamic_cast<Bullet*>(b); asBullet != nullptr) {
+                a->DecrementHealth();
+                asBullet->DecrementHealth();
+                if(a->IsDead()) {
+                    game->DecrementLives();
+                }
+            } else if(auto* asUfo = dynamic_cast<Ufo*>(b); asUfo != nullptr) {
+                a->Kill();
+                game->DecrementLives();
             }
-        } else if(auto* asUfo = dynamic_cast<Ufo*>(b); asUfo != nullptr) {
-            a->Kill();
-            g_theGame->DecrementLives();
         }
     }
     break;
     case Entity::Faction::Asteroid:
     {
-        if(auto* asAsteroid = dynamic_cast<Asteroid*>(b); asAsteroid != nullptr) {
-            a->DecrementHealth();
-            if(a->IsDead()) {
-                g_theGame->DecrementLives();
+        if(auto* game = GetGameAs<Game>(); game != nullptr) {
+            if(auto* asAsteroid = dynamic_cast<Asteroid*>(b); asAsteroid != nullptr) {
+                a->DecrementHealth();
+                if(a->IsDead()) {
+                    game->DecrementLives();
+                }
             }
         }
     }
@@ -242,11 +249,15 @@ void Ship::OnCreate() noexcept {
 }
 
 void Ship::MakeBullet() const noexcept {
-    g_theGame->MakeBullet(this, CalcNewBulletPosition(), CalcNewBulletVelocity());
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        game->MakeBullet(this, CalcNewBulletPosition(), CalcNewBulletVelocity());
+    }
 }
 
 void Ship::MakeMine() const noexcept {
-    g_theGame->MakeMine(this, GetPosition());
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        game->MakeMine(this, GetPosition());
+    }
 }
 
 const Vector2 Ship::CalcNewBulletVelocity() const noexcept {
@@ -260,12 +271,15 @@ const Vector2 Ship::CalcNewBulletPosition() const noexcept {
 const Vector2 Ship::CalcBulletDirectionFromDifficulty() const noexcept {
     const auto current_angle = GetForward().CalcHeadingDegrees();
     const auto angle_bias = []() {
-        switch(g_theGame->gameOptions.GetDifficulty()) {
-        case Difficulty::Easy: return MathUtils::GetRandomNegOneToOne<float>() * 2.5f;
-        case Difficulty::Normal: return MathUtils::GetRandomNegOneToOne<float>() * 5.0f;
-        case Difficulty::Hard: return MathUtils::GetRandomNegOneToOne<float>() * 10.0f;
-        default: return 0.0f;
+        if(auto* game = GetGameAs<Game>(); game != nullptr) {
+            switch(game->gameOptions.GetDifficulty()) {
+            case Difficulty::Easy: return MathUtils::GetRandomNegOneToOne<float>() * 2.5f;
+            case Difficulty::Normal: return MathUtils::GetRandomNegOneToOne<float>() * 5.0f;
+            case Difficulty::Hard: return MathUtils::GetRandomNegOneToOne<float>() * 10.0f;
+            default: return 0.0f;
+            }
         }
+        return 0.0f;
     }();
     const auto new_angle = current_angle + angle_bias;
     return Vector2::CreateFromPolarCoordinatesDegrees(1.0f, new_angle);

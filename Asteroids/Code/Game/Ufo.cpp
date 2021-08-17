@@ -2,6 +2,8 @@
 
 #include "Engine/Audio/AudioSystem.hpp"
 
+#include "Engine/Core/EngineCommon.hpp"
+
 #include "Engine/Renderer/AnimatedSprite.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Renderer/ConstantBuffer.hpp"
@@ -111,13 +113,15 @@ void Ufo::Render() const noexcept {
 }
 
 void Ufo::EndFrame() noexcept {
-    if(const auto& found = std::find(std::begin(g_theGame->ufos), std::end(g_theGame->ufos), this);
-        (found != std::end(g_theGame->ufos) &&
-            (*found)->IsDead()))
-    {
-        *found = nullptr;
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        if(const auto& found = std::find(std::begin(game->ufos), std::end(game->ufos), this);
+            (found != std::end(game->ufos) &&
+                (*found)->IsDead()))
+        {
+            *found = nullptr;
+        }
+        Entity::EndFrame();
     }
-    Entity::EndFrame();
 }
 
 void Ufo::OnCreate() noexcept {
@@ -173,7 +177,9 @@ void Ufo::OnDestroy() noexcept {
         channel->Stop();
     }
     Entity::OnDestroy();
-    g_theGame->MakeExplosion(GetPosition());
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        game->MakeExplosion(GetPosition());
+    }
 }
 
 float Ufo::WasHit() const noexcept {
@@ -183,7 +189,9 @@ float Ufo::WasHit() const noexcept {
 void Ufo::MakeBullet() const noexcept {
     const auto source = GetPosition();
     const auto angle = (_fireTarget - source).CalcHeadingDegrees();
-    g_theGame->MakeBullet(this, source, Vector2::CreateFromPolarCoordinatesDegrees(_bulletSpeed, angle));
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        game->MakeBullet(this, source, Vector2::CreateFromPolarCoordinatesDegrees(_bulletSpeed, angle));
+    }
 }
 
 float Ufo::GetCosmeticRadiusFromType(Type type) noexcept {
@@ -215,7 +223,10 @@ float Ufo::GetScaleFromType(Type type) noexcept {
 }
 
 std::weak_ptr<SpriteSheet> Ufo::GetSpriteSheet() const noexcept {
-    return g_theGame->ufo_sheet;
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        return game->ufo_sheet;
+    }
+    return {};
 }
 
 unsigned int Ufo::GetFireRateFromTypeAndDifficulty(Type type) noexcept {
@@ -237,43 +248,55 @@ float Ufo::GetBulletSpeedFromTypeAndDifficulty(Type type) const noexcept {
         }
     }();
     const auto difficultyMultiplier = []() -> float{
-        switch(g_theGame->gameOptions.GetDifficulty()) {
-        case Difficulty::Easy: return 0.50f;
-        case Difficulty::Normal: return 1.0f;
-        case Difficulty::Hard: return 2.0f;
-        default: return 1.0f;
-        };
+        if(auto* game = GetGameAs<Game>(); game != nullptr) {
+            switch(game->gameOptions.GetDifficulty()) {
+            case Difficulty::Easy: return 0.50f;
+            case Difficulty::Normal: return 1.0f;
+            case Difficulty::Hard: return 2.0f;
+            default: return 1.0f;
+            };
+        }
+        return 1.0f;
     }();
     return difficultyMultiplier * typeMultiplier * _bulletSpeed;
 }
 
 Vector2 Ufo::CalculateFireTarget() const noexcept {
+    const auto defaultTarget = GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, MathUtils::GetRandomInRange<float>(0.0f, 359.0f));
     switch(_type) {
     case Type::Small: {
-        if(auto ship = g_theGame->GetShip()) {
-            return ship->GetPosition();
-        } else {
-            return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, MathUtils::GetRandomInRange<float>(0.0f, 359.0f));
-        }
+        const auto loc = [this, &defaultTarget]() {
+            if(auto* game = GetGameAs<Game>(); game != nullptr) {
+                if(auto ship = game->GetShip()) {
+                    return ship->GetPosition();
+                }
+            }
+            return defaultTarget;
+        }();
+        return loc;
     }
     case Type::Big:
     {
-        return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, MathUtils::GetRandomInRange<float>(0.0f, 359.0f));
+        return defaultTarget;
     }
     case Type::Boss:
     {
-        if(const auto ship = g_theGame->GetShip()) {
-            const auto target = ship->GetPosition();
-            const auto source = GetPosition();
-            const auto angle = (target - source).CalcHeadingDegrees();
-            const auto offset_range = 90.0f;
-            const auto offset = MathUtils::GetRandomNegOneToOne<float>() * offset_range;
-            return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, angle + offset);
-        } else {
-            return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, MathUtils::GetRandomInRange<float>(0.0f, 359.0f));
-        }
+        const auto loc = [this, &defaultTarget]() {
+            if(auto* game = GetGameAs<Game>(); game != nullptr) {
+                if(const auto ship = game->GetShip()) {
+                    const auto target = ship->GetPosition();
+                    const auto source = GetPosition();
+                    const auto angle = (target - source).CalcHeadingDegrees();
+                    const auto offset_range = 90.0f;
+                    const auto offset = MathUtils::GetRandomNegOneToOne<float>() * offset_range;
+                    return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, angle + offset);
+                }
+            }
+            return defaultTarget;
+        }();
+        return loc;
     }
-    default: return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, MathUtils::GetRandomInRange<float>(0.0f, 359.0f));
+    default: return defaultTarget;
     }
 }
 

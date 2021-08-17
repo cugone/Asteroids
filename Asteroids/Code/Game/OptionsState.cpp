@@ -1,5 +1,7 @@
 #include "Game/OptionsState.hpp"
 
+#include "Engine/Core/App.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Core/KerningFont.hpp"
 
@@ -7,7 +9,6 @@
 
 #include "Engine/Renderer/Renderer.hpp"
 
-#include "Game/App.hpp"
 #include "Game/Game.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/GameConfig.hpp"
@@ -20,8 +21,10 @@
 #include <string>
 
 void OptionsState::OnEnter() noexcept {
-    m_selected_item = OptionsMenu::First_;
-    m_temp_options = g_theGame->gameOptions;
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        m_selected_item = OptionsMenu::First_;
+        m_temp_options = game->gameOptions;
+    }
 }
 
 void OptionsState::OnExit() noexcept {
@@ -29,12 +32,16 @@ void OptionsState::OnExit() noexcept {
 }
 
 void OptionsState::BeginFrame() noexcept {
-    g_theGame->SetControlType();
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        game->SetControlType();
+    }
 }
 
 void OptionsState::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) {
-    if(auto newState = HandleInput(deltaSeconds)) {
-        g_theGame->ChangeState(std::move(newState));
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        if(auto newState = HandleInput(deltaSeconds)) {
+            game->ChangeState(std::move(newState));
+        }
     }
 }
 
@@ -122,7 +129,11 @@ std::unique_ptr<GameState> OptionsState::HandleInput([[maybe_unused]] TimeUtils:
 }
 
 std::unique_ptr<GameState> OptionsState::HandleKeyboardInput() noexcept {
-    if(!g_theGame->IsKeyboardActive()) {
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        if(!game->IsKeyboardActive()) {
+            return {};
+        }
+    } else {
         return {};
     }
     const bool up = g_theInputSystem->WasKeyJustPressed(KeyCode::W) || g_theInputSystem->WasKeyJustPressed(KeyCode::Up);
@@ -135,14 +146,16 @@ std::unique_ptr<GameState> OptionsState::HandleKeyboardInput() noexcept {
 }
 
 std::unique_ptr<GameState> OptionsState::HandleControllerInput() noexcept {
-    if(const auto& controller = g_theInputSystem->GetXboxController(0); g_theGame->IsControllerActive() && controller.IsConnected()) {
-        const bool up = controller.WasButtonJustPressed(XboxController::Button::Up);
-        const bool down = controller.WasButtonJustPressed(XboxController::Button::Down);
-        const bool left = controller.WasButtonJustPressed(XboxController::Button::Left);
-        const bool right = controller.WasButtonJustPressed(XboxController::Button::Right);
-        const bool select = controller.WasButtonJustPressed(XboxController::Button::A);
-        const bool cancel = controller.WasButtonJustPressed(XboxController::Button::B) || controller.WasButtonJustPressed(XboxController::Button::Back);
-        return HandleOptionsMenuState(up, down, left, right, cancel, select);
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        if(const auto& controller = g_theInputSystem->GetXboxController(0); game->IsControllerActive() && controller.IsConnected()) {
+            const bool up = controller.WasButtonJustPressed(XboxController::Button::Up);
+            const bool down = controller.WasButtonJustPressed(XboxController::Button::Down);
+            const bool left = controller.WasButtonJustPressed(XboxController::Button::Left);
+            const bool right = controller.WasButtonJustPressed(XboxController::Button::Right);
+            const bool select = controller.WasButtonJustPressed(XboxController::Button::A);
+            const bool cancel = controller.WasButtonJustPressed(XboxController::Button::B) || controller.WasButtonJustPressed(XboxController::Button::Back);
+            return HandleOptionsMenuState(up, down, left, right, cancel, select);
+        }
     }
     return {};
 }
@@ -202,7 +215,7 @@ void OptionsState::CycleSelectedOptionDown(OptionsMenu selectedItem) noexcept {
         auto cur_soundVolume = m_temp_options.GetSoundVolume();
         m_temp_options.SetSoundVolume(std::clamp(cur_soundVolume ? --cur_soundVolume : cur_soundVolume, m_min_sound_volume, m_max_sound_volume));
         auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_sound);
-        const float volumeAsFloat = m_temp_options.GetSoundVolume() / static_cast<float>(m_max_sound_volume);
+        const auto volumeAsFloat = m_temp_options.GetSoundVolume() / static_cast<float>(m_max_sound_volume);
         group->SetVolume(volumeAsFloat);
         AudioSystem::SoundDesc desc{};
         desc.groupName = g_audiogroup_sound;
@@ -214,7 +227,7 @@ void OptionsState::CycleSelectedOptionDown(OptionsMenu selectedItem) noexcept {
         auto cur_musicVolume = m_temp_options.GetMusicVolume();
         m_temp_options.SetMusicVolume(std::clamp(cur_musicVolume ? --cur_musicVolume : cur_musicVolume, m_min_music_volume, m_max_music_volume));
         auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_music);
-        const float volumeAsFloat = m_temp_options.GetMusicVolume() / static_cast<float>(m_max_music_volume);
+        const auto volumeAsFloat = m_temp_options.GetMusicVolume() / static_cast<float>(m_max_music_volume);
         group->SetVolume(volumeAsFloat);
         break;
     }
@@ -258,7 +271,7 @@ void OptionsState::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
         auto cur_soundVolume = m_temp_options.GetSoundVolume();
         m_temp_options.SetSoundVolume((std::min)(++cur_soundVolume, m_max_sound_volume));
         auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_sound);
-        const float volumeAsFloat = m_temp_options.GetSoundVolume() / static_cast<float>(m_max_sound_volume);
+        const auto volumeAsFloat = m_temp_options.GetSoundVolume() / static_cast<float>(m_max_sound_volume);
         group->SetVolume(volumeAsFloat);
         AudioSystem::SoundDesc desc{};
         desc.groupName = g_audiogroup_sound;
@@ -270,7 +283,7 @@ void OptionsState::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
         auto cur_musicVolume = m_temp_options.GetMusicVolume();
         m_temp_options.SetMusicVolume((std::min)(++cur_musicVolume, m_max_music_volume));
         auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_music);
-        const float volumeAsFloat = m_temp_options.GetMusicVolume() / static_cast<float>(m_max_music_volume);
+        const auto volumeAsFloat = m_temp_options.GetMusicVolume() / static_cast<float>(m_max_music_volume);
         group->SetVolume(volumeAsFloat);
         break;
     }
@@ -288,21 +301,25 @@ void OptionsState::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
 }
 
 void OptionsState::SaveCurrentOptions() noexcept {
-    g_theGame->gameOptions = m_temp_options;
-    g_theGame->gameOptions.SaveToConfig(*g_theConfig);
-    g_theConfig->SetValue("difficulty", DifficultyToString(g_theGame->gameOptions.GetDifficulty()));
-    g_theConfig->SetValue("controlpref", ControlPreferenceToString(g_theGame->gameOptions.GetControlPreference()));
-    g_theConfig->SetValue("sound", static_cast<int>(g_theGame->gameOptions.GetSoundVolume()));
-    g_theConfig->SetValue("music", static_cast<int>(g_theGame->gameOptions.GetMusicVolume()));
-    g_theConfig->SetValue("cameraShakeStrength", g_theGame->gameOptions.GetCameraShakeStrength());
-    std::ofstream ofs(g_options_filepath);
-    g_theConfig->PrintConfigs(ofs);
-    ofs.flush();
-    ofs.close();
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        game->gameOptions = m_temp_options;
+        game->gameOptions.SaveToConfig(*g_theConfig);
+        g_theConfig->SetValue("difficulty", DifficultyToString(game->gameOptions.GetDifficulty()));
+        g_theConfig->SetValue("controlpref", ControlPreferenceToString(game->gameOptions.GetControlPreference()));
+        g_theConfig->SetValue("sound", static_cast<int>(game->gameOptions.GetSoundVolume()));
+        g_theConfig->SetValue("music", static_cast<int>(game->gameOptions.GetMusicVolume()));
+        g_theConfig->SetValue("cameraShakeStrength", game->gameOptions.GetCameraShakeStrength());
+        std::ofstream ofs(g_options_filepath);
+        g_theConfig->PrintConfigs(ofs);
+        ofs.flush();
+        ofs.close();
+    }
 }
 
 void OptionsState::SetOptionsToDefault() noexcept {
-    g_theGame->gameOptions.SetToDefault();
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        game->gameOptions.SetToDefault();
+    }
 }
 
 std::string OptionsState::DifficultyToString(Difficulty difficulty) const noexcept {
