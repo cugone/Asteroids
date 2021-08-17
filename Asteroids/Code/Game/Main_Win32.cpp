@@ -32,7 +32,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     UNUSED(nCmdShow);
 
     auto cmdString = StringUtils::ConvertUnicodeToMultiByte(std::wstring(pCmdLine ? pCmdLine : L""));
-    Engine<Game>::Initialize("RogueLike", cmdString);
+    Engine<Game>::Initialize("Asteroids", cmdString);
     Engine<Game>::Run();
     Engine<Game>::Shutdown();
 }
