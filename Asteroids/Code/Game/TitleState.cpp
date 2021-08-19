@@ -48,8 +48,8 @@ void TitleState::Render() const noexcept {
     g_theRenderer->SetViewportAsPercent();
 
     //2D View / HUD
-    const float ui_view_height = currentGraphicsOptions.WindowHeight;
-    const float ui_view_width = ui_view_height * m_ui_camera.GetAspectRatio();
+    const auto ui_view_height = static_cast<float>(GetGameAs<Game>()->GetSettings().GetWindowHeight());
+    const auto ui_view_width = ui_view_height * m_ui_camera.GetAspectRatio();
     const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
     const auto ui_view_half_extents = ui_view_extents * 0.5f;
     const auto ui_leftBottom = Vector2{-ui_view_half_extents.x, ui_view_half_extents.y};
@@ -121,7 +121,7 @@ std::unique_ptr<GameState> TitleState::HandleKeyboardInput() noexcept {
         case TitleMenu::Options:
             return std::make_unique<OptionsState>();
         case TitleMenu::Exit:
-            App<Game>::GetInstance()->SetIsQuitting(true);
+            g_theApp<Game>->SetIsQuitting(true);
             return {};
         default:
             ERROR_AND_DIE("TITLE MENU ENUM HAS CHANGED.");
@@ -152,7 +152,7 @@ std::unique_ptr<GameState> TitleState::HandleControllerInput() noexcept {
                 case TitleMenu::Options:
                     return std::make_unique<OptionsState>();
                 case TitleMenu::Exit:
-                    App<Game>::GetInstance()->SetIsQuitting(true);
+                    g_theApp<Game>->SetIsQuitting(true);
                     return {};
                 default:
                     ERROR_AND_DIE("TITLE MENU ENUM HAS CHANGED.");
