@@ -29,7 +29,7 @@ Ufo::Ufo(Type type, Vector2 position)
     SetCosmeticRadius(GetCosmeticRadiusFromType(_type));
     SetPhysicalRadius(GetPhysicalRadiusFromType(_type));
     SetPosition(position);
-    SetVelocity(Vector2::X_AXIS * 100.0f);
+    SetVelocity(Vector2::X_Axis * 100.0f);
     SetHealth(GetHealthFromType(_type));
     faction = Entity::Faction::Enemy;
     _bulletSpeed = GetBulletSpeedFromTypeAndDifficulty(_type);

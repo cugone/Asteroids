@@ -48,7 +48,7 @@ void Bullet::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     }
 
     const auto pos = GetPosition();
-    const auto uvs = AABB2::ZERO_TO_ONE;
+    const auto uvs = AABB2::Zero_to_One;
     const auto mat = g_theRenderer->GetMaterial("bullet");
     const auto tex = mat->GetTexture(Material::TextureID::Diffuse);
     const auto frameWidth = static_cast<float>(tex->GetDimensions().x);

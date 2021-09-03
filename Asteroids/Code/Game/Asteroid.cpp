@@ -122,7 +122,7 @@ void Asteroid::Render() const noexcept {
 }
 
 Vector4 Asteroid::WasHit() const noexcept {
-    return _timeSinceLastHit.count() == 0.0f ? Vector4::X_AXIS : Vector4::ZERO;
+    return _timeSinceLastHit.count() == 0.0f ? Vector4::X_Axis : Vector4::Zero;
 }
 
 

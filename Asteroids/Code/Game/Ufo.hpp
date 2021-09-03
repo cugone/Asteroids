@@ -68,7 +68,7 @@ protected:
     void MakeBullet() const noexcept;
 
     struct ufo_state_t {
-        Vector4 wasHitUfoIndex = Vector4::Y_AXIS;
+        Vector4 wasHitUfoIndex = Vector4::Y_Axis;
     };
 
     ConstantBuffer* ufo_state_cb{nullptr};

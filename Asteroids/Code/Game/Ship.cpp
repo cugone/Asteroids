@@ -21,7 +21,7 @@
 
 #include <algorithm>
 
-Ship::Ship() : Ship(Vector2::ZERO) {}
+Ship::Ship() : Ship(Vector2::Zero) {}
 
 Ship::Ship(Vector2 position)
     : Entity()

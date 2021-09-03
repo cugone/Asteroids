@@ -24,7 +24,7 @@ void Entity::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     position_orientation_speed.x = new_pos.x;
     position_orientation_speed.y = new_pos.y;
     position_orientation_speed.w = new_vel.CalcLength();
-    auto new_direction = Vector2::X_AXIS;
+    auto new_direction = Vector2::X_Axis;
     new_direction.SetUnitLengthAndHeadingDegrees(new_vel.CalcHeadingDegrees());
     cosmeticphysicalradius_velocitydirection.z = new_direction.x;
     cosmeticphysicalradius_velocitydirection.w = new_direction.y;
@@ -42,7 +42,7 @@ void Entity::EndFrame() noexcept {
 }
 
 Vector2 Entity::GetForward() const noexcept {
-    auto front = Vector2::X_AXIS;
+    auto front = Vector2::X_Axis;
     front.SetHeadingDegrees(GetOrientationDegrees());
     return front;
 }

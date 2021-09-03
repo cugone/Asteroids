@@ -88,7 +88,7 @@ private:
     void DoCameraShake() noexcept;
     bool DoFadeOut(TimeUtils::FPSeconds deltaSeconds) noexcept;
 
-    AABB2 world_bounds = AABB2::ZERO_TO_ONE;
+    AABB2 world_bounds = AABB2::Zero_to_One;
 
     OrthographicCameraController m_cameraController{};
     float m_thrust_force{100.0f};

@@ -43,7 +43,7 @@ void ThrustComponent::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds)
     //transform = Matrix4::MakeSRT(S, R, T);
 
     if(m_thrust) {
-        const auto uvs = AABB2::ZERO_TO_ONE;
+        const auto uvs = AABB2::Zero_to_One;
         auto& builder = mesh_builder;
         builder.Begin(PrimitiveType::Triangles);
         builder.SetColor(Rgba::White);

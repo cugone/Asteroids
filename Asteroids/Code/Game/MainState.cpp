@@ -31,7 +31,7 @@
 
 void MainState::OnEnter() noexcept {
 
-    world_bounds = AABB2::ZERO_TO_ONE;
+    world_bounds = AABB2::Zero_to_One;
     auto dims = Vector2{g_theRenderer->GetOutput()->GetDimensions()};
     //TODO: Fix world dims
     world_bounds.ScalePadding(dims.x, dims.y);
@@ -625,7 +625,7 @@ void MainState::DebugRenderEntities() const noexcept {
             const auto orientation = entity->GetOrientationDegrees();
             const auto cosmetic_radius = entity->GetCosmeticRadius();
             const auto physical_radius = entity->GetPhysicalRadius();
-            const auto facing_end = [=]()->Vector2 { auto end = Vector2::X_AXIS; end.SetLengthAndHeadingDegrees(orientation, cosmetic_radius); return center + end; }();
+            const auto facing_end = [=]()->Vector2 { auto end = Vector2::X_Axis; end.SetLengthAndHeadingDegrees(orientation, cosmetic_radius); return center + end; }();
             const auto velocity_end = [=]()->Vector2 { auto end = entity->GetVelocity().GetNormalize(); end.SetLengthAndHeadingDegrees(end.CalcHeadingDegrees(), cosmetic_radius); return center + end; }();
             const auto acceleration_end = [=]()->Vector2 { auto end = entity->GetAcceleration().GetNormalize(); end.SetLengthAndHeadingDegrees(end.CalcHeadingDegrees(), cosmetic_radius); return center + end; }();
             g_theRenderer->DrawCircle2D(center, cosmetic_radius, Rgba::Green);
@@ -687,7 +687,7 @@ void MainState::RenderStatus() const noexcept {
     }(); //IIIL
     g_theRenderer->DrawMultilineText(g_theRenderer->GetFont("System32"), "Score: " + std::to_string(playerScore) + "\n      x" + std::to_string(playerLives));
 
-    const auto uvs = AABB2::ZERO_TO_ONE;
+    const auto uvs = AABB2::Zero_to_One;
     const auto mat = g_theRenderer->GetMaterial("ship");
     const auto tex = mat->GetTexture(Material::TextureID::Diffuse);
     const auto frameWidth = static_cast<float>(tex->GetDimensions().x);
@@ -737,7 +737,7 @@ void MainState::RenderPausedOverlay() const noexcept {
 
 void MainState::ClampCameraToWorld() noexcept {
     const auto camera_limits = CalculateCameraBounds();
-    const auto current_ship_position = Vector2::ZERO;//ship ? ship->GetPosition() : Vector2::ZERO;
+    const auto current_ship_position = Vector2::Zero;//ship ? ship->GetPosition() : Vector2::ZERO;
     const auto clamped_position = MathUtils::CalcClosestPoint(current_ship_position, camera_limits);
     m_cameraController.TranslateTo(clamped_position, g_theRenderer->GetGameFrameTime() * 5.0f);
 }
