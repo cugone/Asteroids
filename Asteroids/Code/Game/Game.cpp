@@ -322,12 +322,26 @@ void Game::CreateOrLoadOptionsFile() noexcept {
         CreateOptionsFile();
         LoadOptionsFile();
     }
+
+    auto difficulty = TypeUtils::GetUnderlyingValue<Difficulty>(gameOptions.GetDifficulty());
+    g_theConfig->GetValue("difficulty", difficulty);
+    gameOptions.SetDifficulty(static_cast<Difficulty>(difficulty));
+
+    auto controlPref = TypeUtils::GetUnderlyingValue<ControlPreference>(gameOptions.GetControlPreference());
+    g_theConfig->GetValue("controlpref", controlPref);
+    gameOptions.SetControlPreference(static_cast<ControlPreference>(controlPref));
+
     auto shake = gameOptions.GetCameraShakeStrength();
     g_theConfig->GetValue("cameraShakeStrength", shake);
+    gameOptions.SetCameraShakeStrength(shake);
+
     auto soundV = gameOptions.GetSoundVolume();
     g_theConfig->GetValue("sound", soundV);
+    gameOptions.SetSoundVolume(soundV);
+
     auto musicV = gameOptions.GetMusicVolume();
     g_theConfig->GetValue("music", musicV);
+    gameOptions.SetMusicVolume(musicV);
 
 }
 
