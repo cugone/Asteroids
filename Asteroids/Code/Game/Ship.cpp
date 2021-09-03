@@ -54,14 +54,8 @@ void Ship::BeginFrame() noexcept {
 
 void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     Entity::Update(deltaSeconds);
-    if(GetForce().CalcLengthSquared() == 0.0f) {
-        auto newVelocity = GetVelocity() * 0.99f;
-        if(MathUtils::IsEquivalentToZero(newVelocity)) {
-            newVelocity = Vector2::ZERO;
-        }
-        SetVelocity(newVelocity);
-    }
-    const auto uvs = AABB2::ZERO_TO_ONE;
+
+    const auto uvs = AABB2::Zero_to_One;
     const auto tex = material->GetTexture(Material::TextureID::Diffuse);
     const auto frameWidth = static_cast<float>(tex->GetDimensions().x);
     const auto frameHeight = static_cast<float>(tex->GetDimensions().y);
