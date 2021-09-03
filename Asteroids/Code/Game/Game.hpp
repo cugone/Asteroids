@@ -44,7 +44,8 @@ enum class Difficulty {
     First_,
     Easy = First_,
     Normal,
-    Hard,
+    Last_Valid_,
+    Hard = Last_Valid_,
     Last_,
 };
 
@@ -58,7 +59,8 @@ enum class ControlPreference {
     First_,
     Keyboard = First_,
     Mouse,
-    XboxController,
+    Last_Valid_,
+    XboxController = Last_Valid_,
     Last_,
 };
 

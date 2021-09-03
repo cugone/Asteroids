@@ -192,21 +192,17 @@ void OptionsState::CycleSelectedOptionDown(OptionsMenu selectedItem) noexcept {
     switch(selectedItem) {
     case OptionsMenu::DifficultySelection:
     {
-        if(m_temp_options.GetDifficulty() == Difficulty::First_) {
-            m_temp_options.SetDifficulty(Difficulty::Last_);
-        }
         auto cur_difficulty = m_temp_options.GetDifficulty();
         --cur_difficulty;
+        cur_difficulty = std::clamp(cur_difficulty, Difficulty::First_, Difficulty::Last_Valid_);
         m_temp_options.SetDifficulty(cur_difficulty);
         break;
     }
     case OptionsMenu::ControlSelection:
     {
-        if(m_temp_options.GetControlPreference() == ControlPreference::First_) {
-            m_temp_options.SetControlPreference(ControlPreference::Last_);
-        }
         auto cur_pref = m_temp_options.GetControlPreference();
         --cur_pref;
+        cur_pref = std::clamp(cur_pref, ControlPreference::First_, ControlPreference::Last_Valid_);
         m_temp_options.SetControlPreference(cur_pref);
         break;
     }
@@ -250,9 +246,7 @@ void OptionsState::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
     {
         auto cur_difficulty = m_temp_options.GetDifficulty();
         ++cur_difficulty;
-        if(cur_difficulty == Difficulty::Last_) {
-            cur_difficulty = Difficulty::First_;
-        }
+        cur_difficulty = std::clamp(cur_difficulty, Difficulty::First_, Difficulty::Last_Valid_);
         m_temp_options.SetDifficulty(cur_difficulty);
         break;
     }
@@ -260,9 +254,7 @@ void OptionsState::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
     {
         auto cur_pref = m_temp_options.GetControlPreference();
         ++cur_pref;
-        if(cur_pref == ControlPreference::Last_) {
-            cur_pref = ControlPreference::First_;
-        }
+        cur_pref = std::clamp(cur_pref, ControlPreference::First_, ControlPreference::Last_Valid_);
         m_temp_options.SetControlPreference(cur_pref);
         break;
     }
@@ -304,8 +296,8 @@ void OptionsState::SaveCurrentOptions() noexcept {
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
         game->gameOptions = m_temp_options;
         game->gameOptions.SaveToConfig(*g_theConfig);
-        g_theConfig->SetValue("difficulty", DifficultyToString(game->gameOptions.GetDifficulty()));
-        g_theConfig->SetValue("controlpref", ControlPreferenceToString(game->gameOptions.GetControlPreference()));
+        g_theConfig->SetValue("difficulty", TypeUtils::GetUnderlyingValue<Difficulty>(game->gameOptions.GetDifficulty()));
+        g_theConfig->SetValue("controlpref", TypeUtils::GetUnderlyingValue<ControlPreference>(game->gameOptions.GetControlPreference()));
         g_theConfig->SetValue("sound", static_cast<int>(game->gameOptions.GetSoundVolume()));
         g_theConfig->SetValue("music", static_cast<int>(game->gameOptions.GetMusicVolume()));
         g_theConfig->SetValue("cameraShakeStrength", game->gameOptions.GetCameraShakeStrength());

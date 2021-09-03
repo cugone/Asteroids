@@ -2,8 +2,8 @@
 
 static std::string g_options_filepath{"Data/Config/options.config"};
 static std::string g_options_str{
-R"(difficulty=normal
-controlpref=mouse
+R"(difficulty=1
+controlpref=0
 sound=5
 music=5
 cameraShakeStrength=1.0
