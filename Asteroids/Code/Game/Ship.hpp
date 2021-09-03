@@ -26,6 +26,7 @@ public:
     void OnDestroy() noexcept override;
 
     void Thrust(float force) noexcept;
+    void StopThrust() noexcept;
 
     void SetRespawning() noexcept;
     const bool IsRespawning() const noexcept;

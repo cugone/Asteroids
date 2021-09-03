@@ -197,7 +197,7 @@ std::unique_ptr<GameState> MainState::HandleKeyboardInput([[maybe_unused]] TimeU
     if(g_theInputSystem->IsKeyDown(KeyCode::W)) {
         ship->Thrust(m_thrust_force);
     } else {
-        ship->Thrust(0.0f);
+        ship->StopThrust();
     }
     if(g_theInputSystem->IsKeyDown(KeyCode::Space)) {
         ship->OnFire();
@@ -227,7 +227,7 @@ std::unique_ptr<GameState> MainState::HandleControllerInput([[maybe_unused]] Tim
     if(auto& controller = g_theInputSystem->GetXboxController(0); controller.IsConnected() && controller.IsButtonDown(XboxController::Button::A)) {
         ship->Thrust(m_thrust_force);
     } else {
-        ship->Thrust(0.0f);
+        ship->StopThrust();
     }
     if(auto& controller = g_theInputSystem->GetXboxController(0); controller.IsConnected() && controller.GetRightTriggerPosition() > 0.0f) {
         ship->OnFire();
@@ -270,7 +270,7 @@ std::unique_ptr<GameState> MainState::HandleMouseInput([[maybe_unused]] TimeUtil
     if(g_theInputSystem->IsKeyDown(KeyCode::RButton)) {
         ship->Thrust(m_thrust_force);
     } else {
-        ship->Thrust(0.0f);
+        ship->StopThrust();
     }
     if(g_theInputSystem->WasMouseWheelJustScrolledDown()) {
         m_cameraController.ZoomOut();

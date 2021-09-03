@@ -186,6 +186,10 @@ void Ship::Thrust(float force) noexcept {
     AddForce(GetForward() * force);
 }
 
+void Ship::StopThrust() noexcept {
+    _thrust->SetThrust(0.0f);
+}
+
 void Ship::SetRespawning() noexcept {
     _respawning = true;
 }
