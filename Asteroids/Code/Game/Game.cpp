@@ -316,12 +316,10 @@ void Game::LoadOptionsFile() const noexcept {
 }
 
 void Game::CreateOrLoadOptionsFile() noexcept {
-    if(std::filesystem::exists(g_options_filepath)) {
-        LoadOptionsFile();
-    } else {
+    if(!std::filesystem::exists(g_options_filepath)) {
         CreateOptionsFile();
-        LoadOptionsFile();
     }
+    LoadOptionsFile();
 
     auto difficulty = TypeUtils::GetUnderlyingValue<Difficulty>(gameOptions.GetDifficulty());
     g_theConfig->GetValue("difficulty", difficulty);
