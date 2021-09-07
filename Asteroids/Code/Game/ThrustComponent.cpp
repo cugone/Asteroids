@@ -37,10 +37,7 @@ void ThrustComponent::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds)
     const auto S = Matrix4::I;
     const auto R = Matrix4::Create2DRotationDegreesMatrix(m_thrustDirectionAngleOffset);
     const auto T = Matrix4::CreateTranslationMatrix(m_positionOffset);
-    //const auto R = Matrix4::Create2DRotationDegreesMatrix(m_parent->GetOrientationDegrees());
-    //const auto T = Matrix4::CreateTranslationMatrix(m_parent->GetPosition());
     transform = Matrix4::MakeRT(m_parent->GetTransform(), Matrix4::MakeSRT(S, R, T));
-    //transform = Matrix4::MakeSRT(S, R, T);
 
     if(m_thrust) {
         const auto uvs = AABB2::Zero_to_One;
