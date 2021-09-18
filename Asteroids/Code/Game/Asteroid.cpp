@@ -50,10 +50,8 @@ Asteroid::Asteroid(Type type, Vector2 position, Vector2 velocity, float rotation
     desc.playbackMode = AnimatedSprite::SpriteAnimMode::Looping;
     desc.frameLength = 30;
     desc.startSpriteIndex = 0;
-    
-    material = desc.material;
 
-    if(auto cbs = material->GetShader()->GetConstantBuffers(); !cbs.empty()) {
+    if(auto cbs = GetMaterial()->GetShader()->GetConstantBuffers(); !cbs.empty()) {
         asteroid_state_cb = &cbs[0].get();
     }
 
@@ -111,7 +109,7 @@ void Asteroid::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     builder.AddVertex(Vector2{+0.5f, -0.5f});
 
     builder.AddIndicies(Mesh::Builder::Primitive::Quad);
-    builder.End(material);
+    builder.End(GetMaterial());
 
 }
 
@@ -166,6 +164,10 @@ void Asteroid::OnDestroy() noexcept {
         break;
     }
     }
+}
+
+Material* Asteroid::GetMaterial() const noexcept {
+    return g_theRenderer->GetMaterial("asteroid");
 }
 
 void Asteroid::MakeChildAsteroid() const noexcept {

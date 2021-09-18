@@ -34,6 +34,8 @@ public:
 
     void DropMine() noexcept;
 
+    Material* GetMaterial() const noexcept override;
+
 private:
 
     void MakeBullet() const noexcept;

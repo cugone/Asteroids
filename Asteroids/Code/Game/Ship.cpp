@@ -28,7 +28,7 @@ Ship::Ship(Vector2 position)
 {
     faction = Entity::Faction::Player;
     _thrust = std::move(std::make_unique<ThrustComponent>(this));
-    material = g_theRenderer->GetMaterial("ship");
+
     scoreValue = -100LL;
     SetPosition(position);
     SetOrientationDegrees(-90.0f);
@@ -56,7 +56,7 @@ void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     Entity::Update(deltaSeconds);
 
     const auto uvs = AABB2::Zero_to_One;
-    const auto tex = material->GetTexture(Material::TextureID::Diffuse);
+    const auto tex = GetMaterial()->GetTexture(Material::TextureID::Diffuse);
     const auto frameWidth = static_cast<float>(tex->GetDimensions().x);
     const auto frameHeight = static_cast<float>(tex->GetDimensions().y);
     const auto half_extents = Vector2{frameWidth, frameHeight};
@@ -89,7 +89,7 @@ void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     builder.AddVertex(Vector2{+0.5f, -0.5f});
 
     builder.AddIndicies(Mesh::Builder::Primitive::Quad);
-    builder.End(material);
+    builder.End(GetMaterial());
 
     if(!IsRespawning()) {
         _laserWeapon.Update(deltaSeconds);
@@ -176,6 +176,10 @@ void Ship::DropMine() noexcept {
         _canDropMine = false;
         MakeMine();
     }
+}
+
+Material* Ship::GetMaterial() const noexcept {
+    return g_theRenderer->GetMaterial("ship");
 }
 
 void Ship::Thrust(float force) noexcept {

@@ -28,7 +28,6 @@ Explosion::Explosion(Vector2 position)
     desc.playbackMode = AnimatedSprite::SpriteAnimMode::Play_To_End;
     desc.frameLength = 25;
     desc.startSpriteIndex = 0;
-    material = desc.material;
     _sprite = g_theRenderer->CreateAnimatedSprite(desc);
 
     SetPosition(position);
@@ -71,7 +70,7 @@ void Explosion::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     builder.AddVertex(Vector2{+0.5f, -0.5f});
 
     builder.AddIndicies(Mesh::Builder::Primitive::Quad);
-    builder.End(material);
+    builder.End(GetMaterial());
 
 }
 
@@ -92,6 +91,10 @@ void Explosion::EndFrame() noexcept {
 
 void Explosion::OnDestroy() noexcept {
     Entity::OnDestroy();
+}
+
+Material* Explosion::GetMaterial() const noexcept {
+    return g_theRenderer->GetMaterial("explosion");
 }
 
 void Explosion::OnFire() noexcept {

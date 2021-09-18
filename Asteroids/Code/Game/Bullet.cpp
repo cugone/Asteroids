@@ -49,7 +49,7 @@ void Bullet::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 
     const auto pos = GetPosition();
     const auto uvs = AABB2::Zero_to_One;
-    const auto mat = g_theRenderer->GetMaterial("bullet");
+    const auto mat = GetMaterial();
     const auto tex = mat->GetTexture(Material::TextureID::Diffuse);
     const auto frameWidth = static_cast<float>(tex->GetDimensions().x);
     const auto frameHeight = static_cast<float>(tex->GetDimensions().y);
@@ -96,6 +96,10 @@ void Bullet::EndFrame() noexcept {
 
 void Bullet::OnDestroy() noexcept {
     Entity::OnDestroy();
+}
+
+Material* Bullet::GetMaterial() const noexcept {
+    return g_theRenderer->GetMaterial("bullet");
 }
 
 void Bullet::OnFire() noexcept {

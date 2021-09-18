@@ -17,6 +17,7 @@ public:
     void OnFire() noexcept override;
     void OnDestroy() noexcept;
 
+    Material* GetMaterial() const noexcept override;
 protected:
 private:
     std::unique_ptr<class AnimatedSprite> _sprite{};

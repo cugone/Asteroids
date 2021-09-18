@@ -31,6 +31,7 @@ public:
     float GetMaxThrust() const noexcept;
     void SetMaxThrust(float newMaxThrust) noexcept;
 
+    Material* GetMaterial() const noexcept override;
 protected:
 private:
     ParticleEffect m_thrustPS{"flame_emission"};

@@ -45,9 +45,7 @@ Ufo::Ufo(Type type, Vector2 position)
     desc.frameLength = GetFrameLengthFromTypeAndStyle(_type, _style);
     desc.startSpriteIndex = GetStartIndexFromTypeAndStyle(_type, _style);
 
-    material = desc.material;
-
-    if(auto cbs = material->GetShader()->GetConstantBuffers(); !cbs.empty()) {
+    if(auto cbs = GetMaterial()->GetShader()->GetConstantBuffers(); !cbs.empty()) {
         ufo_state_cb = &cbs[0].get();
     }
 
@@ -101,7 +99,7 @@ void Ufo::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     builder.AddVertex(Vector2{+0.5f, -0.5f});
 
     builder.AddIndicies(Mesh::Builder::Primitive::Quad);
-    builder.End(material);
+    builder.End(GetMaterial());
 
 }
 
@@ -328,6 +326,10 @@ int Ufo::GetHealthFromType(Type type) noexcept {
     case Type::Boss: return 3;
     default: return 1;
     }
+}
+
+Material* Ufo::GetMaterial() const noexcept {
+    return g_theRenderer->GetMaterial("ufo");
 }
 
 int Ufo::GetStartIndexFromTypeAndStyle(Type type, Style style) noexcept {

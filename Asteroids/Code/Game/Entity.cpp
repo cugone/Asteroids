@@ -83,10 +83,6 @@ const Matrix4& Entity::GetTransform() const noexcept {
     return transform;
 }
 
-Material* Entity::GetMaterial() const noexcept {
-    return material;
-}
-
 void Entity::DecrementHealth() noexcept {
     if(!IsDead()) {
         --invmass_rotationspeed_health_padding.z;

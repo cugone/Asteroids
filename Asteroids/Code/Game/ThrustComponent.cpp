@@ -15,7 +15,6 @@ ThrustComponent::ThrustComponent(Entity* parent, float maxThrust /*= 100.0f*/)
     , m_parent(parent)
     , m_maxThrust(maxThrust)
 {
-    material = g_theRenderer->GetMaterial("thrust");
     SetCosmeticRadius(7.0f);
 }
 
@@ -28,7 +27,7 @@ void ThrustComponent::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds)
     auto& rs = ServiceLocator::get<IRendererService>();
     m_thrustPS.Update(rs.GetGameTime().count(), deltaSeconds.count());
 
-    const auto tex = material->GetTexture(Material::TextureID::Diffuse);
+    const auto tex = GetMaterial()->GetTexture(Material::TextureID::Diffuse);
     const auto frameWidth = static_cast<float>(tex->GetDimensions().x);
     const auto frameHeight = static_cast<float>(tex->GetDimensions().y);
     const auto half_extents = Vector2{frameWidth, frameHeight};
@@ -58,7 +57,7 @@ void ThrustComponent::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds)
         builder.AddVertex(Vector2{+0.5f, -0.5f});
 
         builder.AddIndicies(Mesh::Builder::Primitive::Quad);
-        builder.End(material);
+        builder.End(GetMaterial());
     }
 
 }
@@ -110,4 +109,8 @@ float ThrustComponent::GetMaxThrust() const noexcept {
 
 void ThrustComponent::SetMaxThrust(float newMaxThrust) noexcept {
     m_maxThrust = newMaxThrust;
+}
+
+Material* ThrustComponent::GetMaterial() const noexcept {
+    return g_theRenderer->GetMaterial("thrust");
 }

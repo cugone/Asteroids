@@ -22,6 +22,7 @@ public:
     void OnCollision(Entity* a, Entity* b) noexcept override;
     void OnDestroy() noexcept override;
 
+    Material* GetMaterial() const noexcept override;
 private:
     float CalculateTtlFromDifficulty() const noexcept;
 

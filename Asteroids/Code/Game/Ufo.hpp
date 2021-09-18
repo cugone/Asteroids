@@ -56,6 +56,7 @@ public:
     static unsigned int GetFireRateFromTypeAndDifficulty(Type type) noexcept;
     static float GetUfoIndexFromStyle(Style style) noexcept;
     static int GetHealthFromType(Type type) noexcept;
+    Material* GetMaterial() const noexcept override;
 protected:
 
     float GetBulletSpeedFromTypeAndDifficulty(Type type) const noexcept;

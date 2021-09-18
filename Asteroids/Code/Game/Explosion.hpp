@@ -24,6 +24,7 @@ public:
     void OnCollision(Entity* a, Entity* b) noexcept override;
     void OnDestroy() noexcept override;
 
+    Material* GetMaterial() const noexcept override;
 private:
     std::unique_ptr<AnimatedSprite> _sprite{};
 };

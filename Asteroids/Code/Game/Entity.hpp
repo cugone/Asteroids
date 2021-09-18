@@ -55,7 +55,7 @@ public:
 
     const Matrix4& GetTransform() const noexcept;
 
-    Material* GetMaterial() const noexcept;
+    virtual Material* GetMaterial() const noexcept = 0;
 
     void DecrementHealth() noexcept;
 
@@ -75,7 +75,6 @@ protected:
     void SetCosmeticRadius(float value) noexcept;
     void SetPhysicalRadius(float value) noexcept;
 
-    Material* material{};
     IWeapon* weapon{};
     Matrix4 transform{};
     Mesh::Builder mesh_builder{};

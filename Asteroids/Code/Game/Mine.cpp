@@ -26,8 +26,6 @@ Mine::Mine(const Entity* parent, Vector2 position)
     desc.frameLength = 12;
     desc.startSpriteIndex = 0;
 
-    material = desc.material;
-
     _sprite = g_theRenderer->CreateAnimatedSprite(desc);
 
 }
@@ -64,7 +62,7 @@ void Mine::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     builder.AddVertex(Vector2{+0.5f, -0.5f});
 
     builder.AddIndicies(Mesh::Builder::Primitive::Quad);
-    builder.End(material);
+    builder.End(GetMaterial());
 
 }
 
@@ -97,6 +95,10 @@ void Mine::OnDestroy() noexcept {
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
         game->MakeExplosion(GetPosition());
     }
+}
+
+Material* Mine::GetMaterial() const noexcept {
+    return g_theRenderer->GetMaterial("mine");
 }
 
 std::weak_ptr<SpriteSheet> Mine::GetSpriteSheet() const noexcept {
