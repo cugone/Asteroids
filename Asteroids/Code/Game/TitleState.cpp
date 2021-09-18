@@ -132,6 +132,9 @@ std::unique_ptr<GameState> TitleState::HandleKeyboardInput() noexcept {
 
 std::unique_ptr<GameState> TitleState::HandleControllerInput() noexcept {
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        if(!game->IsControllerActive()) {
+            return {};
+        }
         if(const auto controller = g_theInputSystem->GetXboxController(0); game->IsControllerActive() && controller.IsConnected()) {
             const bool up = controller.WasButtonJustPressed(XboxController::Button::Up);
             const bool down = controller.WasButtonJustPressed(XboxController::Button::Down);
