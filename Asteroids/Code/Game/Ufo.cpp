@@ -79,10 +79,10 @@ void Ufo::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
         const auto S = Matrix4::CreateScaleMatrix(scale * half_extents);
         const auto R = Matrix4::Create2DRotationDegreesMatrix(GetOrientationDegrees());
         const auto T = Matrix4::CreateTranslationMatrix(GetPosition());
-        transform = Matrix4::MakeSRT(S, R, T);
+        m_transform = Matrix4::MakeSRT(S, R, T);
     }
 
-    auto& builder = mesh_builder;
+    auto& builder = m_mesh_builder;
     builder.Begin(PrimitiveType::Triangles);
     builder.SetColor(Rgba::White);
 

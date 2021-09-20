@@ -10,7 +10,7 @@
 #include "Game/Game.hpp"
 
 void Entity::BeginFrame() noexcept {
-    mesh_builder.Clear();
+    m_mesh_builder.Clear();
 }
 
 void Entity::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
@@ -21,20 +21,20 @@ void Entity::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     Vector2 new_accel = accel;
     Vector2 new_vel = vel + new_accel * deltaSeconds.count();
     Vector2 new_pos = pos + new_vel * deltaSeconds.count();
-    position_orientation_speed.x = new_pos.x;
-    position_orientation_speed.y = new_pos.y;
-    position_orientation_speed.w = new_vel.CalcLength();
+    m_position_orientation_speed.x = new_pos.x;
+    m_position_orientation_speed.y = new_pos.y;
+    m_position_orientation_speed.w = new_vel.CalcLength();
     auto new_direction = Vector2::X_Axis;
     new_direction.SetUnitLengthAndHeadingDegrees(new_vel.CalcHeadingDegrees());
-    cosmeticphysicalradius_velocitydirection.z = new_direction.x;
-    cosmeticphysicalradius_velocitydirection.w = new_direction.y;
-    acceleration_force.x = new_accel.x;
-    acceleration_force.y = new_accel.y;
+    m_cosmeticphysicalradius_velocitydirection.z = new_direction.x;
+    m_cosmeticphysicalradius_velocitydirection.w = new_direction.y;
+    m_acceleration_force.x = new_accel.x;
+    m_acceleration_force.y = new_accel.y;
 }
 
 void Entity::Render() const noexcept {
-    ServiceLocator::get<IRendererService>().SetModelMatrix(transform);
-    Mesh::Render(mesh_builder);
+    ServiceLocator::get<IRendererService>().SetModelMatrix(m_transform);
+    Mesh::Render(m_mesh_builder);
 }
 
 void Entity::EndFrame() noexcept {
@@ -60,80 +60,80 @@ Vector2 Entity::GetLeft() const noexcept {
 }
 
 float Entity::GetCosmeticRadius() const noexcept {
-    return cosmeticphysicalradius_velocitydirection.x;
+    return m_cosmeticphysicalradius_velocitydirection.x;
 }
 
 float Entity::GetPhysicalRadius() const noexcept {
-    return cosmeticphysicalradius_velocitydirection.y;
+    return m_cosmeticphysicalradius_velocitydirection.y;
 }
 
 float Entity::GetSpeed() const noexcept {
-    return position_orientation_speed.w;
+    return m_position_orientation_speed.w;
 }
 
 void Entity::Kill() noexcept {
-    invmass_rotationspeed_health_padding.z = 0;
+    m_invmass_rotationspeed_health_padding.z = 0;
 }
 
 bool Entity::IsDead() const noexcept {
-    return invmass_rotationspeed_health_padding.z <= 0;
+    return m_invmass_rotationspeed_health_padding.z <= 0;
 }
 
 const Matrix4& Entity::GetTransform() const noexcept {
-    return transform;
+    return m_transform;
 }
 
 void Entity::DecrementHealth() noexcept {
     if(!IsDead()) {
-        --invmass_rotationspeed_health_padding.z;
+        --m_invmass_rotationspeed_health_padding.z;
     } else {
         Kill();
     }
 }
 
 void Entity::SetHealth(int newHealth) noexcept {
-    invmass_rotationspeed_health_padding.z = static_cast<float>(newHealth);
+    m_invmass_rotationspeed_health_padding.z = static_cast<float>(newHealth);
 }
 
 void Entity::SetPosition(Vector2 newPosition) noexcept {
-    position_orientation_speed.x = newPosition.x;
-    position_orientation_speed.y = newPosition.y;
+    m_position_orientation_speed.x = newPosition.x;
+    m_position_orientation_speed.y = newPosition.y;
 }
 
 Vector2 Entity::GetPosition() const noexcept {
-    return position_orientation_speed.GetXY();
+    return m_position_orientation_speed.GetXY();
 }
 
 void Entity::SetVelocity(Vector2 newVelocity) noexcept {
-    position_orientation_speed.w = newVelocity.Normalize();
-    cosmeticphysicalradius_velocitydirection.z = newVelocity.x;
-    cosmeticphysicalradius_velocitydirection.w = newVelocity.y;
+    m_position_orientation_speed.w = newVelocity.Normalize();
+    m_cosmeticphysicalradius_velocitydirection.z = newVelocity.x;
+    m_cosmeticphysicalradius_velocitydirection.w = newVelocity.y;
 }
 
 Vector2 Entity::GetVelocity() const noexcept {
-    return cosmeticphysicalradius_velocitydirection.GetZW() * position_orientation_speed.w;
+    return m_cosmeticphysicalradius_velocitydirection.GetZW() * m_position_orientation_speed.w;
 }
 
 Vector2 Entity::GetAcceleration() const noexcept {
-    return acceleration_force.GetXY();
+    return m_acceleration_force.GetXY();
 }
 
 Vector2 Entity::CalcAcceleration() noexcept {
-    return acceleration_force.GetZW() * GetInvMass();
+    return m_acceleration_force.GetZW() * GetInvMass();
 }
 
 Vector2 Entity::GetForce() const noexcept {
-    return Vector2{acceleration_force.z, acceleration_force.w};
+    return Vector2{m_acceleration_force.z, m_acceleration_force.w};
 }
 
 void Entity::AddForce(const Vector2& force) noexcept {
-    acceleration_force.z += force.x;
-    acceleration_force.w += force.y;
+    m_acceleration_force.z += force.x;
+    m_acceleration_force.w += force.y;
 }
 
 void Entity::ClearForce() noexcept {
-    acceleration_force.z = 0.0f;
-    acceleration_force.w = 0.0f;
+    m_acceleration_force.z = 0.0f;
+    m_acceleration_force.w = 0.0f;
 }
 
 float Entity::GetMass() const noexcept {
@@ -141,11 +141,11 @@ float Entity::GetMass() const noexcept {
 }
 
 float Entity::GetInvMass() const noexcept {
-    return invmass_rotationspeed_health_padding.x;
+    return m_invmass_rotationspeed_health_padding.x;
 }
 
 void Entity::SetOrientationDegrees(float newDegrees) noexcept {
-    position_orientation_speed.z = newDegrees;
+    m_position_orientation_speed.z = newDegrees;
 }
 
 void Entity::SetOrientationRadians(float newRadians) noexcept {
@@ -153,7 +153,7 @@ void Entity::SetOrientationRadians(float newRadians) noexcept {
 }
 
 float Entity::GetOrientationDegrees() const noexcept {
-    return position_orientation_speed.z;
+    return m_position_orientation_speed.z;
 }
 
 float Entity::GetOrientationRadians() const noexcept {
@@ -175,26 +175,26 @@ void Entity::RotateClockwise(float speed) noexcept {
 }
 
 void Entity::AdjustOrientation(float value) noexcept {
-    position_orientation_speed.z += value;
-    position_orientation_speed.z = MathUtils::Wrap(position_orientation_speed.z, 0.0f, 360.0f);
+    m_position_orientation_speed.z += value;
+    m_position_orientation_speed.z = MathUtils::Wrap(m_position_orientation_speed.z, 0.0f, 360.0f);
 }
 
 float Entity::GetRotationSpeed() const noexcept {
-    return invmass_rotationspeed_health_padding.y;
+    return m_invmass_rotationspeed_health_padding.y;
 }
 
 void Entity::SetRotationSpeed(float speed) noexcept {
-    invmass_rotationspeed_health_padding.y = speed;
+    m_invmass_rotationspeed_health_padding.y = speed;
 }
 
 IWeapon* Entity::GetWeapon() const noexcept {
-    return weapon;
+    return m_weapon;
 }
 
 void Entity::SetCosmeticRadius(float value) noexcept {
-    cosmeticphysicalradius_velocitydirection.x = value;
+    m_cosmeticphysicalradius_velocitydirection.x = value;
 }
 
 void Entity::SetPhysicalRadius(float value) noexcept {
-    cosmeticphysicalradius_velocitydirection.y = value;
+    m_cosmeticphysicalradius_velocitydirection.y = value;
 }

@@ -75,9 +75,9 @@ protected:
     void SetCosmeticRadius(float value) noexcept;
     void SetPhysicalRadius(float value) noexcept;
 
-    IWeapon* weapon{};
-    Matrix4 transform{};
-    Mesh::Builder mesh_builder{};
+    IWeapon* m_weapon{};
+    Matrix4 m_transform{};
+    Mesh::Builder m_mesh_builder{};
 private:
 
     Vector2 CalcAcceleration() noexcept;
@@ -91,10 +91,8 @@ private:
 
     void AdjustOrientation(float value) noexcept;
 
-    Vector4 position_orientation_speed{};
-    Vector4 cosmeticphysicalradius_velocitydirection{};
-    Vector4 acceleration_force{};
-    Vector4 invmass_rotationspeed_health_padding{1.0f, 90.0f, 1.0f, 0.0f};
+    Vector4 m_position_orientation_speed{};
+    Vector4 m_cosmeticphysicalradius_velocitydirection{};
+    Vector4 m_acceleration_force{};
+    Vector4 m_invmass_rotationspeed_health_padding{1.0f, 90.0f, 1.0f, 0.0f};
 };
-
-

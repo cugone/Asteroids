@@ -20,7 +20,7 @@ ThrustComponent::ThrustComponent(Entity* parent, float maxThrust /*= 100.0f*/)
 
 void ThrustComponent::BeginFrame() noexcept {
     m_thrustPS.BeginFrame();
-    mesh_builder.Clear();
+    m_mesh_builder.Clear();
 }
 
 void ThrustComponent::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
@@ -36,11 +36,11 @@ void ThrustComponent::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds)
     const auto S = Matrix4::I;
     const auto R = Matrix4::Create2DRotationDegreesMatrix(m_thrustDirectionAngleOffset);
     const auto T = Matrix4::CreateTranslationMatrix(m_positionOffset);
-    transform = Matrix4::MakeRT(m_parent->GetTransform(), Matrix4::MakeSRT(S, R, T));
+    m_transform = Matrix4::MakeRT(m_parent->GetTransform(), Matrix4::MakeSRT(S, R, T));
 
     if(m_thrust) {
         const auto uvs = AABB2::Zero_to_One;
-        auto& builder = mesh_builder;
+        auto& builder = m_mesh_builder;
         builder.Begin(PrimitiveType::Triangles);
         builder.SetColor(Rgba::White);
 
@@ -65,8 +65,8 @@ void ThrustComponent::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds)
 void ThrustComponent::Render() const noexcept {
     m_thrustPS.Render();
     auto& rs = ServiceLocator::get<IRendererService>();
-    rs.SetModelMatrix(transform);
-    Mesh::Render(mesh_builder);
+    rs.SetModelMatrix(m_transform);
+    Mesh::Render(m_mesh_builder);
 
 }
 
