@@ -23,7 +23,7 @@
 #include "Game/GameConfig.hpp"
 
 Ufo::Ufo(Type type, Vector2 position)
-    : Entity()
+    : GameEntity()
     , _type(type)
 {
     SetCosmeticRadius(GetCosmeticRadiusFromType(_type));
@@ -31,7 +31,7 @@ Ufo::Ufo(Type type, Vector2 position)
     SetPosition(position);
     SetVelocity(Vector2::X_Axis * 100.0f);
     SetHealth(GetHealthFromType(_type));
-    faction = Entity::Faction::Enemy;
+    faction = GameEntity::Faction::Enemy;
     _bulletSpeed = GetBulletSpeedFromTypeAndDifficulty(_type);
     _fireRate.SetFrequency(GetFireRateFromTypeAndDifficulty(_type));
     _style = GetStyleFromType(_type);
@@ -54,7 +54,7 @@ Ufo::Ufo(Type type, Vector2 position)
 }
 
 void Ufo::BeginFrame() noexcept {
-    Entity::BeginFrame();
+    GameEntity::BeginFrame();
     _fireTarget = CalculateFireTarget();
     if(_fireRate.CheckAndReset()) {
         _canFire = true;
@@ -62,7 +62,7 @@ void Ufo::BeginFrame() noexcept {
 }
 
 void Ufo::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
-    Entity::Update(deltaSeconds);
+    GameEntity::Update(deltaSeconds);
     _timeSinceLastHit += deltaSeconds;
     _sprite->Update(deltaSeconds);
 
@@ -107,7 +107,7 @@ void Ufo::Render() const noexcept {
     ufo_state.wasHitUfoIndex.x = WasHit();
     ufo_state.wasHitUfoIndex.y = GetUfoIndexFromStyle(_style);
     ufo_state_cb->Update(*ServiceLocator::get<IRendererService>().GetDeviceContext(), &ufo_state);
-    Entity::Render();
+    GameEntity::Render();
 }
 
 void Ufo::EndFrame() noexcept {
@@ -118,7 +118,7 @@ void Ufo::EndFrame() noexcept {
         {
             *found = nullptr;
         }
-        Entity::EndFrame();
+        GameEntity::EndFrame();
     }
 }
 
@@ -132,12 +132,12 @@ void Ufo::OnCreate() noexcept {
     g_theAudioSystem->Play(*_warble_sound, desc);
 }
 
-void Ufo::OnCollision(Entity* a, Entity* b) noexcept {
+void Ufo::OnCollision(GameEntity* a, GameEntity* b) noexcept {
     if(a->faction == b->faction) {
         return;
     }
     switch(b->faction) {
-    case Entity::Faction::Player:
+    case GameEntity::Faction::Player:
     {
         if(const auto* asBullet = dynamic_cast<Bullet*>(b); asBullet != nullptr) {
             a->DecrementHealth();
@@ -174,7 +174,7 @@ void Ufo::OnDestroy() noexcept {
     for(auto* channel : _warble_sound->GetChannels()) {
         channel->Stop();
     }
-    Entity::OnDestroy();
+    GameEntity::OnDestroy();
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
         game->MakeExplosion(GetPosition());
     }

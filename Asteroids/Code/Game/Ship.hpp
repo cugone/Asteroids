@@ -3,13 +3,13 @@
 #include "Engine/Core/Stopwatch.hpp"
 #include "Engine/Core/TimeUtils.hpp"
 
-#include "Game/Entity.hpp"
+#include "Game/GameEntity.hpp"
 #include "Game/LaserBulletWeapon.hpp"
 
 class Renderer;
 class ThrustComponent;
 
-class Ship : public Entity {
+class Ship : public GameEntity {
 public:
     Ship();
     explicit Ship(Vector2 position);
@@ -22,7 +22,7 @@ public:
 
     void OnCreate() noexcept override;
     void OnFire() noexcept override;
-    void OnCollision(Entity* a, Entity* b) noexcept override;
+    void OnCollision(GameEntity* a, GameEntity* b) noexcept override;
     void OnDestroy() noexcept override;
 
     void Thrust(float force) noexcept;

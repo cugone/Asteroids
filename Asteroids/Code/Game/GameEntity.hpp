@@ -10,7 +10,7 @@
 
 class IWeapon;
 
-class Entity {
+class GameEntity {
 public:
     enum class Faction {
         None
@@ -19,13 +19,13 @@ public:
         , Asteroid
     };
 
-    virtual ~Entity() = default;
+    virtual ~GameEntity() = default;
     virtual void BeginFrame() noexcept;
     virtual void Update(TimeUtils::FPSeconds deltaSeconds) noexcept;
     virtual void Render() const noexcept;
     virtual void EndFrame() noexcept;
     virtual void OnCreate() noexcept = 0;
-    virtual void OnCollision(Entity* a, Entity* b) noexcept = 0;
+    virtual void OnCollision(GameEntity* a, GameEntity* b) noexcept = 0;
     virtual void OnFire() noexcept = 0;
     virtual void OnDestroy() noexcept = 0;
 

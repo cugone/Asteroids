@@ -15,8 +15,8 @@
 
 #include <algorithm>
 
-Bullet::Bullet(const Entity* parent, Vector2 position, Vector2 velocity) noexcept
-: Entity()
+Bullet::Bullet(const GameEntity* parent, Vector2 position, Vector2 velocity) noexcept
+: GameEntity()
 , _parent(parent)
 {
     faction = _parent->faction;
@@ -41,7 +41,7 @@ float Bullet::CalculateTtlFromDifficulty() const noexcept {
 }
 
 void Bullet::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
-    Entity::Update(deltaSeconds);
+    GameEntity::Update(deltaSeconds);
     if(ttl.CheckAndReset()) {
         Kill();
         return;
@@ -91,11 +91,11 @@ void Bullet::EndFrame() noexcept {
             *found = nullptr;
         }
     }
-    Entity::EndFrame();
+    GameEntity::EndFrame();
 }
 
 void Bullet::OnDestroy() noexcept {
-    Entity::OnDestroy();
+    GameEntity::OnDestroy();
 }
 
 Material* Bullet::GetMaterial() const noexcept {
@@ -106,7 +106,7 @@ void Bullet::OnFire() noexcept {
     /* DO NOTHING */
 }
 
-void Bullet::OnCollision(Entity* /*a*/, Entity* /*b*/) noexcept {
+void Bullet::OnCollision(GameEntity* /*a*/, GameEntity* /*b*/) noexcept {
     /* DO NOTHING */
 }
 

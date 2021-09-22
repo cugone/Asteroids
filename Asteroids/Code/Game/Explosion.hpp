@@ -4,14 +4,14 @@
 
 #include "Engine/Renderer/AnimatedSprite.hpp"
 
-#include "Game/Entity.hpp"
+#include "Game/GameEntity.hpp"
 
 #include <memory>
 #include <utility>
 
 class Renderer;
 
-class Explosion : public Entity {
+class Explosion : public GameEntity {
 public:
     explicit Explosion(Vector2 position);
 
@@ -21,7 +21,7 @@ public:
 
     void OnCreate() noexcept override;
     void OnFire() noexcept override;
-    void OnCollision(Entity* a, Entity* b) noexcept override;
+    void OnCollision(GameEntity* a, GameEntity* b) noexcept override;
     void OnDestroy() noexcept override;
 
     Material* GetMaterial() const noexcept override;

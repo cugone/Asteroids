@@ -10,8 +10,8 @@
 #include "Game/Game.hpp"
 #include "Game/Bullet.hpp"
 
-Mine::Mine(const Entity* parent, Vector2 position)
-    : Entity()
+Mine::Mine(const GameEntity* parent, Vector2 position)
+    : GameEntity()
 {
     faction = parent->faction;
     SetPosition(position);
@@ -31,7 +31,7 @@ Mine::Mine(const Entity* parent, Vector2 position)
 }
 
 void Mine::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
-    Entity::Update(deltaSeconds);
+    GameEntity::Update(deltaSeconds);
     _sprite->Update(deltaSeconds);
 
     const auto uvs = _sprite->GetCurrentTexCoords();
@@ -67,7 +67,7 @@ void Mine::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 }
 
 void Mine::EndFrame() noexcept {
-    Entity::EndFrame();
+    GameEntity::EndFrame();
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
         if(const auto& found = std::find(std::begin(game->mines), std::end(game->mines), this);
             (found != std::end(game->mines) &&
@@ -82,7 +82,7 @@ void Mine::OnCreate() noexcept {
     /* DO NOTHING */
 }
 
-void Mine::OnCollision(Entity* /*a*/, Entity* /*b*/) noexcept {
+void Mine::OnCollision(GameEntity* /*a*/, GameEntity* /*b*/) noexcept {
     /* DO NOTHING */
 }
 
@@ -91,7 +91,7 @@ void Mine::OnFire() noexcept {
 }
 
 void Mine::OnDestroy() noexcept {
-    Entity::OnDestroy();
+    GameEntity::OnDestroy();
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
         game->MakeExplosion(GetPosition());
     }

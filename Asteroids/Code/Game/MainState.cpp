@@ -324,7 +324,7 @@ void MainState::HandlePlayerInput([[maybe_unused]] TimeUtils::FPSeconds deltaSec
     }
 }
 
-void MainState::WrapAroundWorld(Entity* e) noexcept {
+void MainState::WrapAroundWorld(GameEntity* e) noexcept {
     const auto world_left = world_bounds.mins.x;
     const auto world_right = world_bounds.maxs.x;
     const auto world_top = world_bounds.mins.y;

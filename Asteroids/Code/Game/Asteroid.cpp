@@ -30,10 +30,10 @@ Asteroid::Asteroid(Vector2 position, Vector2 velocity, float rotationSpeed)
     : Asteroid(Type::Large, position, velocity, rotationSpeed) {/* DO NOTHING */}
 
 Asteroid::Asteroid(Type type, Vector2 position, Vector2 velocity, float rotationSpeed)
-    : Entity()
+    : GameEntity()
     , _type(type)
 {
-    faction = Entity::Faction::Asteroid;
+    faction = GameEntity::Faction::Asteroid;
     scoreValue = GetScoreFromType(type);
     SetHealth(GetHealthFromType(type));
     SetPosition(position);
@@ -69,7 +69,7 @@ long long Asteroid::GetScoreFromType(Type type) {
 }
 
 void Asteroid::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
-    Entity::Update(deltaSeconds);
+    GameEntity::Update(deltaSeconds);
     _timeSinceLastHit += deltaSeconds;
 
     const auto theta = GetRotationSpeed() * deltaSeconds.count();
@@ -116,7 +116,7 @@ void Asteroid::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 void Asteroid::Render() const noexcept {
     asteroid_state.wasHit = WasHit();
     asteroid_state_cb->Update(*ServiceLocator::get<IRendererService>().GetDeviceContext(), &asteroid_state);
-    Entity::Render();
+    GameEntity::Render();
 }
 
 Vector4 Asteroid::WasHit() const noexcept {
@@ -125,7 +125,7 @@ Vector4 Asteroid::WasHit() const noexcept {
 
 
 void Asteroid::EndFrame() noexcept {
-    Entity::EndFrame();
+    GameEntity::EndFrame();
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
         if(const auto& found = std::find(std::begin(game->asteroids), std::end(game->asteroids), this);
             (found != std::end(game->asteroids) &&
@@ -137,7 +137,7 @@ void Asteroid::EndFrame() noexcept {
 }
 
 void Asteroid::OnDestroy() noexcept {
-    Entity::OnDestroy();
+    GameEntity::OnDestroy();
     switch(_type) {
     case Type::Large:
     {
@@ -202,12 +202,12 @@ void Asteroid::OnHit() noexcept {
     asteroid_state.wasHit = WasHit();
 }
 
-void Asteroid::OnCollision(Entity* a, Entity* b) noexcept {
+void Asteroid::OnCollision(GameEntity* a, GameEntity* b) noexcept {
     if(a->faction == b->faction) {
         return;
     }
     switch(b->faction) {
-    case Entity::Faction::Player:
+    case GameEntity::Faction::Player:
     {
         if(auto* asBullet = dynamic_cast<Bullet*>(b); asBullet != nullptr) {
             a->DecrementHealth();
@@ -221,7 +221,7 @@ void Asteroid::OnCollision(Entity* a, Entity* b) noexcept {
         }
     }
     break;
-    case Entity::Faction::Enemy:
+    case GameEntity::Faction::Enemy:
     /* DO NOTHING */
     break;
     default: break;

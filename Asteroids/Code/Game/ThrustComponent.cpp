@@ -10,8 +10,8 @@
 
 #include "Game/GameCommon.hpp"
 
-ThrustComponent::ThrustComponent(Entity* parent, float maxThrust /*= 100.0f*/)
-    : Entity()
+ThrustComponent::ThrustComponent(GameEntity* parent, float maxThrust /*= 100.0f*/)
+    : GameEntity()
     , m_parent(parent)
     , m_maxThrust(maxThrust)
 {
@@ -78,7 +78,7 @@ void ThrustComponent::OnCreate() noexcept {
     /* DO NOTHING */
 }
 
-void ThrustComponent::OnCollision(Entity* /*a*/, Entity* /*b*/) noexcept {
+void ThrustComponent::OnCollision(GameEntity* /*a*/, GameEntity* /*b*/) noexcept {
     /* DO NOTHING */
 }
 

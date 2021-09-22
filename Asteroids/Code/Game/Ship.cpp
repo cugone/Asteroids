@@ -24,9 +24,9 @@
 Ship::Ship() : Ship(Vector2::Zero) {}
 
 Ship::Ship(Vector2 position)
-    : Entity()
+    : GameEntity()
 {
-    faction = Entity::Faction::Player;
+    faction = GameEntity::Faction::Player;
     _thrust = std::move(std::make_unique<ThrustComponent>(this));
 
     scoreValue = -100LL;
@@ -48,12 +48,12 @@ Ship::Ship(Vector2 position)
 }
 
 void Ship::BeginFrame() noexcept {
-    Entity::BeginFrame();
+    GameEntity::BeginFrame();
     _thrust->BeginFrame();
 }
 
 void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
-    Entity::Update(deltaSeconds);
+    GameEntity::Update(deltaSeconds);
 
     const auto uvs = AABB2::Zero_to_One;
     const auto tex = GetMaterial()->GetTexture(Material::TextureID::Diffuse);
@@ -100,7 +100,7 @@ void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 
 void Ship::Render() const noexcept {
     _thrust->Render();
-    Entity::Render();
+    GameEntity::Render();
 }
 
 void Ship::DoScaleEaseOut(TimeUtils::FPSeconds& deltaSeconds) noexcept {
@@ -140,7 +140,7 @@ float Ship::DoAlphaEaseOut(TimeUtils::FPSeconds& deltaSeconds) const noexcept {
 }
 
 void Ship::EndFrame() noexcept {
-    Entity::EndFrame();
+    GameEntity::EndFrame();
     if(!IsRespawning() && _mineFireRate.CheckAndReset()) {
         _canDropMine = true;
     }
@@ -151,7 +151,7 @@ void Ship::OnDestroy() noexcept {
     if(IsRespawning()) {
         return;
     }
-    Entity::OnDestroy();
+    GameEntity::OnDestroy();
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
         game->MakeExplosion(GetPosition());
         SetRespawning();
@@ -206,7 +206,7 @@ void Ship::DoneRespawning() noexcept {
     _respawning = false;
 }
 
-void Ship::OnCollision(Entity* a, Entity* b) noexcept {
+void Ship::OnCollision(GameEntity* a, GameEntity* b) noexcept {
     if(IsRespawning()) {
         return;
     }
@@ -214,7 +214,7 @@ void Ship::OnCollision(Entity* a, Entity* b) noexcept {
         return;
     }
     switch(b->faction) {
-    case Entity::Faction::Enemy:
+    case GameEntity::Faction::Enemy:
     {
         if(auto* game = GetGameAs<Game>(); game != nullptr) {
             if(auto* asBullet = dynamic_cast<Bullet*>(b); asBullet != nullptr) {
@@ -230,7 +230,7 @@ void Ship::OnCollision(Entity* a, Entity* b) noexcept {
         }
     }
     break;
-    case Entity::Faction::Asteroid:
+    case GameEntity::Faction::Asteroid:
     {
         if(auto* game = GetGameAs<Game>(); game != nullptr) {
             if(auto* asAsteroid = dynamic_cast<Asteroid*>(b); asAsteroid != nullptr) {

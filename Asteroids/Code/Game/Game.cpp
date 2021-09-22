@@ -17,7 +17,7 @@
 #include "Game/GameCommon.hpp"
 #include "Game/GameConfig.hpp"
 
-#include "Game/Entity.hpp"
+#include "Game/GameEntity.hpp"
 #include "Game/Asteroid.hpp"
 #include "Game/Bullet.hpp"
 #include "Game/Explosion.hpp"
@@ -370,7 +370,7 @@ void Game::PostFrameCleanup() noexcept {
     asteroids.erase(std::remove_if(std::begin(asteroids), std::end(asteroids), [&](Asteroid* e) { return !e; }), std::end(asteroids));
     ufos.erase(std::remove_if(std::begin(ufos), std::end(ufos), [&](Ufo* e) { return !e; }), std::end(ufos));
     mines.erase(std::remove_if(std::begin(mines), std::end(mines), [&](Mine* e) { return !e; }), std::end(mines));
-    m_entities.erase(std::remove_if(std::begin(m_entities) + 1, std::end(m_entities), [&](std::unique_ptr<Entity>& e) { return !e; }), std::end(m_entities));
+    m_entities.erase(std::remove_if(std::begin(m_entities) + 1, std::end(m_entities), [&](std::unique_ptr<GameEntity>& e) { return !e; }), std::end(m_entities));
 
     for(auto&& pending : m_pending_entities) {
         m_entities.emplace_back(std::move(pending));
@@ -378,7 +378,7 @@ void Game::PostFrameCleanup() noexcept {
     m_pending_entities.clear();
 }
 
-std::vector<std::unique_ptr<Entity>>& Game::GetEntities() noexcept {
+std::vector<std::unique_ptr<GameEntity>>& Game::GetEntities() noexcept {
     return m_entities;
 }
 
@@ -389,7 +389,7 @@ Ship* Game::GetShip() const noexcept {
     return nullptr;
 }
 
-void Game::MakeBullet(const Entity* parent, Vector2 pos, Vector2 vel) noexcept {
+void Game::MakeBullet(const GameEntity* parent, Vector2 pos, Vector2 vel) noexcept {
     auto newBullet = std::make_unique<Bullet>(parent, pos, vel);
     auto* last_entity = newBullet.get();
     m_pending_entities.emplace_back(std::move(newBullet));
@@ -398,7 +398,7 @@ void Game::MakeBullet(const Entity* parent, Vector2 pos, Vector2 vel) noexcept {
     asBullet->OnCreate();
 }
 
-void Game::MakeMine(const Entity* parent, Vector2 position) noexcept {
+void Game::MakeMine(const GameEntity* parent, Vector2 position) noexcept {
     SetMineSpriteSheet();
     auto newMine = std::make_unique<Mine>(parent, position);
     auto* last_entity = newMine.get();

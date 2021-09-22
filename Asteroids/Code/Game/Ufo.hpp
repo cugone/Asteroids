@@ -3,11 +3,11 @@
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Core/Stopwatch.hpp"
 
-#include "Game/Entity.hpp"
+#include "Game/GameEntity.hpp"
 
 class ConstantBuffer;
 
-class Ufo : public Entity {
+class Ufo : public GameEntity {
 public:
 
     enum class Type {
@@ -41,7 +41,7 @@ public:
     void EndFrame() noexcept override;
 
     void OnCreate() noexcept override;
-    void OnCollision(Entity* a, Entity* b) noexcept override;
+    void OnCollision(GameEntity* a, GameEntity* b) noexcept override;
     void OnHit() noexcept;
     void OnFire() noexcept override;
     void OnDestroy() noexcept override;

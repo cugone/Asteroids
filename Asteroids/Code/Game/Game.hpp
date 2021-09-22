@@ -26,7 +26,7 @@
 #include "Game/GameCommon.hpp"
 
 #include "Game/GameState.hpp"
-#include "Game/Entity.hpp"
+#include "Game/GameEntity.hpp"
 #include "Game/Player.hpp"
 #include "Game/Ufo.hpp"
 
@@ -141,13 +141,13 @@ public:
     void EndFrame() noexcept override;
     void PostFrameCleanup() noexcept;
 
-    std::vector<std::unique_ptr<Entity>>& GetEntities() noexcept;
+    std::vector<std::unique_ptr<GameEntity>>& GetEntities() noexcept;
 
     Ship* GetShip() const noexcept;
 
     void MakeExplosion(Vector2 position) noexcept;
-    void MakeBullet(const Entity* parent, Vector2 pos, Vector2 vel) noexcept;
-    void MakeMine(const Entity* parent, Vector2 position) noexcept;
+    void MakeBullet(const GameEntity* parent, Vector2 pos, Vector2 vel) noexcept;
+    void MakeMine(const GameEntity* parent, Vector2 position) noexcept;
     void MakeSmallUfo(AABB2 world_bounds) noexcept;
     void MakeBigUfo(AABB2 world_bounds) noexcept;
     void MakeBossUfo(AABB2 world_bounds) noexcept;
@@ -213,8 +213,8 @@ private:
 
     std::unique_ptr<GameState> _current_state{nullptr};
     std::unique_ptr<GameState> _next_state{nullptr};
-    std::vector<std::unique_ptr<Entity>> m_entities{};
-    std::vector<std::unique_ptr<Entity>> m_pending_entities{};
+    std::vector<std::unique_ptr<GameEntity>> m_entities{};
+    std::vector<std::unique_ptr<GameEntity>> m_pending_entities{};
     bool _keyboard_control_active{false};
     bool _mouse_control_active{false};
     bool _controller_control_active{false};

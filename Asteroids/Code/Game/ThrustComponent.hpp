@@ -4,12 +4,12 @@
 
 #include "Engine/Physics/Particles/ParticleEffect.hpp"
 
-#include "Game/Entity.hpp"
+#include "Game/GameEntity.hpp"
 
-class ThrustComponent : public Entity {
+class ThrustComponent : public GameEntity {
 public:
     ThrustComponent() = default;
-    explicit ThrustComponent(Entity* parent, float maxThrust = 100.0f);
+    explicit ThrustComponent(GameEntity* parent, float maxThrust = 100.0f);
     ThrustComponent(const ThrustComponent& other) = default;
     ThrustComponent(ThrustComponent&& other) = default;
     ThrustComponent& operator=(const ThrustComponent& other) = default;
@@ -22,7 +22,7 @@ public:
     void EndFrame() noexcept override;
 
     void OnCreate() noexcept override;
-    void OnCollision(Entity* a, Entity* b) noexcept override;
+    void OnCollision(GameEntity* a, GameEntity* b) noexcept override;
     void OnFire() noexcept override;
     void OnDestroy() noexcept override;
 
@@ -35,7 +35,7 @@ public:
 protected:
 private:
     ParticleEffect m_thrustPS{"flame_emission"};
-    Entity* m_parent{nullptr};
+    GameEntity* m_parent{nullptr};
     Vector2 m_positionOffset{};
     float m_thrustDirectionAngleOffset{0.0f};
     float m_thrust{0.0f};

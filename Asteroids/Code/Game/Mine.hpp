@@ -2,18 +2,18 @@
 
 #include "Engine/Math/Vector2.hpp"
 
-#include "Game/Entity.hpp"
+#include "Game/GameEntity.hpp"
 
-class Mine : public Entity {
+class Mine : public GameEntity {
 public:
-    explicit Mine(const Entity* parent, Vector2 position);
+    explicit Mine(const GameEntity* parent, Vector2 position);
     virtual ~Mine() = default;
 
     void Update(TimeUtils::FPSeconds deltaSeconds) noexcept override;
     void EndFrame() noexcept override;
 
     void OnCreate() noexcept override;
-    void OnCollision(Entity* a, Entity* b) noexcept override;
+    void OnCollision(GameEntity* a, GameEntity* b) noexcept override;
     void OnFire() noexcept override;
     void OnDestroy() noexcept;
 

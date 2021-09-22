@@ -2,7 +2,7 @@
 
 #include "Engine/Core/TimeUtils.hpp"
 
-#include "Game/Entity.hpp"
+#include "Game/GameEntity.hpp"
 
 #include <memory>
 #include <tuple>
@@ -11,7 +11,7 @@
 class Renderer;
 class ConstantBuffer;
 
-class Asteroid : public Entity {
+class Asteroid : public GameEntity {
 public:
     enum class Type {
         Large,
@@ -29,7 +29,7 @@ public:
 
     void OnCreate() noexcept override;
     void OnFire() noexcept override;
-    void OnCollision(Entity* a, Entity* b) noexcept override;
+    void OnCollision(GameEntity* a, GameEntity* b) noexcept override;
     void OnDestroy() noexcept override;
 
     Material* GetMaterial() const noexcept override;

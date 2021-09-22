@@ -22,7 +22,7 @@ class Asteroid;
 class Bullet;
 class Explosion;
 class Ship;
-class Entity;
+class GameEntity;
 class Ufo;
 
 class MainState : public GameState {
@@ -49,7 +49,7 @@ private:
     void HandlePlayerInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds);
     void ClampCameraToWorld() noexcept;
 
-    void WrapAroundWorld(Entity* e) noexcept;
+    void WrapAroundWorld(GameEntity* e) noexcept;
     void UpdateEntities(TimeUtils::FPSeconds deltaSeconds) noexcept;
     void StartNewWave(unsigned int wave_number) noexcept;
 

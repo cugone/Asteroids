@@ -17,7 +17,7 @@
 #include <algorithm>
 
 Explosion::Explosion(Vector2 position)
-: Entity()
+: GameEntity()
 {
     AnimatedSpriteDesc desc{};
     desc.material = g_theRenderer->GetMaterial("explosion");
@@ -39,7 +39,7 @@ Explosion::Explosion(Vector2 position)
 }
 
 void Explosion::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
-    Entity::Update(deltaSeconds);
+    GameEntity::Update(deltaSeconds);
     _sprite->Update(deltaSeconds);
 
     const auto uvs = _sprite->GetCurrentTexCoords();
@@ -75,7 +75,7 @@ void Explosion::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 }
 
 void Explosion::EndFrame() noexcept {
-    Entity::EndFrame();
+    GameEntity::EndFrame();
     if(_sprite->IsFinished()) {
         Kill();
     }
@@ -90,7 +90,7 @@ void Explosion::EndFrame() noexcept {
 }
 
 void Explosion::OnDestroy() noexcept {
-    Entity::OnDestroy();
+    GameEntity::OnDestroy();
 }
 
 Material* Explosion::GetMaterial() const noexcept {
@@ -101,7 +101,7 @@ void Explosion::OnFire() noexcept {
     /* DO NOTHING */
 }
 
-void Explosion::OnCollision(Entity* /*a*/, Entity* /*b*/) noexcept {
+void Explosion::OnCollision(GameEntity* /*a*/, GameEntity* /*b*/) noexcept {
     /* DO NOTHING */
 }
 
