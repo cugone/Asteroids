@@ -7,10 +7,11 @@
 #include "Engine/Math/Vector4.hpp"
 
 #include "Engine/Renderer/Mesh.hpp"
+#include "Engine/Scene/Entity.hpp"
 
 class IWeapon;
 
-class GameEntity {
+class GameEntity : public Entity {
 public:
     enum class Faction {
         None
@@ -19,6 +20,7 @@ public:
         , Asteroid
     };
 
+    GameEntity() noexcept;
     virtual ~GameEntity() = default;
     virtual void BeginFrame() noexcept;
     virtual void Update(TimeUtils::FPSeconds deltaSeconds) noexcept;
@@ -54,6 +56,7 @@ public:
     bool IsDead() const noexcept;
 
     const Matrix4& GetTransform() const noexcept;
+    Matrix4& GetTransform() noexcept;
 
     virtual Material* GetMaterial() const noexcept = 0;
 
@@ -76,7 +79,6 @@ protected:
     void SetPhysicalRadius(float value) noexcept;
 
     IWeapon* m_weapon{};
-    Matrix4 m_transform{};
     Mesh::Builder m_mesh_builder{};
 private:
 

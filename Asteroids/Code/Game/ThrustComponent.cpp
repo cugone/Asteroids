@@ -5,6 +5,8 @@
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/Material.hpp"
 
+#include "Engine/Scene/Components.hpp"
+
 #include "Engine/Services/ServiceLocator.hpp"
 #include "Engine/Services/IRendererService.hpp"
 
@@ -15,6 +17,8 @@ ThrustComponent::ThrustComponent(GameEntity* parent, float maxThrust /*= 100.0f*
     , m_parent(parent)
     , m_maxThrust(maxThrust)
 {
+    auto& transform = parent->GetComponent<TransformComponent>();
+    AddComponent<TransformComponent>(transform.Transform);
     SetCosmeticRadius(7.0f);
 }
 
@@ -36,7 +40,12 @@ void ThrustComponent::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds)
     const auto S = Matrix4::I;
     const auto R = Matrix4::Create2DRotationDegreesMatrix(m_thrustDirectionAngleOffset);
     const auto T = Matrix4::CreateTranslationMatrix(m_positionOffset);
-    m_transform = Matrix4::MakeRT(m_parent->GetTransform(), Matrix4::MakeSRT(S, R, T));
+    auto& transform = GetComponent<TransformComponent>();
+    if(HasParent()) {
+        transform.Transform = Matrix4::MakeRT(GetParent()->GetComponent<TransformComponent>(), Matrix4::MakeSRT(S, R, T));
+    } else {
+        transform.Transform = Matrix4::MakeRT(transform, Matrix4::MakeSRT(S, R, T));
+    }
 
     if(m_thrust) {
         const auto uvs = AABB2::Zero_to_One;
@@ -65,7 +74,7 @@ void ThrustComponent::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds)
 void ThrustComponent::Render() const noexcept {
     m_thrustPS.Render();
     auto& rs = ServiceLocator::get<IRendererService>();
-    rs.SetModelMatrix(m_transform);
+    rs.SetModelMatrix(GetComponent<TransformComponent>());
     Mesh::Render(m_mesh_builder);
 
 }

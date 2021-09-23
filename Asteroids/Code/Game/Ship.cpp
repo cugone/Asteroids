@@ -9,6 +9,8 @@
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/Material.hpp"
 
+#include "Engine/Scene/Components.hpp"
+
 #include "Game/GameCommon.hpp"
 #include "Game/Game.hpp"
 
@@ -26,6 +28,8 @@ Ship::Ship() : Ship(Vector2::Zero) {}
 Ship::Ship(Vector2 position)
     : GameEntity()
 {
+    AddComponent<TransformComponent>();
+
     faction = GameEntity::Faction::Player;
     _thrust = std::move(std::make_unique<ThrustComponent>(this));
 
@@ -66,7 +70,8 @@ void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     const auto S = Matrix4::CreateScaleMatrix(_scale * half_extents);
     const auto R = Matrix4::Create2DRotationDegreesMatrix(GetOrientationDegrees());
     const auto T = Matrix4::CreateTranslationMatrix(GetPosition());
-    m_transform = Matrix4::MakeSRT(S, R, T);
+    auto& transform = GetComponent<TransformComponent>();
+    transform.Transform = Matrix4::MakeSRT(S, R, T);
     
     auto& builder = m_mesh_builder;
     builder.Begin(PrimitiveType::Triangles);

@@ -11,7 +11,6 @@ class Renderer;
 
 class Bullet : public GameEntity {
 public:
-    Bullet() = default;
     explicit Bullet(const GameEntity* parent, Vector2 position, Vector2 velocity) noexcept;
     virtual ~Bullet() = default;
     void Update(TimeUtils::FPSeconds deltaSeconds) noexcept override;

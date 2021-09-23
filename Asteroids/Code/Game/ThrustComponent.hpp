@@ -8,7 +8,6 @@
 
 class ThrustComponent : public GameEntity {
 public:
-    ThrustComponent() = default;
     explicit ThrustComponent(GameEntity* parent, float maxThrust = 100.0f);
     ThrustComponent(const ThrustComponent& other) = default;
     ThrustComponent(ThrustComponent&& other) = default;

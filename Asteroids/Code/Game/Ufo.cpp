@@ -11,6 +11,7 @@
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/Shader.hpp"
 
+#include "Engine/Scene/Components.hpp"
 #include "Engine/Services/ServiceLocator.hpp"
 #include "Engine/Services/IRendererService.hpp"
 
@@ -26,6 +27,8 @@ Ufo::Ufo(Type type, Vector2 position)
     : GameEntity()
     , _type(type)
 {
+    AddComponent<TransformComponent>();
+
     SetCosmeticRadius(GetCosmeticRadiusFromType(_type));
     SetPhysicalRadius(GetPhysicalRadiusFromType(_type));
     SetPosition(position);
@@ -79,7 +82,8 @@ void Ufo::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
         const auto S = Matrix4::CreateScaleMatrix(scale * half_extents);
         const auto R = Matrix4::Create2DRotationDegreesMatrix(GetOrientationDegrees());
         const auto T = Matrix4::CreateTranslationMatrix(GetPosition());
-        m_transform = Matrix4::MakeSRT(S, R, T);
+        auto& transform = GetComponent<TransformComponent>();
+        transform.Transform = Matrix4::MakeSRT(S, R, T);
     }
 
     auto& builder = m_mesh_builder;

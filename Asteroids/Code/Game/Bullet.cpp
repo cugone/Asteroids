@@ -9,6 +9,8 @@
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/Material.hpp"
 
+#include "Engine/Scene/Components.hpp"
+
 #include "Game/GameCommon.hpp"
 #include "Game/GameConfig.hpp"
 #include "Game/Game.hpp"
@@ -19,6 +21,8 @@ Bullet::Bullet(const GameEntity* parent, Vector2 position, Vector2 velocity) noe
 : GameEntity()
 , _parent(parent)
 {
+    AddComponent<TransformComponent>();
+
     faction = _parent->faction;
     SetPosition(position);
     SetVelocity(velocity);
@@ -58,7 +62,8 @@ void Bullet::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
         const auto S = Matrix4::CreateScaleMatrix(half_extents);
         const auto R = Matrix4::Create2DRotationDegreesMatrix(GetOrientationDegrees());
         const auto T = Matrix4::CreateTranslationMatrix(GetPosition());
-        m_transform = Matrix4::MakeSRT(S, R, T);
+        auto& transform = GetComponent<TransformComponent>();
+        transform.Transform = Matrix4::MakeSRT(S, R, T);
     }
 
     auto& builder = m_mesh_builder;

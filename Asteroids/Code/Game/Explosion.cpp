@@ -7,6 +7,8 @@
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/Material.hpp"
 
+#include "Engine/Scene/Components.hpp"
+
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Game/GameBase.hpp"
 
@@ -19,6 +21,8 @@
 Explosion::Explosion(Vector2 position)
 : GameEntity()
 {
+    AddComponent<TransformComponent>();
+
     AnimatedSpriteDesc desc{};
     desc.material = g_theRenderer->GetMaterial("explosion");
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
@@ -50,7 +54,8 @@ void Explosion::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
         const auto S = Matrix4::CreateScaleMatrix(half_extents);
         const auto R = Matrix4::Create2DRotationDegreesMatrix(GetOrientationDegrees());
         const auto T = Matrix4::CreateTranslationMatrix(GetPosition());
-        m_transform = Matrix4::MakeSRT(S, R, T);
+        auto& transform = GetComponent<TransformComponent>();
+        transform.Transform = Matrix4::MakeSRT(S, R, T);
     }
 
     auto& builder = m_mesh_builder;

@@ -6,6 +6,8 @@
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
 
+#include "Engine/Scene/Components.hpp"
+
 #include "Game/GameCommon.hpp"
 #include "Game/Game.hpp"
 #include "Game/Bullet.hpp"
@@ -13,6 +15,8 @@
 Mine::Mine(const GameEntity* parent, Vector2 position)
     : GameEntity()
 {
+    AddComponent<TransformComponent>();
+
     faction = parent->faction;
     SetPosition(position);
     SetCosmeticRadius(25.0f);
@@ -42,7 +46,8 @@ void Mine::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
         const auto S = Matrix4::CreateScaleMatrix(half_extents);
         const auto R = Matrix4::I;
         const auto T = Matrix4::CreateTranslationMatrix(GetPosition());
-        m_transform = Matrix4::MakeSRT(S, R, T);
+        auto& transform = GetComponent<TransformComponent>();
+        transform.Transform = Matrix4::MakeSRT(S, R, T);
     }
 
     auto& builder = m_mesh_builder;

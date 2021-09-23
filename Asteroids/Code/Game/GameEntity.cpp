@@ -9,6 +9,15 @@
 #include "Game/GameCommon.hpp"
 #include "Game/Game.hpp"
 
+#include "Engine/Scene/Components.hpp"
+
+GameEntity::GameEntity() noexcept
+: Entity()
+{
+    AddComponent<TransformComponent>();
+    AddComponent<MeshComponent>();
+}
+
 void GameEntity::BeginFrame() noexcept {
     m_mesh_builder.Clear();
 }
@@ -33,7 +42,7 @@ void GameEntity::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 }
 
 void GameEntity::Render() const noexcept {
-    ServiceLocator::get<IRendererService>().SetModelMatrix(m_transform);
+    ServiceLocator::get<IRendererService>().SetModelMatrix(GetTransform());
     Mesh::Render(m_mesh_builder);
 }
 
@@ -80,7 +89,11 @@ bool GameEntity::IsDead() const noexcept {
 }
 
 const Matrix4& GameEntity::GetTransform() const noexcept {
-    return m_transform;
+    return GetComponent<TransformComponent>();
+}
+
+Matrix4& GameEntity::GetTransform() noexcept {
+    return GetComponent<TransformComponent>();
 }
 
 void GameEntity::DecrementHealth() noexcept {
