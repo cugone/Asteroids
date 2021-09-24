@@ -3,16 +3,20 @@
 #include "Engine/Core/Stopwatch.hpp"
 #include "Engine/Core/TimeUtils.hpp"
 
+#include "Engine/Scene/Scene.hpp"
+
 #include "Game/GameEntity.hpp"
 #include "Game/LaserBulletWeapon.hpp"
+
+#include <memory>
 
 class Renderer;
 class ThrustComponent;
 
 class Ship : public GameEntity {
 public:
-    Ship();
-    explicit Ship(Vector2 position);
+    Ship(std::weak_ptr<Scene> scene);
+    explicit Ship(std::weak_ptr<Scene> scene, Vector2 position);
     virtual ~Ship() = default;
 
     void BeginFrame() noexcept override;

@@ -4,11 +4,15 @@
 
 #include "Engine/Physics/Particles/ParticleEffect.hpp"
 
+#include "Engine/Scene/Scene.hpp"
+
 #include "Game/GameEntity.hpp"
+
+#include <memory>
 
 class ThrustComponent : public GameEntity {
 public:
-    explicit ThrustComponent(GameEntity* parent, float maxThrust = 100.0f);
+    explicit ThrustComponent(std::weak_ptr<Scene> scene, GameEntity* parent, float maxThrust = 100.0f);
     ThrustComponent(const ThrustComponent& other) = default;
     ThrustComponent(ThrustComponent&& other) = default;
     ThrustComponent& operator=(const ThrustComponent& other) = default;

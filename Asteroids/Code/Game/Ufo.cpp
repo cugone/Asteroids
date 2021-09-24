@@ -23,8 +23,8 @@
 #include "Game/GameCommon.hpp"
 #include "Game/GameConfig.hpp"
 
-Ufo::Ufo(Type type, Vector2 position)
-    : GameEntity()
+Ufo::Ufo(std::weak_ptr<Scene> scene, Type type, Vector2 position)
+    : GameEntity(scene.lock()->CreateEntity(), scene)
     , _type(type)
 {
     AddComponent<TransformComponent>();

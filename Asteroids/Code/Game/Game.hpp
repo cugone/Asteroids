@@ -139,26 +139,8 @@ public:
     void Update(TimeUtils::FPSeconds deltaSeconds) noexcept override;
     void Render() const noexcept override;
     void EndFrame() noexcept override;
-    void PostFrameCleanup() noexcept;
 
     std::vector<std::unique_ptr<GameEntity>>& GetEntities() noexcept;
-
-    Ship* GetShip() const noexcept;
-
-    void MakeExplosion(Vector2 position) noexcept;
-    void MakeBullet(const GameEntity* parent, Vector2 pos, Vector2 vel) noexcept;
-    void MakeMine(const GameEntity* parent, Vector2 position) noexcept;
-    void MakeSmallUfo(AABB2 world_bounds) noexcept;
-    void MakeBigUfo(AABB2 world_bounds) noexcept;
-    void MakeBossUfo(AABB2 world_bounds) noexcept;
-
-    void AddNewUfoToWorld(std::unique_ptr<Ufo> newUfo) noexcept;
-    void AddNewAsteroidToWorld(std::unique_ptr<Asteroid> newAsteroid);
-    void MakeLargeAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
-    void MakeLargeAsteroidAt(Vector2 pos) noexcept;
-    void MakeLargeAsteroidOffScreen(AABB2 world_bounds) noexcept;
-    void MakeMediumAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
-    void MakeSmallAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
 
     void DoCameraShake(OrthographicCameraController& controller) const noexcept;
 
@@ -172,6 +154,7 @@ public:
     bool IsGameOver() const noexcept;
     void TogglePause() noexcept;
     bool IsPaused() const noexcept;
+
     void SetAsteroidSpriteSheet() noexcept;
     void SetMineSpriteSheet() noexcept;
     void SetExplosionSpriteSheet() noexcept;
@@ -185,12 +168,7 @@ public:
 
     GameOptions gameOptions{};
     Player player{};
-    unsigned int m_current_wave{1u};
-    std::vector<Asteroid*> asteroids{};
-    std::vector<Ufo*> ufos{};
-    std::vector<Bullet*> bullets{};
-    std::vector<Explosion*> explosions{};
-    std::vector<Mine*> mines{};
+
     std::shared_ptr<SpriteSheet> asteroid_sheet{};
     std::shared_ptr<SpriteSheet> lasercharge_sheet{};
     std::shared_ptr<SpriteSheet> mine_sheet{};
@@ -208,8 +186,6 @@ private:
     void CreateOrLoadOptionsFile() noexcept;
     void CreateOptionsFile() const noexcept;
     void LoadOptionsFile() const noexcept;
-
-    void MakeUfo(Ufo::Type type, AABB2 world_bounds) noexcept;
 
     std::unique_ptr<GameState> _current_state{nullptr};
     std::unique_ptr<GameState> _next_state{nullptr};

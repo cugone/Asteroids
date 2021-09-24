@@ -28,11 +28,11 @@
 #include <type_traits>
 #include <vector>
 
-Asteroid::Asteroid(Vector2 position, Vector2 velocity, float rotationSpeed)
-    : Asteroid(Type::Large, position, velocity, rotationSpeed) {/* DO NOTHING */}
+Asteroid::Asteroid(std::weak_ptr<Scene> scene, Vector2 position, Vector2 velocity, float rotationSpeed)
+    : Asteroid(scene, Type::Large, position, velocity, rotationSpeed) {/* DO NOTHING */}
 
-Asteroid::Asteroid(Type type, Vector2 position, Vector2 velocity, float rotationSpeed)
-    : GameEntity()
+Asteroid::Asteroid(std::weak_ptr<Scene> scene, Type type, Vector2 position, Vector2 velocity, float rotationSpeed)
+    : GameEntity(scene.lock()->CreateEntity(), scene)
     , _type(type)
 {
     AddComponent<TransformComponent>();
@@ -60,15 +60,6 @@ Asteroid::Asteroid(Type type, Vector2 position, Vector2 velocity, float rotation
 
     _sprite = g_theRenderer->CreateAnimatedSprite(desc);
 
-}
-
-long long Asteroid::GetScoreFromType(Type type) {
-    switch(type) {
-    case Type::Large: return 25LL;
-    case Type::Medium: return 50LL;
-    case Type::Small: return 100LL;
-    default: return 0LL;
-    }
 }
 
 void Asteroid::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
@@ -236,19 +227,6 @@ void Asteroid::OnCollision(GameEntity* a, GameEntity* b) noexcept {
 
 void Asteroid::OnCreate() noexcept {
     /* DO NOTHING */
-}
-
-std::pair<float, float> Asteroid::GetRadiiFromType(Type type) const noexcept {
-    switch(type) {
-    case Type::Large:
-        return std::make_pair(50.0f, 40.0f);
-    case Type::Medium:
-        return std::make_pair(25.0f, 20.0f);
-    case Type::Small:
-        return std::make_pair(12.0f, 10.0f);
-    default:
-        return std::make_pair(50.0f, 40.0f);
-    }
 }
 
 int Asteroid::GetHealthFromType(Type type) const noexcept {

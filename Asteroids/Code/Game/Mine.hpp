@@ -2,11 +2,15 @@
 
 #include "Engine/Math/Vector2.hpp"
 
+#include "Engine/Scene/Scene.hpp"
+
 #include "Game/GameEntity.hpp"
+
+#include <memory>
 
 class Mine : public GameEntity {
 public:
-    explicit Mine(const GameEntity* parent, Vector2 position);
+    explicit Mine(std::weak_ptr<Scene> scene, const GameEntity* parent, Vector2 position);
     virtual ~Mine() = default;
 
     void Update(TimeUtils::FPSeconds deltaSeconds) noexcept override;

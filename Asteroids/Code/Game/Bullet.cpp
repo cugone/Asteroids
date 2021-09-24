@@ -17,8 +17,8 @@
 
 #include <algorithm>
 
-Bullet::Bullet(const GameEntity* parent, Vector2 position, Vector2 velocity) noexcept
-: GameEntity()
+Bullet::Bullet(std::weak_ptr<Scene> scene, const GameEntity* parent, Vector2 position, Vector2 velocity) noexcept
+: GameEntity(scene.lock()->CreateEntity(), scene)
 , _parent(parent)
 {
     AddComponent<TransformComponent>();

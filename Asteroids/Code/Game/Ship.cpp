@@ -23,10 +23,10 @@
 
 #include <algorithm>
 
-Ship::Ship() : Ship(Vector2::Zero) {}
+Ship::Ship(std::weak_ptr<Scene> scene) : Ship(scene, Vector2::Zero) {}
 
-Ship::Ship(Vector2 position)
-    : GameEntity()
+Ship::Ship(std::weak_ptr<Scene> scene, Vector2 position)
+    : GameEntity(scene.lock()->CreateEntity(), scene)
 {
     AddComponent<TransformComponent>();
 
@@ -158,7 +158,7 @@ void Ship::OnDestroy() noexcept {
     }
     GameEntity::OnDestroy();
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        game->MakeExplosion(GetPosition());
+        m_Scene.lock()->MakeExplosion(GetPosition());
         SetRespawning();
         game->respawnTimer.Reset();
     }

@@ -18,8 +18,8 @@
 
 #include <algorithm>
 
-Explosion::Explosion(Vector2 position)
-: GameEntity()
+Explosion::Explosion(std::weak_ptr<Scene> scene, Vector2 position)
+: GameEntity(scene.lock()->CreateEntity(), scene)
 {
     AddComponent<TransformComponent>();
 

@@ -12,8 +12,8 @@
 
 #include "Game/GameCommon.hpp"
 
-ThrustComponent::ThrustComponent(GameEntity* parent, float maxThrust /*= 100.0f*/)
-    : GameEntity()
+ThrustComponent::ThrustComponent(std::weak_ptr<Scene> scene, GameEntity* parent, float maxThrust /*= 100.0f*/)
+    : GameEntity(scene.lock()->CreateEntity(), scene)
     , m_parent(parent)
     , m_maxThrust(maxThrust)
 {

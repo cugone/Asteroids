@@ -4,6 +4,8 @@
 
 #include "Engine/Renderer/AnimatedSprite.hpp"
 
+#include "Engine/Scene/Scene.hpp"
+
 #include "Game/GameEntity.hpp"
 
 #include <memory>
@@ -13,7 +15,7 @@ class Renderer;
 
 class Explosion : public GameEntity {
 public:
-    explicit Explosion(Vector2 position);
+    explicit Explosion(std::weak_ptr<Scene> scene, Vector2 position);
 
     virtual ~Explosion() = default;
     void Update(TimeUtils::FPSeconds deltaSeconds) noexcept override;

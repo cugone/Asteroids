@@ -12,8 +12,8 @@
 #include "Game/Game.hpp"
 #include "Game/Bullet.hpp"
 
-Mine::Mine(const GameEntity* parent, Vector2 position)
-    : GameEntity()
+Mine::Mine(std::weak_ptr<Scene> scene, const GameEntity* parent, Vector2 position)
+    : GameEntity(scene.lock()->CreateEntity(), scene)
 {
     AddComponent<TransformComponent>();
 

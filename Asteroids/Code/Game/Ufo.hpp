@@ -3,7 +3,11 @@
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Core/Stopwatch.hpp"
 
+#include "Engine/Scene/Scene.hpp"
+
 #include "Game/GameEntity.hpp"
+
+#include <memory>
 
 class ConstantBuffer;
 
@@ -32,7 +36,7 @@ public:
         ,Last_Boss = Orange
     };
 
-    Ufo(Ufo::Type type, Vector2 position);
+    Ufo(std::weak_ptr<Scene> scene, Ufo::Type type, Vector2 position);
     virtual ~Ufo() = default;
 
     void BeginFrame() noexcept override;

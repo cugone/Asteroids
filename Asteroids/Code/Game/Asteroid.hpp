@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Engine/Core/TimeUtils.hpp"
+#include "Engine/Scene/Scene.hpp"
 
 #include "Game/GameEntity.hpp"
 
@@ -18,8 +19,8 @@ public:
         Medium,
         Small
     };
-    explicit Asteroid(Vector2 position, Vector2 velocity, float rotationSpeed);
-    explicit Asteroid(Type type, Vector2 position, Vector2 velocity, float rotationSpeed);
+    explicit Asteroid(std::weak_ptr<Scene> scene, Vector2 position, Vector2 velocity, float rotationSpeed);
+    explicit Asteroid(std::weak_ptr<Scene> scene, Type type, Vector2 position, Vector2 velocity, float rotationSpeed);
 
     virtual ~Asteroid() = default;
 
@@ -33,12 +34,32 @@ public:
     void OnDestroy() noexcept override;
 
     Material* GetMaterial() const noexcept override;
+
+    static constexpr long long GetScoreFromType(Type type) noexcept {
+        switch(type) {
+        case Type::Large: return 25LL;
+        case Type::Medium: return 50LL;
+        case Type::Small: return 100LL;
+        default: return 0LL;
+        }
+    }
+
+    static constexpr std::pair<const float, const float> GetRadiiFromType(Type type) noexcept {
+        switch(type) {
+        case Type::Large:
+            return std::make_pair<const float, const float>(50.0f, 40.0f);
+        case Type::Medium:
+            return std::make_pair<const float, const float>(25.0f, 20.0f);
+        case Type::Small:
+            return std::make_pair<const float, const float>(12.0f, 10.0f);
+        default:
+            return std::make_pair<const float, const float>(50.0f, 40.0f);
+        }
+    }
 private:
     void OnHit() noexcept;
     Vector4 WasHit() const noexcept;
     void MakeChildAsteroid() const noexcept;
-    long long GetScoreFromType(Type type);
-    std::pair<float, float> GetRadiiFromType(Type type) const noexcept;
     int GetHealthFromType(Type type) const noexcept;
     float CalcChildHeadingFromDifficulty() const noexcept;
     float CalcChildSpeedFromSizeAndDifficulty() const noexcept;

@@ -11,8 +11,8 @@
 
 #include "Engine/Scene/Components.hpp"
 
-GameEntity::GameEntity() noexcept
-: Entity()
+GameEntity::GameEntity(uint32_t handle, std::weak_ptr<Scene> scene) noexcept
+: Entity(handle, scene)
 {
     AddComponent<TransformComponent>();
     AddComponent<MeshComponent>();

@@ -5,13 +5,17 @@
 
 #include "Engine/Math/Vector2.hpp"
 
+#include "Engine/Scene/Scene.hpp"
+
 #include "Game/GameEntity.hpp"
+
+#include <memory>
 
 class Renderer;
 
 class Bullet : public GameEntity {
 public:
-    explicit Bullet(const GameEntity* parent, Vector2 position, Vector2 velocity) noexcept;
+    explicit Bullet(std::weak_ptr<Scene> scene, const GameEntity* parent, Vector2 position, Vector2 velocity) noexcept;
     virtual ~Bullet() = default;
     void Update(TimeUtils::FPSeconds deltaSeconds) noexcept override;
     void EndFrame() noexcept override;

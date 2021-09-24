@@ -8,6 +8,8 @@
 
 #include "Engine/Renderer/Camera2D.hpp"
 
+#include "Engine/Scene/Scene.hpp"
+
 #include "Game/GameCommon.hpp"
 
 #include "Game/Game.hpp"
@@ -24,6 +26,7 @@ class Explosion;
 class Ship;
 class GameEntity;
 class Ufo;
+class Mine;
 
 class MainState : public GameState {
 public:
@@ -53,8 +56,31 @@ private:
     void UpdateEntities(TimeUtils::FPSeconds deltaSeconds) noexcept;
     void StartNewWave(unsigned int wave_number) noexcept;
 
+    void MakeLargeAsteroidOffScreen(AABB2 world_bounds) noexcept;
+    void MakeLargeAsteroidAt(Vector2 pos) noexcept;
+    void MakeLargeAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
+
+    void MakeMediumAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
+
+    void MakeSmallAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
+
+    void AddNewAsteroidToWorld(std::unique_ptr<Asteroid> newAsteroid);
+
+    Ship* GetShip() const noexcept;
+
+    void MakeExplosion(Vector2 position) noexcept;
+    void MakeBullet(const GameEntity* parent, Vector2 pos, Vector2 vel) noexcept;
+    void MakeMine(const GameEntity* parent, Vector2 position) noexcept;
+    void MakeSmallUfo(AABB2 world_bounds) noexcept;
+    void MakeBigUfo(AABB2 world_bounds) noexcept;
+    void MakeBossUfo(AABB2 world_bounds) noexcept;
+
+    void AddNewUfoToWorld(std::unique_ptr<Ufo> newUfo) noexcept;
+
     void MakeUfo() noexcept;
     void MakeUfo(Ufo::Type type) noexcept;
+
+    void MakeUfo(Ufo::Type type, AABB2 world_bounds) noexcept;
 
     void MakeShip() noexcept;
     void MakeLargeAsteroidAtMouse() noexcept;
@@ -88,7 +114,17 @@ private:
     void DoCameraShake() noexcept;
     bool DoFadeOut(TimeUtils::FPSeconds deltaSeconds) noexcept;
 
-    AABB2 world_bounds = AABB2::Zero_to_One;
+    void PostFrameCleanup() noexcept;
+
+    AABB2 m_world_bounds = AABB2::Zero_to_One;
+
+    std::shared_ptr<Scene> m_Scene{};
+    unsigned int m_current_wave{1u};
+    std::vector<Asteroid*> asteroids{};
+    std::vector<Ufo*> ufos{};
+    std::vector<Bullet*> bullets{};
+    std::vector<Explosion*> explosions{};
+    std::vector<Mine*> mines{};
 
     OrthographicCameraController m_cameraController{};
     float m_thrust_force{100.0f};

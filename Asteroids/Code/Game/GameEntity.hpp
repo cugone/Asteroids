@@ -8,6 +8,9 @@
 
 #include "Engine/Renderer/Mesh.hpp"
 #include "Engine/Scene/Entity.hpp"
+#include "Engine/Scene/Scene.hpp"
+
+#include <memory>
 
 class IWeapon;
 
@@ -20,7 +23,7 @@ public:
         , Asteroid
     };
 
-    GameEntity() noexcept;
+    GameEntity(uint32_t handle, std::weak_ptr<Scene> scene) noexcept;
     virtual ~GameEntity() = default;
     virtual void BeginFrame() noexcept;
     virtual void Update(TimeUtils::FPSeconds deltaSeconds) noexcept;
