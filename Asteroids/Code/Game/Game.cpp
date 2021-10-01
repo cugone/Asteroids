@@ -131,29 +131,16 @@ void Game::InitializeAudio() noexcept {
 
 void Game::InitializeSounds() noexcept {
     g_theAudioSystem->RegisterWavFilesFromFolder(g_sound_folderpath);
-    g_theAudioSystem->AddChannelGroup(g_audiogroup_sound);
-    for(const auto& filepath : FileUtils::GetAllPathsInFolders(g_sound_folderpath)) {
-        g_theAudioSystem->AddSoundToChannelGroup(g_audiogroup_sound, filepath);
-    }
-    if(auto* sound_group = g_theAudioSystem->GetChannelGroup(g_audiogroup_sound)) {
-        sound_group->SetVolume(gameOptions.GetSoundVolume() / 10.0f);
-    }
 }
 
 void Game::InitializeMusic() noexcept {
     g_theAudioSystem->RegisterWavFilesFromFolder(g_music_folderpath);
-    g_theAudioSystem->AddChannelGroup(g_audiogroup_music);
-    for(const auto& filepath : FileUtils::GetAllPathsInFolders(g_music_folderpath)) {
-        g_theAudioSystem->AddSoundToChannelGroup(g_audiogroup_music, filepath);
-    }
-    if(auto* music_group = g_theAudioSystem->GetChannelGroup(g_audiogroup_music)) {
-        music_group->SetVolume(gameOptions.GetMusicVolume() / 10.0f);
-    }
-    AudioSystem::SoundDesc desc{};
-    desc.loopCount = -1;
-    desc.frequency = 2.0f;
-    desc.groupName = g_audiogroup_music;
-    g_theAudioSystem->Play(g_music_bgmpath, desc);
+    //TODO: Fix music
+    //AudioSystem::SoundDesc desc{};
+    //desc.loopCount = -1;
+    //desc.frequency = 2.0f;
+    //desc.groupName = g_audiogroup_music;
+    //g_theAudioSystem->Play(g_music_bgmpath, desc);
 }
 
 void Game::BeginFrame() noexcept {

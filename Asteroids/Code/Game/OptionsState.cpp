@@ -210,9 +210,6 @@ void OptionsState::CycleSelectedOptionDown(OptionsMenu selectedItem) noexcept {
     {
         auto cur_soundVolume = m_temp_options.GetSoundVolume();
         m_temp_options.SetSoundVolume(std::clamp(cur_soundVolume ? --cur_soundVolume : cur_soundVolume, m_min_sound_volume, m_max_sound_volume));
-        auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_sound);
-        const auto volumeAsFloat = m_temp_options.GetSoundVolume() / static_cast<float>(m_max_sound_volume);
-        group->SetVolume(volumeAsFloat);
         AudioSystem::SoundDesc desc{};
         desc.groupName = g_audiogroup_sound;
         g_theAudioSystem->Play(g_sound_shootpath, desc);
@@ -222,9 +219,6 @@ void OptionsState::CycleSelectedOptionDown(OptionsMenu selectedItem) noexcept {
     {
         auto cur_musicVolume = m_temp_options.GetMusicVolume();
         m_temp_options.SetMusicVolume(std::clamp(cur_musicVolume ? --cur_musicVolume : cur_musicVolume, m_min_music_volume, m_max_music_volume));
-        auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_music);
-        const auto volumeAsFloat = m_temp_options.GetMusicVolume() / static_cast<float>(m_max_music_volume);
-        group->SetVolume(volumeAsFloat);
         break;
     }
     case OptionsMenu::CameraShake:
@@ -262,9 +256,6 @@ void OptionsState::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
     {
         auto cur_soundVolume = m_temp_options.GetSoundVolume();
         m_temp_options.SetSoundVolume((std::min)(++cur_soundVolume, m_max_sound_volume));
-        auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_sound);
-        const auto volumeAsFloat = m_temp_options.GetSoundVolume() / static_cast<float>(m_max_sound_volume);
-        group->SetVolume(volumeAsFloat);
         AudioSystem::SoundDesc desc{};
         desc.groupName = g_audiogroup_sound;
         g_theAudioSystem->Play(g_sound_shootpath, desc);
@@ -274,9 +265,6 @@ void OptionsState::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
     {
         auto cur_musicVolume = m_temp_options.GetMusicVolume();
         m_temp_options.SetMusicVolume((std::min)(++cur_musicVolume, m_max_music_volume));
-        auto* group = g_theAudioSystem->GetChannelGroup(g_audiogroup_music);
-        const auto volumeAsFloat = m_temp_options.GetMusicVolume() / static_cast<float>(m_max_music_volume);
-        group->SetVolume(volumeAsFloat);
         break;
     }
     case OptionsMenu::CameraShake:
