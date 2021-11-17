@@ -17,7 +17,6 @@ void Entity::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     auto accel = CalcAcceleration();
     auto vel = GetVelocity();
     auto pos = GetPosition();
-    const auto r = GetCosmeticRadius();
     Vector2 new_accel = accel;
     Vector2 new_vel = vel + new_accel * deltaSeconds.count();
     Vector2 new_pos = pos + new_vel * deltaSeconds.count();

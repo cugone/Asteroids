@@ -240,7 +240,6 @@ void Game::AddNewUfoToWorld(std::unique_ptr<Ufo> newUfo) noexcept {
 void Game::MakeUfo(Ufo::Type type, AABB2 world_bounds) noexcept {
     const auto pos = [world_bounds, type]()->const Vector2 {
         const auto world_dims = world_bounds.CalcDimensions();
-        const auto world_width = world_dims.x;
         const auto world_height = world_dims.y;
         const auto cr = Ufo::GetCosmeticRadiusFromType(type);
         const auto y = [world_height, cr]() {
@@ -477,7 +476,7 @@ void Game::DoCameraShake(OrthographicCameraController& controller) const noexcep
         const auto shakeMultiplier = gameOptions.GetCameraShakeStrength();
         if(const auto* ship = GetShip(); ship) {
             const auto speed = ship->GetVelocity().CalcLength();
-            return speed;
+            return speed * shakeMultiplier;
         } else {
             return 0.0f;
         }
