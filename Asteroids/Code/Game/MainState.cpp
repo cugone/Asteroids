@@ -614,7 +614,6 @@ void MainState::DebugRenderEntities() const noexcept {
         return;
     }
     g_theRenderer->SetModelMatrix();
-    g_theRenderer->SetMaterial("__2D");
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
         for(const auto& e : game->GetEntities()) {
             if(!e) {
@@ -628,17 +627,21 @@ void MainState::DebugRenderEntities() const noexcept {
             const auto facing_end = [=]()->Vector2 { auto end = Vector2::X_Axis; end.SetLengthAndHeadingDegrees(orientation, cosmetic_radius); return center + end; }();
             const auto velocity_end = [=]()->Vector2 { auto end = entity->GetVelocity().GetNormalize(); end.SetLengthAndHeadingDegrees(end.CalcHeadingDegrees(), cosmetic_radius); return center + end; }();
             const auto acceleration_end = [=]()->Vector2 { auto end = entity->GetAcceleration().GetNormalize(); end.SetLengthAndHeadingDegrees(end.CalcHeadingDegrees(), cosmetic_radius); return center + end; }();
+            g_theRenderer->SetMaterial("circles");
             g_theRenderer->DrawCircle2D(center, cosmetic_radius, Rgba::Green);
             g_theRenderer->DrawCircle2D(center, physical_radius, Rgba::Red);
+            g_theRenderer->SetMaterial("__2D");
             g_theRenderer->DrawLine2D(center, facing_end, Rgba::Red);
             g_theRenderer->DrawLine2D(center, velocity_end, Rgba::Green);
             g_theRenderer->DrawLine2D(center, acceleration_end, Rgba::Orange);
         }
+        g_theRenderer->SetMaterial("circles");
+        g_theRenderer->DrawCircle2D(m_cameraController.GetCamera().GetPosition(), 25.0f, Rgba::Pink);
+        g_theRenderer->SetMaterial("__2D");
         g_theRenderer->DrawAABB2(world_bounds, Rgba::Green, Rgba::NoAlpha);
         g_theRenderer->DrawAABB2(game->CalcOrthoBounds(m_cameraController), Rgba::White, Rgba::NoAlpha);
         g_theRenderer->DrawAABB2(game->CalcViewBounds(m_cameraController), Rgba::Red, Rgba::NoAlpha);
         g_theRenderer->DrawAABB2(game->CalcCullBounds(m_cameraController), Rgba::White, Rgba::NoAlpha);
-        g_theRenderer->DrawCircle2D(m_cameraController.GetCamera().GetPosition(), 25.0f, Rgba::Pink);
         g_theRenderer->DrawAABB2(CalculateCameraBounds(), Rgba::Periwinkle, Rgba::NoAlpha);
     }
 }
