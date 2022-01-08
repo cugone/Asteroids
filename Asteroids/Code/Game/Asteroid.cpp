@@ -237,13 +237,13 @@ void Asteroid::OnCreate() noexcept {
 std::pair<float, float> Asteroid::GetRadiiFromType(Type type) const noexcept {
     switch(type) {
     case Type::Large:
-        return std::make_pair(50.0f, 40.0f);
+        return std::make_pair(Asteroid::largeAsteroidPhysicalSize, Asteroid::largeAsteroidCosmeticSize);
     case Type::Medium:
-        return std::make_pair(25.0f, 20.0f);
+        return std::make_pair(Asteroid::mediumAsteroidPhysicalSize, Asteroid::mediumAsteroidCosmeticSize);
     case Type::Small:
-        return std::make_pair(12.0f, 10.0f);
+        return std::make_pair(Asteroid::smallAsteroidPhysicalSize, Asteroid::smallAsteroidCosmeticSize);
     default:
-        return std::make_pair(50.0f, 40.0f);
+        return std::make_pair(Asteroid::largeAsteroidPhysicalSize, Asteroid::largeAsteroidCosmeticSize);
     }
 }
 
