@@ -437,10 +437,10 @@ void Game::MakeLargeAsteroidOffScreen(AABB2 world_bounds) noexcept {
         const auto world_dims = world_bounds.CalcDimensions();
         const auto world_width = world_dims.x;
         const auto world_height = world_dims.y;
-        const auto left = Vector2{world_bounds.mins.x, MathUtils::GetRandomNegOneToOne<float>() * world_height};
-        const auto right = Vector2{world_bounds.maxs.x, MathUtils::GetRandomNegOneToOne<float>() * world_height};
-        const auto top = Vector2{MathUtils::GetRandomNegOneToOne<float>() * world_width, world_bounds.mins.y};
-        const auto bottom = Vector2{MathUtils::GetRandomNegOneToOne<float>() * world_width, world_bounds.maxs.y};
+        const auto left = Vector2{world_bounds.mins.x - Asteroid::largeAsteroidCosmeticSize - 1.0f, MathUtils::GetRandomNegOneToOne<float>() * world_height};
+        const auto right = Vector2{world_bounds.maxs.x + Asteroid::largeAsteroidCosmeticSize + 1.0f, MathUtils::GetRandomNegOneToOne<float>() * world_height};
+        const auto top = Vector2{MathUtils::GetRandomNegOneToOne<float>() * world_width, world_bounds.mins.y - Asteroid::largeAsteroidCosmeticSize - 1.0f };
+        const auto bottom = Vector2{MathUtils::GetRandomNegOneToOne<float>() * world_width, world_bounds.maxs.y + Asteroid::largeAsteroidCosmeticSize + 1.0f };
         const auto i = MathUtils::GetRandomLessThan(4);
         switch(i) {
         case 0:
