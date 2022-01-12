@@ -19,8 +19,15 @@ public:
         Medium,
         Small
     };
-    explicit Asteroid(std::weak_ptr<Scene> scene, Vector2 position, Vector2 velocity, float rotationSpeed);
-    explicit Asteroid(std::weak_ptr<Scene> scene, Type type, Vector2 position, Vector2 velocity, float rotationSpeed);
+    static constexpr float largeAsteroidCosmeticSize = 50.0f;
+    static constexpr float largeAsteroidPhysicalSize = 40.0f;
+    static constexpr float mediumAsteroidCosmeticSize = 25.0f;
+    static constexpr float mediumAsteroidPhysicalSize = 20.0f;
+    static constexpr float smallAsteroidCosmeticSize = 12.0f;
+    static constexpr float smallAsteroidPhysicalSize = 10.0f;
+
+    explicit Asteroid(Vector2 position, Vector2 velocity, float rotationSpeed);
+    explicit Asteroid(Type type, Vector2 position, Vector2 velocity, float rotationSpeed);
 
     virtual ~Asteroid() = default;
 

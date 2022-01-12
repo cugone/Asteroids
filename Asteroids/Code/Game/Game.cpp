@@ -131,29 +131,16 @@ void Game::InitializeAudio() noexcept {
 
 void Game::InitializeSounds() noexcept {
     g_theAudioSystem->RegisterWavFilesFromFolder(g_sound_folderpath);
-    g_theAudioSystem->AddChannelGroup(g_audiogroup_sound);
-    for(const auto& filepath : FileUtils::GetAllPathsInFolders(g_sound_folderpath)) {
-        g_theAudioSystem->AddSoundToChannelGroup(g_audiogroup_sound, filepath);
-    }
-    if(auto* sound_group = g_theAudioSystem->GetChannelGroup(g_audiogroup_sound)) {
-        sound_group->SetVolume(gameOptions.GetSoundVolume() / 10.0f);
-    }
 }
 
 void Game::InitializeMusic() noexcept {
     g_theAudioSystem->RegisterWavFilesFromFolder(g_music_folderpath);
-    g_theAudioSystem->AddChannelGroup(g_audiogroup_music);
-    for(const auto& filepath : FileUtils::GetAllPathsInFolders(g_music_folderpath)) {
-        g_theAudioSystem->AddSoundToChannelGroup(g_audiogroup_music, filepath);
-    }
-    if(auto* music_group = g_theAudioSystem->GetChannelGroup(g_audiogroup_music)) {
-        music_group->SetVolume(gameOptions.GetMusicVolume() / 10.0f);
-    }
-    AudioSystem::SoundDesc desc{};
-    desc.loopCount = -1;
-    desc.frequency = 2.0f;
-    desc.groupName = g_audiogroup_music;
-    g_theAudioSystem->Play(g_music_bgmpath, desc);
+    //TODO: Fix music
+    //AudioSystem::SoundDesc desc{};
+    //desc.loopCount = -1;
+    //desc.frequency = 2.0f;
+    //desc.groupName = g_audiogroup_music;
+    //g_theAudioSystem->Play(g_music_bgmpath, desc);
 }
 
 void Game::BeginFrame() noexcept {
@@ -240,6 +227,39 @@ AABB2 Game::CalcCullBoundsFromOrthoBounds(const OrthographicCameraController& co
     AABB2 cullBounds = CalcOrthoBounds(controller);
     cullBounds.AddPaddingToSides(-1.0f, -1.0f);
     return cullBounds;
+}
+
+void Game::AddNewUfoToWorld(std::unique_ptr<Ufo> newUfo) noexcept {
+    auto* last_entity = newUfo.get();
+    m_pending_entities.emplace_back(std::move(newUfo));
+    auto* asUfo = reinterpret_cast<Ufo*>(last_entity);
+    ufos.push_back(asUfo);
+    asUfo->OnCreate();
+}
+
+void Game::MakeUfo(Ufo::Type type, AABB2 world_bounds) noexcept {
+    const auto pos = [world_bounds, type]()->const Vector2 {
+        const auto world_dims = world_bounds.CalcDimensions();
+        const auto world_height = world_dims.y;
+        const auto cr = Ufo::GetCosmeticRadiusFromType(type);
+        const auto y = [world_height, cr]() {
+            const auto r = MathUtils::GetRandomNegOneToOne<float>();
+            if(r < 0.0f) {
+                return r * world_height + cr;
+            }
+            return r * world_height - cr;
+        }();
+
+        const auto left = Vector2{world_bounds.mins.x, y };
+        const auto right = Vector2{world_bounds.maxs.x, y};
+        return MathUtils::GetRandomBool() ? left : right;
+    }();
+    auto newUfo = std::make_unique<Ufo>(type, pos);
+    const auto ptr = newUfo.get();
+    if(auto* game = GetGameAs<Game>(); game != nullptr) {
+        game->AddNewUfoToWorld(std::move(newUfo));
+    }
+    ptr->SetVelocity(Vector2{pos.x < 0.0f ? -ptr->GetSpeed() : ptr->GetSpeed(), 0.0f});
 }
 
 void Game::SetControlType() noexcept {
@@ -334,13 +354,115 @@ std::vector<std::unique_ptr<GameEntity>>& Game::GetEntities() noexcept {
     return m_entities;
 }
 
+Ship* Game::GetShip() const noexcept {
+    if(const auto state = dynamic_cast<MainState*>(_current_state.get()); state != nullptr) {
+        return state->ship;
+    }
+    return nullptr;
+}
+
+void Game::MakeBullet(const Entity* parent, Vector2 pos, Vector2 vel) noexcept {
+    auto newBullet = std::make_unique<Bullet>(parent, pos, vel);
+    auto* last_entity = newBullet.get();
+    m_pending_entities.emplace_back(std::move(newBullet));
+    auto* asBullet = reinterpret_cast<Bullet*>(last_entity);
+    bullets.push_back(asBullet);
+    asBullet->OnCreate();
+}
+
+void Game::MakeMine(const Entity* parent, Vector2 position) noexcept {
+    SetMineSpriteSheet();
+    auto newMine = std::make_unique<Mine>(parent, position);
+    auto* last_entity = newMine.get();
+    m_pending_entities.emplace_back(std::move(newMine));
+    auto* asMine = reinterpret_cast<Mine*>(last_entity);
+    mines.push_back(asMine);
+    asMine->OnCreate();
+}
+
+void Game::MakeSmallUfo(AABB2 world_bounds) noexcept {
+    SetUfoSpriteSheets();
+    MakeUfo(Ufo::Type::Small, world_bounds);
+}
+
+void Game::MakeBigUfo(AABB2 world_bounds) noexcept {
+    SetUfoSpriteSheets();
+    MakeUfo(Ufo::Type::Big, world_bounds);
+}
+
+void Game::MakeBossUfo(AABB2 world_bounds) noexcept {
+    SetUfoSpriteSheets();
+    MakeUfo(Ufo::Type::Boss, world_bounds);
+}
+
+void Game::AddNewAsteroidToWorld(std::unique_ptr<Asteroid> newAsteroid) {
+    auto* last_entity = newAsteroid.get();
+    m_pending_entities.emplace_back(std::move(newAsteroid));
+    auto* asAsteroid = reinterpret_cast<Asteroid*>(last_entity);
+    asteroids.push_back(asAsteroid);
+    asAsteroid->OnCreate();
+}
+
+void Game::MakeLargeAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept {
+    SetAsteroidSpriteSheet();
+    auto newAsteroid = std::make_unique<Asteroid>(Asteroid::Type::Large, pos, vel, rotationSpeed);
+    AddNewAsteroidToWorld(std::move(newAsteroid));
+}
+
+void Game::MakeLargeAsteroidAt(Vector2 pos) noexcept {
+    const auto vx = MathUtils::GetRandomNegOneToOne<float>();
+    const auto vy = MathUtils::GetRandomNegOneToOne<float>();
+    const auto s = MathUtils::GetRandomInRange<float>(20.0f, 100.0f);
+    const auto vel = Vector2{vx, vy} * s;
+    const auto rot = MathUtils::GetRandomNegOneToOne<float>() * 180.0f;
+    MakeLargeAsteroid(pos, vel, rot);
+}
+
+void Game::MakeLargeAsteroidOffScreen(AABB2 world_bounds) noexcept {
+    const auto pos = [world_bounds]()->const Vector2 {
+        const auto world_dims = world_bounds.CalcDimensions();
+        const auto world_width = world_dims.x;
+        const auto world_height = world_dims.y;
+        const auto left = Vector2{world_bounds.mins.x - Asteroid::largeAsteroidCosmeticSize - 1.0f, MathUtils::GetRandomNegOneToOne<float>() * world_height};
+        const auto right = Vector2{world_bounds.maxs.x + Asteroid::largeAsteroidCosmeticSize + 1.0f, MathUtils::GetRandomNegOneToOne<float>() * world_height};
+        const auto top = Vector2{MathUtils::GetRandomNegOneToOne<float>() * world_width, world_bounds.mins.y - Asteroid::largeAsteroidCosmeticSize - 1.0f };
+        const auto bottom = Vector2{MathUtils::GetRandomNegOneToOne<float>() * world_width, world_bounds.maxs.y + Asteroid::largeAsteroidCosmeticSize + 1.0f };
+        const auto i = MathUtils::GetRandomLessThan(4);
+        switch(i) {
+        case 0:
+            return left;
+        case 1:
+            return right;
+        case 2:
+            return top;
+        case 3:
+            return bottom;
+        default:
+            return left;
+        }
+    }();
+    MakeLargeAsteroidAt(pos);
+}
+
+void Game::MakeMediumAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept {
+    SetAsteroidSpriteSheet();
+    auto newAsteroid = std::make_unique<Asteroid>(Asteroid::Type::Medium, pos, vel, rotationSpeed);
+    AddNewAsteroidToWorld(std::move(newAsteroid));
+}
+
+void Game::MakeSmallAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept {
+    SetAsteroidSpriteSheet();
+    auto newAsteroid = std::make_unique<Asteroid>(Asteroid::Type::Small, pos, vel, rotationSpeed);
+    AddNewAsteroidToWorld(std::move(newAsteroid));
+}
+
 void Game::DoCameraShake(OrthographicCameraController& controller) const noexcept {
     controller.SetupCameraShake(gameOptions.GetMaxShakeOffsetHorizontal(), gameOptions.GetMaxShakeOffsetVertical(), gameOptions.GetMaxShakeAngle());
     controller.DoCameraShake([this]() {
         const auto shakeMultiplier = gameOptions.GetCameraShakeStrength();
         if(const auto* ship = GetShip(); ship) {
             const auto speed = ship->GetVelocity().CalcLength();
-            return speed;
+            return speed * shakeMultiplier;
         } else {
             return 0.0f;
         }
