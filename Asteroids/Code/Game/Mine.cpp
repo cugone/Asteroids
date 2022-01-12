@@ -11,6 +11,7 @@
 #include "Game/GameCommon.hpp"
 #include "Game/Game.hpp"
 #include "Game/Bullet.hpp"
+#include "Game/MainState.hpp"
 
 Mine::Mine(std::weak_ptr<Scene> scene, const GameEntity* parent, Vector2 position)
     : GameEntity(scene.lock()->CreateEntity(), scene)
@@ -73,14 +74,6 @@ void Mine::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 
 void Mine::EndFrame() noexcept {
     GameEntity::EndFrame();
-    if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        if(const auto& found = std::find(std::begin(game->mines), std::end(game->mines), this);
-            (found != std::end(game->mines) &&
-                (*found)->IsDead()))
-        {
-            *found = nullptr;
-        }
-    }
 }
 
 void Mine::OnCreate() noexcept {
@@ -98,7 +91,9 @@ void Mine::OnFire() noexcept {
 void Mine::OnDestroy() noexcept {
     GameEntity::OnDestroy();
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        game->MakeExplosion(GetPosition());
+        if (auto* const mainState = dynamic_cast<MainState* const>(game->GetCurrentState()); mainState != nullptr) {
+            mainState->MakeExplosion(GetPosition());
+        }
     }
 }
 

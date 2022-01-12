@@ -17,9 +17,11 @@ ThrustComponent::ThrustComponent(std::weak_ptr<Scene> scene, GameEntity* parent,
     , m_parent(parent)
     , m_maxThrust(maxThrust)
 {
-    auto& transform = parent->GetComponent<TransformComponent>();
-    AddComponent<TransformComponent>(transform.Transform);
-    SetCosmeticRadius(7.0f);
+    if (m_parent->HasComponent<TransformComponent>()) {
+        auto& transform = m_parent->GetComponent<TransformComponent>();
+        AddComponent<TransformComponent>(transform.Transform);
+        SetCosmeticRadius(7.0f);
+    }
 }
 
 void ThrustComponent::BeginFrame() noexcept {

@@ -40,6 +40,13 @@ public:
     void EndFrame() noexcept override;
 
     mutable Ship* ship{nullptr};
+    
+    void MakeExplosion(Vector2 position) noexcept;
+    void MakeMediumAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
+    void MakeSmallAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
+    void MakeBullet(const GameEntity* parent, Vector2 pos, Vector2 vel) noexcept;
+    void MakeMine(const GameEntity* parent, Vector2 position) noexcept;
+
 protected:
 private:
     std::unique_ptr<GameState> HandleInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept override;
@@ -60,17 +67,10 @@ private:
     void MakeLargeAsteroidAt(Vector2 pos) noexcept;
     void MakeLargeAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
 
-    void MakeMediumAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
-
-    void MakeSmallAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
-
     void AddNewAsteroidToWorld(std::unique_ptr<Asteroid> newAsteroid);
 
     Ship* GetShip() const noexcept;
 
-    void MakeExplosion(Vector2 position) noexcept;
-    void MakeBullet(const GameEntity* parent, Vector2 pos, Vector2 vel) noexcept;
-    void MakeMine(const GameEntity* parent, Vector2 position) noexcept;
     void MakeSmallUfo(AABB2 world_bounds) noexcept;
     void MakeBigUfo(AABB2 world_bounds) noexcept;
     void MakeBossUfo(AABB2 world_bounds) noexcept;
@@ -125,9 +125,12 @@ private:
     std::vector<Bullet*> bullets{};
     std::vector<Explosion*> explosions{};
     std::vector<Mine*> mines{};
+    std::vector<std::unique_ptr<GameEntity>> m_entities{};
+    std::vector<std::unique_ptr<GameEntity>> m_pending_entities{};
 
     OrthographicCameraController m_cameraController{};
     float m_thrust_force{100.0f};
     float m_fadeOut_alpha{0.0f};
     bool m_debug_render{false};
+    bool IsWaveComplete() const noexcept;
 };

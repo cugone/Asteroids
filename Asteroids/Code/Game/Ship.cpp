@@ -13,6 +13,7 @@
 
 #include "Game/GameCommon.hpp"
 #include "Game/Game.hpp"
+#include "Game/MainState.hpp"
 
 #include "Game/Asteroid.hpp"
 #include "Game/Bullet.hpp"
@@ -28,10 +29,8 @@ Ship::Ship(std::weak_ptr<Scene> scene) : Ship(scene, Vector2::Zero) {}
 Ship::Ship(std::weak_ptr<Scene> scene, Vector2 position)
     : GameEntity(scene.lock()->CreateEntity(), scene)
 {
-    AddComponent<TransformComponent>();
-
     faction = GameEntity::Faction::Player;
-    _thrust = std::move(std::make_unique<ThrustComponent>(this));
+    _thrust = std::move(std::make_unique<ThrustComponent>(scene, this));
 
     scoreValue = -100LL;
     SetPosition(position);
@@ -158,9 +157,11 @@ void Ship::OnDestroy() noexcept {
     }
     GameEntity::OnDestroy();
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        m_Scene.lock()->MakeExplosion(GetPosition());
-        SetRespawning();
-        game->respawnTimer.Reset();
+        if (auto* const mainState = dynamic_cast<MainState* const>(game->GetCurrentState()); mainState != nullptr) {
+            mainState->MakeExplosion(GetPosition());
+            SetRespawning();
+            game->respawnTimer.Reset();
+        }
     }
 }
 
@@ -257,13 +258,17 @@ void Ship::OnCreate() noexcept {
 
 void Ship::MakeBullet() const noexcept {
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        game->MakeBullet(this, CalcNewBulletPosition(), CalcNewBulletVelocity());
+        if (auto* const mainState = dynamic_cast<MainState* const>(game->GetCurrentState()); mainState != nullptr) {
+            mainState->MakeBullet(this, CalcNewBulletPosition(), CalcNewBulletVelocity());
+        }
     }
 }
 
 void Ship::MakeMine() const noexcept {
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        game->MakeMine(this, GetPosition());
+        if (auto* const mainState = dynamic_cast<MainState* const>(game->GetCurrentState()); mainState != nullptr) {
+            mainState->MakeMine(this, GetPosition());
+        }
     }
 }
 

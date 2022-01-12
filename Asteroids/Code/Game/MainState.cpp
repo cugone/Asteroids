@@ -30,7 +30,7 @@
 #include <utility>
 
 void MainState::OnEnter() noexcept {
-
+    m_Scene = std::make_shared<Scene>();
     m_world_bounds = AABB2::Zero_to_One;
     auto dims = Vector2{g_theRenderer->GetOutput()->GetDimensions()};
     //TODO: Fix world dims
@@ -71,8 +71,8 @@ void MainState::OnExit() noexcept {
         explosions.shrink_to_fit();
         ufos.clear();
         ufos.shrink_to_fit();
-        game->GetEntities().clear();
-        game->GetEntities().shrink_to_fit();
+        m_entities.clear();
+        m_entities.shrink_to_fit();
         m_current_wave = 1u;
         ship = nullptr;
     }
@@ -81,7 +81,7 @@ void MainState::OnExit() noexcept {
 void MainState::BeginFrame() noexcept {
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
         game->SetControlType();
-        for(auto& entity : game->GetEntities()) {
+        for(auto& entity : m_entities) {
             if(entity) {
                 entity->BeginFrame();
             }
@@ -151,12 +151,12 @@ void MainState::RenderFadeOutOverlay() const noexcept {
 
 void MainState::EndFrame() noexcept {
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        for(auto& entity : game->GetEntities()) {
+        for(auto& entity : m_entities) {
             if(entity) {
                 entity->EndFrame();
             }
         }
-        for(auto& entity : game->GetEntities()) {
+        for(auto& entity : m_entities) {
             if(entity && entity->IsDead()) {
                 entity->OnDestroy();
                 entity.reset();
@@ -355,10 +355,10 @@ void MainState::WrapAroundWorld(GameEntity* e) noexcept {
 
 void MainState::UpdateEntities(TimeUtils::FPSeconds deltaSeconds) noexcept {
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        if(game->asteroids.empty()) {
-            StartNewWave(game->m_current_wave++);
+        if(IsWaveComplete()) {
+            StartNewWave(m_current_wave++);
         }
-        for(auto& entity : game->GetEntities()) {
+        for(auto& entity : m_entities) {
             if(entity) {
                 WrapAroundWorld(entity.get());
                 entity->Update(deltaSeconds);
@@ -382,12 +382,10 @@ void MainState::MakeLargeAsteroidOffScreen(AABB2 world_bounds) noexcept {
         const auto world_dims = world_bounds.CalcDimensions();
         const auto world_width = world_dims.x;
         const auto world_height = world_dims.y;
-        const auto asteroid_half_width = Asteroid::GetRadiiFromType(Asteroid::Type::Large).first;
-        const auto asteroid_half_height = Asteroid::GetRadiiFromType(Asteroid::Type::Large).second;
-        const auto left = Vector2{world_bounds.mins.x - asteroid_half_width, MathUtils::GetRandomNegOneToOne<float>() * world_height};
-        const auto right = Vector2{world_bounds.maxs.x + asteroid_half_width, MathUtils::GetRandomNegOneToOne<float>() * world_height};
-        const auto top = Vector2{MathUtils::GetRandomNegOneToOne<float>() * world_width, world_bounds.mins.y - asteroid_half_height};
-        const auto bottom = Vector2{MathUtils::GetRandomNegOneToOne<float>() * world_width, world_bounds.maxs.y + asteroid_half_height};
+        const auto left = Vector2{world_bounds.mins.x - Asteroid::largeAsteroidCosmeticSize - 1.0f, MathUtils::GetRandomNegOneToOne<float>() * world_height};
+        const auto right = Vector2{world_bounds.maxs.x + Asteroid::largeAsteroidCosmeticSize + 1.0f, MathUtils::GetRandomNegOneToOne<float>() * world_height};
+        const auto top = Vector2{MathUtils::GetRandomNegOneToOne<float>() * world_width, world_bounds.mins.y - Asteroid::largeAsteroidCosmeticSize - 1.0f};
+        const auto bottom = Vector2{MathUtils::GetRandomNegOneToOne<float>() * world_width, world_bounds.maxs.y + Asteroid::largeAsteroidCosmeticSize + 1.0f };
         const auto i = MathUtils::GetRandomLessThan(4);
         switch(i) {
         case 0:
@@ -427,7 +425,7 @@ void MainState::MakeMediumAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed
         game->SetAsteroidSpriteSheet();
     }
 
-    auto newAsteroid = std::make_unique<Asteroid>(Asteroid::Type::Medium, pos, vel, rotationSpeed);
+    auto newAsteroid = std::make_unique<Asteroid>(m_Scene, Asteroid::Type::Medium, pos, vel, rotationSpeed);
     AddNewAsteroidToWorld(std::move(newAsteroid));
 }
 
@@ -436,7 +434,7 @@ void MainState::MakeSmallAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed)
         game->SetAsteroidSpriteSheet();
     }
 
-    auto newAsteroid = std::make_unique<Asteroid>(Asteroid::Type::Small, pos, vel, rotationSpeed);
+    auto newAsteroid = std::make_unique<Asteroid>(m_Scene, Asteroid::Type::Small, pos, vel, rotationSpeed);
     AddNewAsteroidToWorld(std::move(newAsteroid));
 }
 
@@ -453,8 +451,10 @@ Ship* MainState::GetShip() const noexcept {
 }
 
 void MainState::MakeExplosion(Vector2 position) noexcept {
-    SetExplosionSpriteSheet();
-    auto newExplosion = std::make_unique<Explosion>(position);
+    if (auto* game = GetGameAs<Game>(); game) {
+        game->SetExplosionSpriteSheet();
+    }
+    auto newExplosion = std::make_unique<Explosion>(m_Scene, position);
     auto* last_entity = newExplosion.get();
     m_pending_entities.emplace_back(std::move(newExplosion));
     auto* asExplosion = reinterpret_cast<Explosion*>(last_entity);
@@ -463,7 +463,7 @@ void MainState::MakeExplosion(Vector2 position) noexcept {
 }
 
 void MainState::MakeBullet(const GameEntity* parent, Vector2 pos, Vector2 vel) noexcept {
-    auto newBullet = std::make_unique<Bullet>(parent, pos, vel);
+    auto newBullet = std::make_unique<Bullet>(m_Scene, parent, pos, vel);
     auto* last_entity = newBullet.get();
     m_pending_entities.emplace_back(std::move(newBullet));
     auto* asBullet = reinterpret_cast<Bullet*>(last_entity);
@@ -472,8 +472,11 @@ void MainState::MakeBullet(const GameEntity* parent, Vector2 pos, Vector2 vel) n
 }
 
 void MainState::MakeMine(const GameEntity* parent, Vector2 position) noexcept {
-    SetMineSpriteSheet();
-    auto newMine = std::make_unique<Mine>(parent, position);
+    if (auto* game = GetGameAs<Game>(); game) {
+        game->SetMineSpriteSheet();
+    }
+
+    auto newMine = std::make_unique<Mine>(m_Scene, parent, position);
     auto* last_entity = newMine.get();
     m_pending_entities.emplace_back(std::move(newMine));
     auto* asMine = reinterpret_cast<Mine*>(last_entity);
@@ -482,17 +485,23 @@ void MainState::MakeMine(const GameEntity* parent, Vector2 position) noexcept {
 }
 
 void MainState::MakeSmallUfo(AABB2 world_bounds) noexcept {
-    SetUfoSpriteSheets();
+    if (auto* game = GetGameAs<Game>(); game) {
+        game->SetUfoSpriteSheets();
+    }
     MakeUfo(Ufo::Type::Small, world_bounds);
 }
 
 void MainState::MakeBigUfo(AABB2 world_bounds) noexcept {
-    SetUfoSpriteSheets();
+    if (auto* game = GetGameAs<Game>(); game) {
+        game->SetUfoSpriteSheets();
+    }
     MakeUfo(Ufo::Type::Big, world_bounds);
 }
 
 void MainState::MakeBossUfo(AABB2 world_bounds) noexcept {
-    SetUfoSpriteSheets();
+    if (auto* game = GetGameAs<Game>(); game) {
+        game->SetUfoSpriteSheets();
+    }
     MakeUfo(Ufo::Type::Boss, world_bounds);
 }
 
@@ -522,7 +531,6 @@ void MainState::MakeUfo(Ufo::Type type) noexcept {
 void MainState::MakeUfo(Ufo::Type type, AABB2 world_bounds) noexcept {
     const auto pos = [world_bounds, type]()->const Vector2 {
         const auto world_dims = world_bounds.CalcDimensions();
-        const auto world_width = world_dims.x;
         const auto world_height = world_dims.y;
         const auto cr = Ufo::GetCosmeticRadiusFromType(type);
         const auto y = [world_height, cr]() {
@@ -537,24 +545,22 @@ void MainState::MakeUfo(Ufo::Type type, AABB2 world_bounds) noexcept {
         const auto right = Vector2{world_bounds.maxs.x, y};
         return MathUtils::GetRandomBool() ? left : right;
     }();
-    auto newUfo = std::make_unique<Ufo>(type, pos);
+    auto newUfo = std::make_unique<Ufo>(m_Scene, type, pos);
     const auto ptr = newUfo.get();
-    if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        game->AddNewUfoToWorld(std::move(newUfo));
-    }
+    AddNewUfoToWorld(std::move(newUfo));
     ptr->SetVelocity(Vector2{pos.x < 0.0f ? -ptr->GetSpeed() : ptr->GetSpeed(), 0.0f});
 }
 
 void MainState::MakeShip() noexcept {
     if(!ship) {
         if(auto* game = GetGameAs<Game>(); game != nullptr) {
-            if(game->GetEntities().empty()) {
-                game->GetEntities().emplace_back(std::make_unique<Ship>(m_world_bounds.CalcCenter()));
+            if(m_entities.empty()) {
+                m_entities.emplace_back(std::make_unique<Ship>(m_Scene->get(), m_world_bounds.CalcCenter()));
             } else {
-                auto iter = game->GetEntities().begin();
-                *iter = std::move(std::make_unique<Ship>(m_world_bounds.CalcCenter()));
+                auto iter = m_entities.begin();
+                *iter = std::move(std::make_unique<Ship>(m_Scene, m_world_bounds.CalcCenter()));
             }
-            ship = reinterpret_cast<Ship*>(game->GetEntities().begin()->get());
+            ship = reinterpret_cast<Ship*>(m_entities.begin()->get());
             ship->OnCreate();
         }
     }
@@ -576,31 +582,27 @@ void MainState::HandleBulletCollision() const noexcept {
 }
 
 void MainState::HandleBulletAsteroidCollision() const noexcept {
-    if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        for(auto& bullet : game->bullets) {
-            Disc2 bulletCollisionMesh{bullet->GetPosition(), bullet->GetPhysicalRadius()};
-            for(auto& asteroid : game->asteroids) {
-                Disc2 asteroidCollisionMesh{asteroid->GetPosition(), asteroid->GetPhysicalRadius()};
-                if(MathUtils::DoDiscsOverlap(bulletCollisionMesh, asteroidCollisionMesh)) {
-                    asteroid->OnCollision(asteroid, bullet);
-                }
+    for(auto& bullet : bullets) {
+        Disc2 bulletCollisionMesh{bullet->GetPosition(), bullet->GetPhysicalRadius()};
+        for(auto& asteroid : asteroids) {
+            Disc2 asteroidCollisionMesh{asteroid->GetPosition(), asteroid->GetPhysicalRadius()};
+            if(MathUtils::DoDiscsOverlap(bulletCollisionMesh, asteroidCollisionMesh)) {
+                asteroid->OnCollision(asteroid, bullet);
             }
         }
     }
 }
 
 void MainState::HandleBulletUfoCollision() const noexcept {
-    if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        for(auto& ufo : game->ufos) {
-            Disc2 ufoCollisionMesh{ufo->GetPosition(), ufo->GetPhysicalRadius()};
-            for(auto& bullet : game->bullets) {
-                if(bullet->faction == ufo->faction) {
-                    continue;
-                }
-                Disc2 bulletCollisionMesh{bullet->GetPosition(), bullet->GetPhysicalRadius()};
-                if(MathUtils::DoDiscsOverlap(bulletCollisionMesh, ufoCollisionMesh)) {
-                    ufo->OnCollision(ufo, bullet);
-                }
+    for(auto& ufo : ufos) {
+        Disc2 ufoCollisionMesh{ufo->GetPosition(), ufo->GetPhysicalRadius()};
+        for(auto& bullet : bullets) {
+            if(bullet->faction == ufo->faction) {
+                continue;
+            }
+            Disc2 bulletCollisionMesh{bullet->GetPosition(), bullet->GetPhysicalRadius()};
+            if(MathUtils::DoDiscsOverlap(bulletCollisionMesh, ufoCollisionMesh)) {
+                ufo->OnCollision(ufo, bullet);
             }
         }
     }
@@ -617,7 +619,7 @@ void MainState::HandleShipAsteroidCollision() noexcept {
     }
     Disc2 shipCollisionMesh{ship->GetPosition(), ship->GetPhysicalRadius()};
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        for(auto& asteroid : game->asteroids) {
+        for(auto& asteroid : asteroids) {
             Disc2 asteroidCollisionMesh{asteroid->GetPosition(), asteroid->GetPhysicalRadius()};
             if(MathUtils::DoDiscsOverlap(shipCollisionMesh, asteroidCollisionMesh)) {
                 ship->OnCollision(ship, asteroid);
@@ -638,7 +640,7 @@ void MainState::HandleShipBulletCollision() noexcept {
     }
     const auto shipCollisionMesh = Disc2{ship->GetPosition(), ship->GetPhysicalRadius()};
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        for(auto& bullet : game->bullets) {
+        for(auto& bullet : bullets) {
             const auto bulletCollisionMesh = Disc2{bullet->GetPosition(), bullet->GetPhysicalRadius()};
             if(MathUtils::DoDiscsOverlap(shipCollisionMesh, bulletCollisionMesh)) {
                 ship->OnCollision(ship, bullet);
@@ -659,9 +661,9 @@ void MainState::HandleMineCollision() noexcept {
 
 void MainState::HandleMineAsteroidCollision() noexcept {
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        for(const auto& mine : game->mines) {
+        for(const auto& mine : mines) {
             const auto mineCollisionMesh = Disc2{mine->GetPosition(), mine->GetPhysicalRadius()};
-            for(const auto& asteroid : game->asteroids) {
+            for(const auto& asteroid : asteroids) {
                 const auto asteroidCollisionMesh = Disc2{asteroid->GetPosition(), asteroid->GetPhysicalRadius()};
                 if(MathUtils::DoDiscsOverlap(mineCollisionMesh, asteroidCollisionMesh)) {
                     asteroid->OnCollision(asteroid, mine);
@@ -673,9 +675,9 @@ void MainState::HandleMineAsteroidCollision() noexcept {
 
 void MainState::HandleMineUfoCollision() noexcept {
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        for(const auto& mine : game->mines) {
+        for(const auto& mine : mines) {
             const auto mineCollisionMesh = Disc2{mine->GetPosition(), mine->GetPhysicalRadius()};
-            for(const auto& ufo : game->ufos) {
+            for(const auto& ufo : ufos) {
                 const auto ufoCollisionMesh = Disc2{ufo->GetPosition(), ufo->GetPhysicalRadius()};
                 if(MathUtils::DoDiscsOverlap(mineCollisionMesh, ufoCollisionMesh)) {
                     ufo->OnCollision(ufo, mine);
@@ -687,17 +689,17 @@ void MainState::HandleMineUfoCollision() noexcept {
 
 void MainState::KillAll() noexcept {
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        for(auto* asteroid : game->asteroids) {
+        for(auto* asteroid : asteroids) {
             if(asteroid) {
                 asteroid->Kill();
             }
         }
-        for(auto* bullet : game->bullets) {
+        for(auto* bullet : bullets) {
             if(bullet) {
                 bullet->Kill();
             }
         }
-        for(auto* explosion : game->explosions) {
+        for(auto* explosion : explosions) {
             if(explosion) {
                 explosion->Kill();
             }
@@ -750,7 +752,7 @@ void MainState::RenderBackground() const noexcept {
 
 void MainState::RenderEntities() const noexcept {
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        for(const auto& entity : game->GetEntities()) {
+        for(const auto& entity : m_entities) {
             if(entity) {
                 entity->Render();
             }
@@ -764,7 +766,7 @@ void MainState::DebugRenderEntities() const noexcept {
     }
     g_theRenderer->SetModelMatrix();
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        for(const auto& e : game->GetEntities()) {
+        for(const auto& e : m_entities) {
             if(!e) {
                 continue;
             }
@@ -787,7 +789,7 @@ void MainState::DebugRenderEntities() const noexcept {
         g_theRenderer->SetMaterial("circles");
         g_theRenderer->DrawCircle2D(m_cameraController.GetCamera().GetPosition(), 25.0f, Rgba::Pink);
         g_theRenderer->SetMaterial("__2D");
-        g_theRenderer->DrawAABB2(world_bounds, Rgba::Green, Rgba::NoAlpha);
+        g_theRenderer->DrawAABB2(m_world_bounds, Rgba::Green, Rgba::NoAlpha);
         g_theRenderer->DrawAABB2(game->CalcOrthoBounds(m_cameraController), Rgba::White, Rgba::NoAlpha);
         g_theRenderer->DrawAABB2(game->CalcViewBounds(m_cameraController), Rgba::Red, Rgba::NoAlpha);
         g_theRenderer->DrawAABB2(game->CalcCullBounds(m_cameraController), Rgba::White, Rgba::NoAlpha);
@@ -880,6 +882,10 @@ void MainState::PostFrameCleanup() noexcept {
         m_entities.emplace_back(std::move(pending));
     }
     m_pending_entities.clear();
+}
+
+bool MainState::IsWaveComplete() const noexcept {
+    return asteroids.empty();
 }
 
 void MainState::RenderPausedOverlay() const noexcept {

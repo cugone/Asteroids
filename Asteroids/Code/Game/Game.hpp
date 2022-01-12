@@ -177,6 +177,8 @@ public:
 
     Stopwatch respawnTimer{TimeUtils::FPSeconds{1.0f}};
     std::unique_ptr<ParticleSystem> particleSystem{};
+
+    GameState* const GetCurrentState() const noexcept;
 protected:
 private:
     void InitializeAudio() noexcept;
@@ -189,8 +191,6 @@ private:
 
     std::unique_ptr<GameState> _current_state{nullptr};
     std::unique_ptr<GameState> _next_state{nullptr};
-    std::vector<std::unique_ptr<GameEntity>> m_entities{};
-    std::vector<std::unique_ptr<GameEntity>> m_pending_entities{};
     bool _keyboard_control_active{false};
     bool _mouse_control_active{false};
     bool _controller_control_active{false};

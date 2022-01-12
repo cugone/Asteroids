@@ -22,6 +22,7 @@
 
 #include "Game/GameCommon.hpp"
 #include "Game/GameConfig.hpp"
+#include "Game/MainState.hpp"
 
 Ufo::Ufo(std::weak_ptr<Scene> scene, Type type, Vector2 position)
     : GameEntity(scene.lock()->CreateEntity(), scene)
@@ -115,15 +116,7 @@ void Ufo::Render() const noexcept {
 }
 
 void Ufo::EndFrame() noexcept {
-    if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        if(const auto& found = std::find(std::begin(game->ufos), std::end(game->ufos), this);
-            (found != std::end(game->ufos) &&
-                (*found)->IsDead()))
-        {
-            *found = nullptr;
-        }
-        GameEntity::EndFrame();
-    }
+    GameEntity::EndFrame();
 }
 
 void Ufo::OnCreate() noexcept {
@@ -180,7 +173,9 @@ void Ufo::OnDestroy() noexcept {
     }
     GameEntity::OnDestroy();
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        game->MakeExplosion(GetPosition());
+        if (auto* const mainState = dynamic_cast<MainState* const>(game->GetCurrentState()); mainState != nullptr) {
+            mainState->MakeExplosion(GetPosition());
+        }
     }
 }
 
@@ -192,7 +187,9 @@ void Ufo::MakeBullet() const noexcept {
     const auto source = GetPosition();
     const auto angle = (_fireTarget - source).CalcHeadingDegrees();
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        game->MakeBullet(this, source, Vector2::CreateFromPolarCoordinatesDegrees(_bulletSpeed, angle));
+        if (auto* const mainState = dynamic_cast<MainState* const>(game->GetCurrentState()); mainState != nullptr) {
+            mainState->MakeBullet(this, source, Vector2::CreateFromPolarCoordinatesDegrees(_bulletSpeed, angle));
+        }
     }
 }
 
@@ -269,8 +266,10 @@ Vector2 Ufo::CalculateFireTarget() const noexcept {
     case Type::Small: {
         const auto loc = [this, &defaultTarget]() {
             if(auto* game = GetGameAs<Game>(); game != nullptr) {
-                if(auto ship = game->GetShip()) {
-                    return ship->GetPosition();
+                if(auto* const mainState = dynamic_cast<MainState* const>(game->GetCurrentState()); mainState != nullptr) {
+                    if(mainState->ship && !mainState->ship->IsDead()) {
+                        return mainState->ship->GetPosition();
+                    }
                 }
             }
             return defaultTarget;
@@ -285,13 +284,15 @@ Vector2 Ufo::CalculateFireTarget() const noexcept {
     {
         const auto loc = [this, &defaultTarget]() {
             if(auto* game = GetGameAs<Game>(); game != nullptr) {
-                if(const auto ship = game->GetShip()) {
-                    const auto target = ship->GetPosition();
-                    const auto source = GetPosition();
-                    const auto angle = (target - source).CalcHeadingDegrees();
-                    const auto offset_range = 90.0f;
-                    const auto offset = MathUtils::GetRandomNegOneToOne<float>() * offset_range;
-                    return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, angle + offset);
+                if (auto* const mainState = dynamic_cast<MainState* const>(game->GetCurrentState()); mainState != nullptr) {
+                    if (mainState->ship && !mainState->ship->IsDead()) {
+                        const auto target = mainState->ship->GetPosition();
+                        const auto source = GetPosition();
+                        const auto angle = (target - source).CalcHeadingDegrees();
+                        const auto offset_range = 90.0f;
+                        const auto offset = MathUtils::GetRandomNegOneToOne<float>() * offset_range;
+                        return GetPosition() + Vector2::CreateFromPolarCoordinatesDegrees(1.0f, angle + offset);
+                    }
                 }
             }
             return defaultTarget;

@@ -26,8 +26,8 @@ public:
     static constexpr float smallAsteroidCosmeticSize = 12.0f;
     static constexpr float smallAsteroidPhysicalSize = 10.0f;
 
-    explicit Asteroid(Vector2 position, Vector2 velocity, float rotationSpeed);
-    explicit Asteroid(Type type, Vector2 position, Vector2 velocity, float rotationSpeed);
+    explicit Asteroid(std::weak_ptr<Scene> scene, Vector2 position, Vector2 velocity, float rotationSpeed);
+    explicit Asteroid(std::weak_ptr<Scene> scene, Type type, Vector2 position, Vector2 velocity, float rotationSpeed);
 
     virtual ~Asteroid() = default;
 

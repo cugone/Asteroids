@@ -20,6 +20,7 @@
 #include "Game/GameCommon.hpp"
 #include "Game/GameConfig.hpp"
 #include "Game/Game.hpp"
+#include "Game/MainState.hpp"
 
 #include "Game/Bullet.hpp"
 #include "Game/Mine.hpp"
@@ -121,14 +122,6 @@ Vector4 Asteroid::WasHit() const noexcept {
 
 void Asteroid::EndFrame() noexcept {
     GameEntity::EndFrame();
-    if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        if(const auto& found = std::find(std::begin(game->asteroids), std::end(game->asteroids), this);
-            (found != std::end(game->asteroids) &&
-                (*found)->IsDead()))
-        {
-            *found = nullptr;
-        }
-    }
 }
 
 void Asteroid::OnDestroy() noexcept {
@@ -167,18 +160,20 @@ Material* Asteroid::GetMaterial() const noexcept {
 
 void Asteroid::MakeChildAsteroid() const noexcept {
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        const auto [position, velocity, rotation] = CalcChildPhysicsParameters();
-        switch(_type) {
-        case Type::Large:
-            game->MakeMediumAsteroid(position, velocity, rotation);
-            break;
-        case Type::Medium:
-            game->MakeSmallAsteroid(position, velocity, rotation);
-            break;
-        case Type::Small:
-            break;
-        default:
-            break;
+        if (auto* const mainState = dynamic_cast<MainState* const>(game->GetCurrentState()); mainState != nullptr) {
+            const auto [position, velocity, rotation] = CalcChildPhysicsParameters();
+            switch (_type) {
+            case Type::Large:
+                mainState->MakeMediumAsteroid(position, velocity, rotation);
+                break;
+            case Type::Medium:
+                mainState->MakeSmallAsteroid(position, velocity, rotation);
+                break;
+            case Type::Small:
+                break;
+            default:
+                break;
+            }
         }
     }
 }
@@ -227,19 +222,6 @@ void Asteroid::OnCollision(GameEntity* a, GameEntity* b) noexcept {
 
 void Asteroid::OnCreate() noexcept {
     /* DO NOTHING */
-}
-
-std::pair<float, float> Asteroid::GetRadiiFromType(Type type) const noexcept {
-    switch(type) {
-    case Type::Large:
-        return std::make_pair(Asteroid::largeAsteroidPhysicalSize, Asteroid::largeAsteroidCosmeticSize);
-    case Type::Medium:
-        return std::make_pair(Asteroid::mediumAsteroidPhysicalSize, Asteroid::mediumAsteroidCosmeticSize);
-    case Type::Small:
-        return std::make_pair(Asteroid::smallAsteroidPhysicalSize, Asteroid::smallAsteroidCosmeticSize);
-    default:
-        return std::make_pair(Asteroid::largeAsteroidPhysicalSize, Asteroid::largeAsteroidCosmeticSize);
-    }
 }
 
 int Asteroid::GetHealthFromType(Type type) const noexcept {

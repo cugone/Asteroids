@@ -84,14 +84,6 @@ void Explosion::EndFrame() noexcept {
     if(_sprite->IsFinished()) {
         Kill();
     }
-    if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        if(const auto& found = std::find(std::begin(game->explosions), std::end(game->explosions), this);
-            (found != std::end(game->explosions) &&
-                (*found)->IsDead()))
-        {
-            *found = nullptr;
-        }
-    }
 }
 
 void Explosion::OnDestroy() noexcept {

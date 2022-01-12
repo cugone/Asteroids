@@ -88,14 +88,6 @@ void Bullet::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 }
 
 void Bullet::EndFrame() noexcept {
-    if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        if(const auto& found = std::find(std::begin(game->bullets), std::end(game->bullets), this);
-            (found != std::end(game->bullets) &&
-                (*found)->IsDead()))
-        {
-            *found = nullptr;
-        }
-    }
     GameEntity::EndFrame();
 }
 
