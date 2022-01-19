@@ -28,7 +28,7 @@ Ufo::Ufo(std::weak_ptr<Scene> scene, Type type, Vector2 position)
     : GameEntity(scene.lock()->CreateEntity(), scene)
     , _type(type)
 {
-    AddComponent<TransformComponent>();
+    UpdateComponent<TransformComponent>(Matrix4::CreateTranslationMatrix(position));
 
     SetCosmeticRadius(GetCosmeticRadiusFromType(_type));
     SetPhysicalRadius(GetPhysicalRadiusFromType(_type));
@@ -83,8 +83,7 @@ void Ufo::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
         const auto S = Matrix4::CreateScaleMatrix(scale * half_extents);
         const auto R = Matrix4::Create2DRotationDegreesMatrix(GetOrientationDegrees());
         const auto T = Matrix4::CreateTranslationMatrix(GetPosition());
-        auto& transform = GetComponent<TransformComponent>();
-        transform.Transform = Matrix4::MakeSRT(S, R, T);
+        UpdateComponent<TransformComponent>(Matrix4::MakeSRT(S, R, T));
     }
 
     auto& builder = m_mesh_builder;

@@ -307,6 +307,9 @@ void MainState::HandleDebugKeyboardInput([[maybe_unused]] TimeUtils::FPSeconds d
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::L)) {
         MakeUfo(Ufo::Type::Boss);
     }
+    if(g_theInputSystem->WasKeyJustPressed(KeyCode::Semicolon)) {
+        KillAll();
+    }
 #endif
 }
 
@@ -438,6 +441,14 @@ void MainState::MakeSmallAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed)
     AddNewAsteroidToWorld(std::move(newAsteroid));
 }
 
+void MainState::DestroyAsteroid(Asteroid* pAsteroid) noexcept {
+    if(pAsteroid && pAsteroid->IsDead()) {
+        if(auto iter = std::find(std::begin(asteroids), std::end(asteroids), pAsteroid); iter != std::end(asteroids)) {
+            *iter = nullptr;
+        }
+    }
+}
+
 void MainState::AddNewAsteroidToWorld(std::unique_ptr<Asteroid> newAsteroid) {
     auto* last_entity = newAsteroid.get();
     m_pending_entities.emplace_back(std::move(newAsteroid));
@@ -462,6 +473,14 @@ void MainState::MakeExplosion(Vector2 position) noexcept {
     asExplosion->OnCreate();
 }
 
+void MainState::DestroyExplosion(Explosion* pExplosion) noexcept {
+    if(pExplosion && pExplosion->IsDead()) {
+        if(auto iter = std::find(std::begin(explosions), std::end(explosions), pExplosion); iter != std::end(explosions)) {
+            *iter = nullptr;
+        }
+    }
+}
+
 void MainState::MakeBullet(const GameEntity* parent, Vector2 pos, Vector2 vel) noexcept {
     auto newBullet = std::make_unique<Bullet>(m_Scene, parent, pos, vel);
     auto* last_entity = newBullet.get();
@@ -469,6 +488,14 @@ void MainState::MakeBullet(const GameEntity* parent, Vector2 pos, Vector2 vel) n
     auto* asBullet = reinterpret_cast<Bullet*>(last_entity);
     bullets.push_back(asBullet);
     asBullet->OnCreate();
+}
+
+void MainState::DestroyBullet(Bullet* pBullet) noexcept {
+    if(pBullet && pBullet->IsDead()) {
+        if(auto iter = std::find(std::begin(bullets), std::end(bullets), pBullet); iter != std::end(bullets)) {
+            *iter = nullptr;
+        }
+    }
 }
 
 void MainState::MakeMine(const GameEntity* parent, Vector2 position) noexcept {
@@ -482,6 +509,14 @@ void MainState::MakeMine(const GameEntity* parent, Vector2 position) noexcept {
     auto* asMine = reinterpret_cast<Mine*>(last_entity);
     mines.push_back(asMine);
     asMine->OnCreate();
+}
+
+void MainState::DestroyMine(Mine* pMine) noexcept {
+    if(pMine && pMine->IsDead()) {
+        if(auto iter = std::find(std::begin(mines), std::end(mines), pMine); iter != std::end(mines)) {
+            *iter = nullptr;
+        }
+    }
 }
 
 void MainState::MakeSmallUfo(AABB2 world_bounds) noexcept {
@@ -549,6 +584,14 @@ void MainState::MakeUfo(Ufo::Type type, AABB2 world_bounds) noexcept {
     const auto ptr = newUfo.get();
     AddNewUfoToWorld(std::move(newUfo));
     ptr->SetVelocity(Vector2{pos.x < 0.0f ? -ptr->GetSpeed() : ptr->GetSpeed(), 0.0f});
+}
+
+void MainState::DestroyUfo(Ufo* pUfo) noexcept {
+    if(pUfo && pUfo->IsDead()) {
+        if(auto iter = std::find(std::begin(ufos), std::end(ufos), pUfo); iter != std::end(ufos)) {
+            *iter = nullptr;
+        }
+    }
 }
 
 void MainState::MakeShip() noexcept {
@@ -707,6 +750,7 @@ void MainState::KillAll() noexcept {
     }
     if(ship) {
         ship->Kill();
+        ship = nullptr;
     }
 }
 
@@ -871,6 +915,22 @@ bool MainState::DoFadeOut(TimeUtils::FPSeconds deltaSeconds) noexcept {
 }
 
 void MainState::PostFrameCleanup() noexcept {
+    for(auto& e : explosions) {
+        DestroyExplosion(e);
+    }
+    for(auto& e : bullets) {
+        DestroyBullet(e);
+    }
+    for(auto& e : asteroids) {
+        DestroyAsteroid(e);
+    }
+    for(auto& e : ufos) {
+        DestroyUfo(e);
+    }
+    for(auto& e : mines) {
+        DestroyMine(e);
+    }
+
     explosions.erase(std::remove_if(std::begin(explosions), std::end(explosions), [&](Explosion* e) { return !e; }), std::end(explosions));
     bullets.erase(std::remove_if(std::begin(bullets), std::end(bullets), [&](Bullet* e) { return !e; }), std::end(bullets));
     asteroids.erase(std::remove_if(std::begin(asteroids), std::end(asteroids), [&](Asteroid* e) { return !e; }), std::end(asteroids));

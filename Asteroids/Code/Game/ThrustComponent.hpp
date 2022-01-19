@@ -38,7 +38,6 @@ public:
 protected:
 private:
     ParticleEffect m_thrustPS{"flame_emission"};
-    GameEntity* m_parent{nullptr};
     Vector2 m_positionOffset{};
     float m_thrustDirectionAngleOffset{0.0f};
     float m_thrust{0.0f};

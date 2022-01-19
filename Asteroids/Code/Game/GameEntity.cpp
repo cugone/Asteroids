@@ -14,8 +14,8 @@
 GameEntity::GameEntity(uint32_t handle, std::weak_ptr<Scene> scene) noexcept
 : Entity(handle, scene)
 {
-    AddComponent<TransformComponent>();
-    AddComponent<MeshComponent>();
+    AddComponent<TransformComponent>(Matrix4::I);
+    AddComponent<MeshComponent>(Mesh{});
 }
 
 void GameEntity::BeginFrame() noexcept {
@@ -209,4 +209,16 @@ void GameEntity::SetCosmeticRadius(float value) noexcept {
 
 void GameEntity::SetPhysicalRadius(float value) noexcept {
     m_cosmeticphysicalradius_velocitydirection.y = value;
+}
+
+bool GameEntity::HasGameParent() const noexcept {
+    return m_gameParent != nullptr;
+}
+
+const GameEntity* GameEntity::GetGameParent() const noexcept {
+    return m_gameParent;
+}
+
+GameEntity* GameEntity::GetGameParent() noexcept {
+    return m_gameParent;
 }

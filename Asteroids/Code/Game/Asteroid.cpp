@@ -36,7 +36,7 @@ Asteroid::Asteroid(std::weak_ptr<Scene> scene, Type type, Vector2 position, Vect
     : GameEntity(scene.lock()->CreateEntity(), scene)
     , _type(type)
 {
-    AddComponent<TransformComponent>();
+    UpdateComponent<TransformComponent>(Matrix4::CreateTranslationMatrix(position));
     faction = GameEntity::Faction::Asteroid;
     scoreValue = GetScoreFromType(type);
     SetHealth(GetHealthFromType(type));
@@ -84,8 +84,7 @@ void Asteroid::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
         const auto S = Matrix4::CreateScaleMatrix(half_extents);
         const auto R = Matrix4::Create2DRotationDegreesMatrix(GetOrientationDegrees());
         const auto T = Matrix4::CreateTranslationMatrix(GetPosition());
-        auto& transform = GetTransform();
-        transform = Matrix4::MakeSRT(S, R, T);
+        UpdateComponent<TransformComponent>(Matrix4::MakeSRT(S, R, T));
     }
 
     auto& builder = m_mesh_builder;

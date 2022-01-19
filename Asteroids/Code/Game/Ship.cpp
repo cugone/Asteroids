@@ -29,6 +29,7 @@ Ship::Ship(std::weak_ptr<Scene> scene) : Ship(scene, Vector2::Zero) {}
 Ship::Ship(std::weak_ptr<Scene> scene, Vector2 position)
     : GameEntity(scene.lock()->CreateEntity(), scene)
 {
+    UpdateComponent<TransformComponent>(Matrix4::MakeRT(Matrix4::Create2DRotationDegreesMatrix(-90.0f), Matrix4::CreateTranslationMatrix(position)));
     faction = GameEntity::Faction::Player;
     _thrust = std::move(std::make_unique<ThrustComponent>(scene, this));
 
@@ -65,13 +66,12 @@ void Ship::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     const auto half_extents = Vector2{frameWidth, frameHeight};
 
     DoScaleEaseOut(deltaSeconds);
-
-    const auto S = Matrix4::CreateScaleMatrix(_scale * half_extents);
-    const auto R = Matrix4::Create2DRotationDegreesMatrix(GetOrientationDegrees());
-    const auto T = Matrix4::CreateTranslationMatrix(GetPosition());
-    auto& transform = GetComponent<TransformComponent>();
-    transform.Transform = Matrix4::MakeSRT(S, R, T);
-    
+    {
+        const auto S = Matrix4::CreateScaleMatrix(_scale * half_extents);
+        const auto R = Matrix4::Create2DRotationDegreesMatrix(GetOrientationDegrees());
+        const auto T = Matrix4::CreateTranslationMatrix(GetPosition());
+        UpdateComponent<TransformComponent>(Matrix4::MakeSRT(S, R, T));
+    }
     auto& builder = m_mesh_builder;
     builder.Begin(PrimitiveType::Triangles);
     if(IsRespawning()) {

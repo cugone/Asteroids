@@ -14,14 +14,16 @@
 
 ThrustComponent::ThrustComponent(std::weak_ptr<Scene> scene, GameEntity* parent, float maxThrust /*= 100.0f*/)
     : GameEntity(scene.lock()->CreateEntity(), scene)
-    , m_parent(parent)
     , m_maxThrust(maxThrust)
 {
-    if (m_parent->HasComponent<TransformComponent>()) {
-        auto& transform = m_parent->GetComponent<TransformComponent>();
-        AddComponent<TransformComponent>(transform.Transform);
-        SetCosmeticRadius(7.0f);
+    SetParent(parent);
+    if(HasParent() && GetParent()->HasComponent<TransformComponent>()) {
+        const auto& transform = GetParent()->GetComponent<TransformComponent>();
+        UpdateComponent<TransformComponent>(transform.Transform);
+    } else {
+        UpdateComponent<TransformComponent>(Matrix4::I);
     }
+    SetCosmeticRadius(7.0f);
 }
 
 void ThrustComponent::BeginFrame() noexcept {
@@ -37,16 +39,16 @@ void ThrustComponent::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds)
     const auto frameWidth = static_cast<float>(tex->GetDimensions().x);
     const auto frameHeight = static_cast<float>(tex->GetDimensions().y);
     const auto half_extents = Vector2{frameWidth, frameHeight};
-    auto backward = m_parent->GetBackward();
-    m_positionOffset = backward * (m_parent->GetCosmeticRadius() + GetCosmeticRadius());
+    auto backward = -GetParent()->GetComponent<TransformComponent>().Transform.GetForward2D();
+    m_positionOffset = backward * (HasGameParent() ? GetGameParent()->GetCosmeticRadius() + GetCosmeticRadius() : GetCosmeticRadius());
     const auto S = Matrix4::I;
     const auto R = Matrix4::Create2DRotationDegreesMatrix(m_thrustDirectionAngleOffset);
     const auto T = Matrix4::CreateTranslationMatrix(m_positionOffset);
     auto& transform = GetComponent<TransformComponent>();
     if(HasParent()) {
-        transform.Transform = Matrix4::MakeRT(GetParent()->GetComponent<TransformComponent>(), Matrix4::MakeSRT(S, R, T));
+        UpdateComponent<TransformComponent>(Matrix4::MakeRT(GetParent()->GetComponent<TransformComponent>(), Matrix4::MakeSRT(S, R, T)));
     } else {
-        transform.Transform = Matrix4::MakeRT(transform, Matrix4::MakeSRT(S, R, T));
+        UpdateComponent<TransformComponent>(Matrix4::MakeRT(transform, Matrix4::MakeSRT(S, R, T)));
     }
 
     if(m_thrust) {

@@ -23,7 +23,7 @@ public:
         , Asteroid
     };
 
-    GameEntity(uint32_t handle, std::weak_ptr<Scene> scene) noexcept;
+    explicit GameEntity(uint32_t handle, std::weak_ptr<Scene> scene) noexcept;
     virtual ~GameEntity() = default;
     virtual void BeginFrame() noexcept;
     virtual void Update(TimeUtils::FPSeconds deltaSeconds) noexcept;
@@ -70,6 +70,10 @@ public:
     Vector2 GetRight() const noexcept;
     Vector2 GetLeft() const noexcept;
 
+    bool HasGameParent() const noexcept;
+    const GameEntity* GetGameParent() const noexcept;
+    GameEntity* GetGameParent() noexcept;
+
     long long scoreValue = 0ll;
     Faction faction = Faction::None;
 protected:
@@ -82,6 +86,7 @@ protected:
     void SetPhysicalRadius(float value) noexcept;
 
     IWeapon* m_weapon{};
+    GameEntity* m_gameParent{};
     Mesh::Builder m_mesh_builder{};
 private:
 

@@ -21,7 +21,7 @@ Bullet::Bullet(std::weak_ptr<Scene> scene, const GameEntity* parent, Vector2 pos
 : GameEntity(scene.lock()->CreateEntity(), scene)
 , _parent(parent)
 {
-    AddComponent<TransformComponent>();
+    UpdateComponent<TransformComponent>(Matrix4::CreateTranslationMatrix(position));
 
     faction = _parent->faction;
     SetPosition(position);
@@ -62,8 +62,7 @@ void Bullet::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
         const auto S = Matrix4::CreateScaleMatrix(half_extents);
         const auto R = Matrix4::Create2DRotationDegreesMatrix(GetOrientationDegrees());
         const auto T = Matrix4::CreateTranslationMatrix(GetPosition());
-        auto& transform = GetComponent<TransformComponent>();
-        transform.Transform = Matrix4::MakeSRT(S, R, T);
+        UpdateComponent<TransformComponent>(Matrix4::MakeSRT(S, R, T));
     }
 
     auto& builder = m_mesh_builder;

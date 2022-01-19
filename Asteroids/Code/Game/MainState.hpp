@@ -87,6 +87,12 @@ private:
 
     void Respawn() noexcept;
 
+    void DestroyAsteroid(Asteroid* pAsteroid) noexcept;
+    void DestroyBullet(Bullet* pBullet) noexcept;
+    void DestroyExplosion(Explosion* pExplosion) noexcept;
+    void DestroyMine(Mine* pMine) noexcept;
+    void DestroyUfo(Ufo* pUfo) noexcept;
+
     void HandleBulletCollision() const noexcept;
     void HandleBulletAsteroidCollision() const noexcept;
     void HandleBulletUfoCollision() const noexcept;
