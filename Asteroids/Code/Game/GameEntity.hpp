@@ -14,7 +14,7 @@
 
 class IWeapon;
 
-class GameEntity : public Entity {
+class GameEntity : public a2de::Entity {
 public:
     enum class Faction {
         None
