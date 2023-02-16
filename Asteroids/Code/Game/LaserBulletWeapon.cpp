@@ -20,8 +20,8 @@ bool LaserBulletWeapon::Fire() noexcept {
 }
 
 Material* LaserBulletWeapon::GetMaterial() const noexcept {
-    auto& rs = ServiceLocator::get<IRendererService>();
-    return rs.GetMaterial(m_desc.materialName);
+    auto* rs = ServiceLocator::get<IRendererService>();
+    return rs->GetMaterial(m_desc.materialName);
 }
 
 float LaserBulletWeapon::GetFireRate() const noexcept {

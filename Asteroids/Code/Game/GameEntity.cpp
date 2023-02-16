@@ -41,7 +41,7 @@ void GameEntity::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 }
 
 void GameEntity::Render() const noexcept {
-    ServiceLocator::get<IRendererService>().SetModelMatrix(GetTransform());
+    ServiceLocator::get<IRendererService>()->SetModelMatrix(GetTransform());
     Mesh::Render(m_mesh_builder);
 }
 

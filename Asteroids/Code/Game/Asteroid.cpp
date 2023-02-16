@@ -110,7 +110,7 @@ void Asteroid::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 
 void Asteroid::Render() const noexcept {
     asteroid_state.wasHit = WasHit();
-    asteroid_state_cb->Update(*ServiceLocator::get<IRendererService>().GetDeviceContext(), &asteroid_state);
+    asteroid_state_cb->Update(*ServiceLocator::get<IRendererService>()->GetDeviceContext(), &asteroid_state);
     GameEntity::Render();
 }
 

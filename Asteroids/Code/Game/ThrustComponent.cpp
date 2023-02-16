@@ -32,8 +32,8 @@ void ThrustComponent::BeginFrame() noexcept {
 }
 
 void ThrustComponent::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
-    auto& rs = ServiceLocator::get<IRendererService>();
-    m_thrustPS.Update(rs.GetGameTime().count(), deltaSeconds.count());
+    auto* rs = ServiceLocator::get<IRendererService>();
+    m_thrustPS.Update(rs->GetGameTime().count(), deltaSeconds.count());
 
     const auto tex = GetMaterial()->GetTexture(Material::TextureID::Diffuse);
     const auto frameWidth = static_cast<float>(tex->GetDimensions().x);
@@ -77,8 +77,8 @@ void ThrustComponent::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds)
 
 void ThrustComponent::Render() const noexcept {
     m_thrustPS.Render();
-    auto& rs = ServiceLocator::get<IRendererService>();
-    rs.SetModelMatrix(GetComponent<TransformComponent>());
+    auto* rs = ServiceLocator::get<IRendererService>();
+    rs->SetModelMatrix(GetComponent<TransformComponent>());
     Mesh::Render(m_mesh_builder);
 
 }

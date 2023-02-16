@@ -303,13 +303,11 @@ void Game::CreateOrLoadOptionsFile() noexcept {
 void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     g_theRenderer->UpdateGameTime(deltaSeconds);
     _current_state->Update(deltaSeconds);
-    if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        auto& app = ServiceLocator::get<IAppService>();
-        if(app.LostFocus() || game->IsPaused()) {
-            g_theAudioSystem->SuspendAudio();
-        } else {
-            g_theAudioSystem->ResumeAudio();
-        }
+    auto* app = ServiceLocator::get<IAppService>();
+    if(IsPaused() || app->LostFocus()) {
+        g_theAudioSystem->SuspendAudio();
+    } else {
+        g_theAudioSystem->ResumeAudio();
     }
 }
 

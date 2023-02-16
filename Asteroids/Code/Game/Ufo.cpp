@@ -110,7 +110,7 @@ void Ufo::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 void Ufo::Render() const noexcept {
     ufo_state.wasHitUfoIndex.x = WasHit();
     ufo_state.wasHitUfoIndex.y = GetUfoIndexFromStyle(_style);
-    ufo_state_cb->Update(*ServiceLocator::get<IRendererService>().GetDeviceContext(), &ufo_state);
+    ufo_state_cb->Update(*ServiceLocator::get<IRendererService>()->GetDeviceContext(), &ufo_state);
     GameEntity::Render();
 }
 
