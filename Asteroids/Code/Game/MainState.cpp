@@ -27,6 +27,7 @@
 #include "Game/TitleState.hpp"
 #include "Game/GameOverState.hpp"
 
+#include <format>
 #include <utility>
 
 void MainState::OnEnter() noexcept {
@@ -883,7 +884,7 @@ void MainState::RenderStatus() const noexcept {
         }
         return std::pair<const long long, const long long>(0LL, 0LL);
     }(); //IIIL
-    g_theRenderer->DrawMultilineText(g_theRenderer->GetFont("System32"), "Score: " + std::to_string(playerScore) + "\n      x" + std::to_string(playerLives));
+    g_theRenderer->DrawMultilineText(g_theRenderer->GetFont("System32"), std::format("Score: {}\n{:>6}{}", playerScore, 'x', playerLives));
 
     const auto uvs = AABB2::Zero_to_One;
     const auto mat = g_theRenderer->GetMaterial("ship");
