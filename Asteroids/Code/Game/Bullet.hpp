@@ -28,8 +28,6 @@ public:
     Material* GetMaterial() const noexcept override;
 private:
     float CalculateTtlFromDifficulty() const noexcept;
-
-    const GameEntity* _parent{};
     Stopwatch ttl{};
 };
 

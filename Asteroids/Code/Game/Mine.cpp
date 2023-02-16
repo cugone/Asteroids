@@ -14,11 +14,11 @@
 #include "Game/MainState.hpp"
 
 Mine::Mine(std::weak_ptr<Scene> scene, const GameEntity* parent, Vector2 position)
-    : GameEntity(scene.lock()->CreateEntity(), scene)
+    : GameEntity(scene.lock()->CreateEntity(), scene, parent)
 {
     UpdateComponent<TransformComponent>(Matrix4::CreateTranslationMatrix(position));
 
-    faction = parent->faction;
+    faction = HasGameParent() ? GetGameParent()->faction : GameEntity::Faction::None;
     SetPosition(position);
     SetCosmeticRadius(25.0f);
     SetPhysicalRadius(25.0f);

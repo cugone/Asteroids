@@ -18,12 +18,11 @@
 #include <algorithm>
 
 Bullet::Bullet(std::weak_ptr<Scene> scene, const GameEntity* parent, Vector2 position, Vector2 velocity) noexcept
-: GameEntity(scene.lock()->CreateEntity(), scene)
-, _parent(parent)
+: GameEntity(scene.lock()->CreateEntity(), scene, parent)
 {
     UpdateComponent<TransformComponent>(Matrix4::CreateTranslationMatrix(position));
 
-    faction = _parent->faction;
+    faction = m_gameParent->faction;
     SetPosition(position);
     SetVelocity(velocity);
     SetCosmeticRadius(15.0f);

@@ -23,7 +23,7 @@ public:
         , Asteroid
     };
 
-    explicit GameEntity(uint32_t handle, std::weak_ptr<Scene> scene) noexcept;
+    explicit GameEntity(uint32_t handle, std::weak_ptr<Scene> scene, const GameEntity* parent = nullptr) noexcept;
     virtual ~GameEntity() = default;
     virtual void BeginFrame() noexcept;
     virtual void Update(TimeUtils::FPSeconds deltaSeconds) noexcept;
@@ -86,7 +86,7 @@ protected:
     void SetPhysicalRadius(float value) noexcept;
 
     IWeapon* m_weapon{};
-    GameEntity* m_gameParent{};
+    const GameEntity* m_gameParent{};
     Mesh::Builder m_mesh_builder{};
 private:
 

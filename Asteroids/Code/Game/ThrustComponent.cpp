@@ -13,8 +13,8 @@
 #include "Game/GameCommon.hpp"
 
 ThrustComponent::ThrustComponent(std::weak_ptr<Scene> scene, GameEntity* parent, float maxThrust /*= 100.0f*/)
-    : GameEntity(scene.lock()->CreateEntity(), scene)
-    , m_maxThrust(maxThrust)
+: GameEntity(scene.lock()->CreateEntity(), scene, parent)
+, m_maxThrust(maxThrust)
 {
     SetParent(parent);
     if(HasParent() && GetParent()->HasComponent<TransformComponent>()) {
@@ -32,47 +32,40 @@ void ThrustComponent::BeginFrame() noexcept {
 }
 
 void ThrustComponent::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
+    if(MathUtils::IsEquivalentToZero(m_thrust)) {
+        return;
+    }
     auto* rs = ServiceLocator::get<IRendererService>();
     m_thrustPS.Update(rs->GetGameTime().count(), deltaSeconds.count());
 
-    const auto tex = GetMaterial()->GetTexture(Material::TextureID::Diffuse);
-    const auto frameWidth = static_cast<float>(tex->GetDimensions().x);
-    const auto frameHeight = static_cast<float>(tex->GetDimensions().y);
-    const auto half_extents = Vector2{frameWidth, frameHeight};
-    auto backward = -GetParent()->GetComponent<TransformComponent>().Transform.GetForward2D();
+    auto& transform = HasParent() ? GetParent()->GetComponent<TransformComponent>() : GetComponent<TransformComponent>();
+    auto backward = HasGameParent() ? GetGameParent()->GetBackward() : GetBackward();
     m_positionOffset = backward * (HasGameParent() ? GetGameParent()->GetCosmeticRadius() + GetCosmeticRadius() : GetCosmeticRadius());
     const auto S = Matrix4::I;
     const auto R = Matrix4::Create2DRotationDegreesMatrix(m_thrustDirectionAngleOffset);
     const auto T = Matrix4::CreateTranslationMatrix(m_positionOffset);
-    auto& transform = GetComponent<TransformComponent>();
-    if(HasParent()) {
-        UpdateComponent<TransformComponent>(Matrix4::MakeRT(GetParent()->GetComponent<TransformComponent>(), Matrix4::MakeSRT(S, R, T)));
-    } else {
-        UpdateComponent<TransformComponent>(Matrix4::MakeRT(transform, Matrix4::MakeSRT(S, R, T)));
-    }
 
-    if(m_thrust) {
-        const auto uvs = AABB2::Zero_to_One;
-        auto& builder = m_mesh_builder;
-        builder.Begin(PrimitiveType::Triangles);
-        builder.SetColor(Rgba::White);
+    UpdateComponent<TransformComponent>(Matrix4::MakeRT(transform, Matrix4::MakeSRT(S, R, T)));
 
-        builder.SetUV(Vector2{uvs.maxs.x, uvs.maxs.y});
-        builder.AddVertex(Vector2{+0.5f, +0.5f});
+    const auto uvs = AABB2::Zero_to_One;
+    auto& builder = m_mesh_builder;
+    builder.Begin(PrimitiveType::Triangles);
+    builder.SetColor(Rgba::White);
 
-        builder.SetUV(Vector2{uvs.mins.x, uvs.maxs.y});
-        builder.AddVertex(Vector2{-0.5f, +0.5f});
+    builder.SetUV(Vector2{ uvs.maxs.x, uvs.maxs.y });
+    builder.AddVertex(Vector2{ +0.5f, +0.5f });
 
-        builder.SetUV(Vector2{uvs.mins.x, uvs.mins.y});
-        builder.AddVertex(Vector2{-0.5f, -0.5f});
+    builder.SetUV(Vector2{ uvs.mins.x, uvs.maxs.y });
+    builder.AddVertex(Vector2{ -0.5f, +0.5f });
 
-        builder.SetUV(Vector2{uvs.maxs.x, uvs.mins.y});
-        builder.AddVertex(Vector2{+0.5f, -0.5f});
+    builder.SetUV(Vector2{ uvs.mins.x, uvs.mins.y });
+    builder.AddVertex(Vector2{ -0.5f, -0.5f });
 
-        builder.AddIndicies(Mesh::Builder::Primitive::Quad);
-        builder.End(GetMaterial());
-    }
+    builder.SetUV(Vector2{ uvs.maxs.x, uvs.mins.y });
+    builder.AddVertex(Vector2{ +0.5f, -0.5f });
 
+    builder.AddIndicies(Mesh::Builder::Primitive::Quad);
+    builder.End(GetMaterial());
 }
 
 void ThrustComponent::Render() const noexcept {

@@ -11,8 +11,9 @@
 
 #include "Engine/Scene/Components.hpp"
 
-GameEntity::GameEntity(uint32_t handle, std::weak_ptr<Scene> scene) noexcept
+GameEntity::GameEntity(uint32_t handle, std::weak_ptr<Scene> scene, const GameEntity* parent /*= nullptr*/) noexcept
 : Entity(handle, scene)
+, m_gameParent(parent)
 {
     AddComponent<TransformComponent>(Matrix4::I);
     AddComponent<MeshComponent>(Mesh{});
@@ -38,6 +39,13 @@ void GameEntity::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     m_cosmeticphysicalradius_velocitydirection.w = new_direction.y;
     m_acceleration_force.x = new_accel.x;
     m_acceleration_force.y = new_accel.y;
+
+    auto& transform = GetComponent<TransformComponent>();
+    const auto S = Matrix4::I;
+    const auto R = Matrix4::Create2DRotationMatrix(GetOrientationRadians());
+    const auto T = Matrix4::CreateTranslationMatrix(GetPosition());
+    transform.Transform = Matrix4::MakeSRT(S, R, T);
+
 }
 
 void GameEntity::Render() const noexcept {
@@ -220,5 +228,5 @@ const GameEntity* GameEntity::GetGameParent() const noexcept {
 }
 
 GameEntity* GameEntity::GetGameParent() noexcept {
-    return m_gameParent;
+    return const_cast<GameEntity*>(static_cast<const GameEntity*>(this)->GetGameParent());
 }
