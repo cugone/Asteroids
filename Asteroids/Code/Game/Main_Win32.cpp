@@ -14,10 +14,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) {
     UNUSED(hInstance);
     UNUSED(hPrevInstance);
+    UNUSED(pCmdLine);
     UNUSED(nCmdShow);
 
-    auto cmdString = StringUtils::ConvertUnicodeToMultiByte(std::wstring(pCmdLine ? pCmdLine : L""));
-    Engine<Game>::Initialize("Asteroids", cmdString);
+    Engine<Game>::Initialize("Asteroids");
     Engine<Game>::Run();
     Engine<Game>::Shutdown();
 }
