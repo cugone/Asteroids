@@ -312,6 +312,26 @@ void MainState::HandleDebugKeyboardInput([[maybe_unused]] TimeUtils::FPSeconds d
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::Semicolon)) {
         KillAll();
     }
+    if (g_theInputSystem->IsKeyDown(KeyCode::SingleQuote)) {
+        if (const auto* a = GetClosestAsteroidToPlayer(); a != nullptr) {
+            const auto weaponProjectileSpeed = GetShip()->GetWeapon()->GetSpeed();
+            auto vel = Vector2::X_Axis * weaponProjectileSpeed;
+            vel.SetHeadingDegrees(GetShip()->GetOrientationDegrees());
+            if(const auto [valid, newVelocity] = MathUtils::CalculateVelocityFromMovingTarget(deltaSeconds.count(), GetShip()->GetPosition(), vel, GetShip()->GetAcceleration(), a->GetPosition(), a->GetVelocity()); valid) {
+                //Time to target
+                const auto distance = (a->GetPosition() - GetShip()->GetPosition()).CalcLength();
+                const auto ttt = distance / weaponProjectileSpeed;
+                //Where will target be in that time?
+                const auto newPos = a->GetPosition() + a->GetVelocity() * ttt;
+                //Where does the ship need to point to hit that location?
+                const auto newAngle = (newPos - GetShip()->GetPosition()).CalcHeadingDegrees();
+                //Lead the target
+                GetShip()->SetOrientationDegrees(newAngle);
+                //Fire
+                GetShip()->OnFire();
+            }
+        }
+    }
 #endif
 }
 
