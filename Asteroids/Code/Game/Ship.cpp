@@ -47,7 +47,7 @@ Ship::Ship(std::weak_ptr<Scene> scene, Vector2 position)
     laser_weaponDesc.scale = 1.0f;
 
     _laserWeapon.Initialize(laser_weaponDesc);
-
+    m_weapon = &_laserWeapon;
     _mineFireRate.SetFrequency(1u);
 }
 
