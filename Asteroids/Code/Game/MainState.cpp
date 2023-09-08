@@ -27,6 +27,7 @@
 #include "Game/TitleState.hpp"
 #include "Game/GameOverState.hpp"
 
+#include <algorithm>
 #include <format>
 #include <utility>
 
@@ -947,6 +948,18 @@ void MainState::PostFrameCleanup() noexcept {
 
 bool MainState::IsWaveComplete() const noexcept {
     return asteroids.empty();
+}
+
+Asteroid* MainState::GetClosestAsteroidToEntity(GameEntity* entity) const noexcept {
+    if (asteroids.empty()) {
+        return nullptr;
+    }
+    if (!entity) {
+        return nullptr;
+    }
+    return *std::min_element(std::cbegin(asteroids), std::cend(asteroids), [e = entity](const Asteroid* a, const Asteroid* b) {
+        return MathUtils::CalcDistanceSquared(e->GetPosition(), a->GetPosition()) < MathUtils::CalcDistanceSquared(e->GetPosition(), b->GetPosition());
+        });
 }
 
 void MainState::RenderPausedOverlay() const noexcept {

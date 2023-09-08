@@ -68,6 +68,7 @@ private:
     void MakeLargeAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
 
     void AddNewAsteroidToWorld(std::unique_ptr<Asteroid> newAsteroid);
+    Asteroid* GetClosestAsteroidToEntity(GameEntity* entity) const noexcept;
 
     Ship* GetShip() const noexcept;
 
