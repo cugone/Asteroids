@@ -69,6 +69,7 @@ private:
 
     void AddNewAsteroidToWorld(std::unique_ptr<Asteroid> newAsteroid);
     Asteroid* GetClosestAsteroidToEntity(GameEntity* entity) const noexcept;
+    Asteroid* GetClosestAsteroidToPlayer() const noexcept;
 
     Ship* GetShip() const noexcept;
 

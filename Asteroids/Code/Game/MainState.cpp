@@ -962,6 +962,10 @@ Asteroid* MainState::GetClosestAsteroidToEntity(GameEntity* entity) const noexce
         });
 }
 
+Asteroid* MainState::GetClosestAsteroidToPlayer() const noexcept {
+    return GetClosestAsteroidToEntity(GetShip());
+}
+
 void MainState::RenderPausedOverlay() const noexcept {
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
         if(!game->IsPaused()) {
