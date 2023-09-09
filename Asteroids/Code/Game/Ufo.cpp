@@ -11,6 +11,8 @@
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/Shader.hpp"
 
+#include "Engine/Physics/PhysicsUtils.hpp"
+
 #include "Engine/Scene/Components.hpp"
 #include "Engine/Services/ServiceLocator.hpp"
 #include "Engine/Services/IRendererService.hpp"
@@ -285,6 +287,7 @@ Vector2 Ufo::CalculateFireTarget() const noexcept {
             if(auto* game = GetGameAs<Game>(); game != nullptr) {
                 if (auto* const mainState = dynamic_cast<MainState* const>(game->GetCurrentState()); mainState != nullptr) {
                     if (mainState->ship && !mainState->ship->IsDead()) {
+                        //MathUtils::CalculateVelocityFromMovingTarget(t, GetPosition(), Vector2::X_Axis * GetWeapon()->GetSpeed(), GetAcceleration(), mainState->ship->GetPosition(), mainState->ship->GetVelocity());
                         const auto target = mainState->ship->GetPosition();
                         const auto source = GetPosition();
                         const auto angle = (target - source).CalcHeadingDegrees();
