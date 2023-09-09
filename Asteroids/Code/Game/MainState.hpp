@@ -57,6 +57,7 @@ private:
     void HandleDebugInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds);
     void HandleDebugKeyboardInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds);
 
+    void FireAtPlayer(TimeUtils::FPSeconds deltaSeconds, GameEntity* entity, bool leadTarget) const noexcept;
     void FireAtClosestAsteroid(TimeUtils::FPSeconds deltaSeconds, GameEntity* entity) const noexcept;
     void FireAtClosestAsteroidToPlayer(TimeUtils::FPSeconds deltaSeconds) const noexcept;
 
