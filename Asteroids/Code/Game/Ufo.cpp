@@ -390,8 +390,8 @@ int Ufo::GetFrameLengthFromTypeAndStyle(Type type, Style style) noexcept {
     case Type::Boss:
     {
         switch(style) {
-        case Style::Orange: return 8;
-        default: return 8;
+        case Style::Orange: return 4;
+        default: return 4;
         }
     }
     default: return 4;
