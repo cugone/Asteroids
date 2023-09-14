@@ -345,16 +345,16 @@ int Ufo::GetStartIndexFromTypeAndStyle(Type type, Style style) noexcept {
     {
         switch(style) {
         case Style::Blue: return 0;
-        case Style::Green: return 4;
-        case Style::Yellow: return 8;
+        case Style::Green: return 0;
+        case Style::Yellow: return 0;
         }
     }
     case Type::Big:
     {
         switch(style) {
         case Style::Cyan: return 0;
-        case Style::Magenta: return 4;
-        default: return 4;
+        case Style::Magenta: return 0;
+        default: return 0;
         }
     }
     case Type::Boss:
