@@ -1,10 +1,8 @@
 
 #include "Engine/Core/EngineBase.hpp"
 
-#include "Engine/Core/StringUtils.hpp"
-#include "Engine/Platform/Win.hpp"
-
 #include "Game/Game.hpp"
+#include "Game/GameConfig.hpp"
 
 #pragma warning(push)
 #pragma warning(disable: 28251)
@@ -17,7 +15,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     UNUSED(pCmdLine);
     UNUSED(nCmdShow);
 
-    Engine<Game>::Initialize("Asteroids");
+    Engine<Game>::Initialize(g_title_str);
     Engine<Game>::Run();
     Engine<Game>::Shutdown();
 }
