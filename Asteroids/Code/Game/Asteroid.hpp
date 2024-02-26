@@ -80,8 +80,8 @@ private:
     ConstantBuffer* asteroid_state_cb{nullptr};
     mutable asteroid_state_t asteroid_state{};
     Type _type{Type::Large};
-    std::unique_ptr<class AnimatedSprite> _sprite{};
     TimeUtils::FPSeconds _timeSinceLastHit{0.0f};
+    std::unique_ptr<class AnimatedSprite> _sprite{};
 };
 
 
