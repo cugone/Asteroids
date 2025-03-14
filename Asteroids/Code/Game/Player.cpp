@@ -30,7 +30,7 @@ void Player::AdjustScore(long long amount) noexcept {
        !(amount < 0 && desc.score - amount > desc.score)) {
         desc.score += amount;
         _scoreRemainingForOneUp -= amount;
-        if(_scoreRemainingForOneUp < 0ll) {
+        if(_scoreRemainingForOneUp <= 0ll) {
             _scoreRemainingForOneUp = MathUtils::Wrap(_scoreRemainingForOneUp, 0ll, desc.oneUpScore);
             IncrementLives();
         }
