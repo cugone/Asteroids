@@ -19,12 +19,16 @@ public:
         Medium,
         Small
     };
-    static constexpr float largeAsteroidCosmeticSize = 50.0f;
-    static constexpr float largeAsteroidPhysicalSize = 40.0f;
-    static constexpr float mediumAsteroidCosmeticSize = 25.0f;
-    static constexpr float mediumAsteroidPhysicalSize = 20.0f;
-    static constexpr float smallAsteroidCosmeticSize = 12.0f;
-    static constexpr float smallAsteroidPhysicalSize = 10.0f;
+    static inline constexpr const float largeAsteroidCosmeticSize{50.0f};
+    static inline constexpr const float largeAsteroidPhysicalSize{40.0f};
+    static inline constexpr const float mediumAsteroidCosmeticSize{25.0f};
+    static inline constexpr const float mediumAsteroidPhysicalSize{20.0f};
+    static inline constexpr const float smallAsteroidCosmeticSize{12.0f};
+    static inline constexpr const float smallAsteroidPhysicalSize{10.0f};
+
+    static inline constexpr const unsigned long long largeAsteroidScoreValue{25LL};
+    static inline constexpr const unsigned long long mediumAsteroidScoreValue{50LL};
+    static inline constexpr const unsigned long long smallAsteroidScoreValue{100LL};
 
     explicit Asteroid(std::weak_ptr<Scene> scene, Vector2 position, Vector2 velocity, float rotationSpeed);
     explicit Asteroid(std::weak_ptr<Scene> scene, Type type, Vector2 position, Vector2 velocity, float rotationSpeed);
@@ -44,9 +48,9 @@ public:
 
     static constexpr long long GetScoreFromType(Type type) noexcept {
         switch(type) {
-        case Type::Large: return 25LL;
-        case Type::Medium: return 50LL;
-        case Type::Small: return 100LL;
+        case Type::Large: return largeAsteroidScoreValue;
+        case Type::Medium: return mediumAsteroidScoreValue;
+        case Type::Small: return smallAsteroidScoreValue;
         default: return 0LL;
         }
     }
@@ -54,13 +58,13 @@ public:
     static constexpr std::pair<const float, const float> GetRadiiFromType(Type type) noexcept {
         switch(type) {
         case Type::Large:
-            return std::make_pair<const float, const float>(50.0f, 40.0f);
+            return std::make_pair(largeAsteroidCosmeticSize, largeAsteroidPhysicalSize);
         case Type::Medium:
-            return std::make_pair<const float, const float>(25.0f, 20.0f);
+            return std::make_pair(mediumAsteroidCosmeticSize, mediumAsteroidPhysicalSize);
         case Type::Small:
-            return std::make_pair<const float, const float>(12.0f, 10.0f);
+            return std::make_pair(smallAsteroidCosmeticSize, smallAsteroidPhysicalSize);
         default:
-            return std::make_pair<const float, const float>(50.0f, 40.0f);
+            return std::make_pair(largeAsteroidCosmeticSize, largeAsteroidPhysicalSize);
         }
     }
 private:
@@ -80,8 +84,8 @@ private:
     ConstantBuffer* asteroid_state_cb{nullptr};
     mutable asteroid_state_t asteroid_state{};
     Type _type{Type::Large};
-    std::unique_ptr<class AnimatedSprite> _sprite{};
     TimeUtils::FPSeconds _timeSinceLastHit{0.0f};
+    std::unique_ptr<class AnimatedSprite> _sprite{};
 };
 
 

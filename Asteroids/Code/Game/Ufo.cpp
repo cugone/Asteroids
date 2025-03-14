@@ -11,6 +11,8 @@
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/Shader.hpp"
 
+#include "Engine/Physics/PhysicsUtils.hpp"
+
 #include "Engine/Scene/Components.hpp"
 #include "Engine/Services/ServiceLocator.hpp"
 #include "Engine/Services/IRendererService.hpp"
@@ -285,6 +287,7 @@ Vector2 Ufo::CalculateFireTarget() const noexcept {
             if(auto* game = GetGameAs<Game>(); game != nullptr) {
                 if (auto* const mainState = dynamic_cast<MainState* const>(game->GetCurrentState()); mainState != nullptr) {
                     if (mainState->ship && !mainState->ship->IsDead()) {
+                        //MathUtils::CalculateVelocityFromMovingTarget(t, GetPosition(), Vector2::X_Axis * GetWeapon()->GetSpeed(), GetAcceleration(), mainState->ship->GetPosition(), mainState->ship->GetVelocity());
                         const auto target = mainState->ship->GetPosition();
                         const auto source = GetPosition();
                         const auto angle = (target - source).CalcHeadingDegrees();
@@ -342,16 +345,16 @@ int Ufo::GetStartIndexFromTypeAndStyle(Type type, Style style) noexcept {
     {
         switch(style) {
         case Style::Blue: return 0;
-        case Style::Green: return 4;
-        case Style::Yellow: return 8;
+        case Style::Green: return 0;
+        case Style::Yellow: return 0;
         }
     }
     case Type::Big:
     {
         switch(style) {
         case Style::Cyan: return 0;
-        case Style::Magenta: return 4;
-        default: return 4;
+        case Style::Magenta: return 0;
+        default: return 0;
         }
     }
     case Type::Boss:
@@ -387,8 +390,8 @@ int Ufo::GetFrameLengthFromTypeAndStyle(Type type, Style style) noexcept {
     case Type::Boss:
     {
         switch(style) {
-        case Style::Orange: return 8;
-        default: return 8;
+        case Style::Orange: return 4;
+        default: return 4;
         }
     }
     default: return 4;

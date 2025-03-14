@@ -48,7 +48,7 @@ void TitleState::Render() const noexcept {
     g_theRenderer->SetViewportAsPercent();
 
     //2D View / HUD
-    const auto ui_view_height = static_cast<float>(GetGameAs<Game>()->GetSettings().GetWindowHeight());
+    const auto ui_view_height = static_cast<float>(GetGameAs<Game>()->GetSettings()->GetWindowHeight());
     const auto ui_view_width = ui_view_height * m_ui_camera.GetAspectRatio();
     const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
     const auto ui_view_half_extents = ui_view_extents * 0.5f;

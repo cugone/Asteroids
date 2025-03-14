@@ -10,6 +10,8 @@
 #include "Engine/Math/Matrix4.hpp"
 #include "Engine/Math/MathUtils.hpp"
 
+#include "Engine/Physics/PhysicsUtils.hpp"
+
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/Material.hpp"
 
@@ -27,6 +29,7 @@
 #include "Game/TitleState.hpp"
 #include "Game/GameOverState.hpp"
 
+#include <algorithm>
 #include <format>
 #include <utility>
 
@@ -311,7 +314,63 @@ void MainState::HandleDebugKeyboardInput([[maybe_unused]] TimeUtils::FPSeconds d
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::Semicolon)) {
         KillAll();
     }
+    if (g_theInputSystem->IsKeyDown(KeyCode::SingleQuote)) {
+        FireAtClosestAsteroidToPlayer(deltaSeconds);
+
+    }
 #endif
+}
+
+void MainState::FireAtClosestAsteroid(TimeUtils::FPSeconds deltaSeconds, GameEntity* entity) const noexcept {
+    if (const auto* a = GetClosestAsteroidToEntity(entity); a != nullptr) {
+        const auto weaponProjectileSpeed = entity->GetWeapon()->GetSpeed();
+        auto vel = Vector2::X_Axis * weaponProjectileSpeed;
+        vel.SetHeadingDegrees(entity->GetOrientationDegrees());
+        if (auto [valid, newVelocity] = MathUtils::CalculateVelocityFromMovingTarget(deltaSeconds.count(), entity->GetPosition(), vel, entity->GetAcceleration(), a->GetPosition(), a->GetVelocity()); valid) {
+            //Time to target
+            const auto distance = (a->GetPosition() - entity->GetPosition()).CalcLength();
+            const auto ttt = distance / weaponProjectileSpeed;
+            //Where will target be in that time?
+            const auto newPos = a->GetPosition() + a->GetVelocity() * ttt;
+            //Where does the ship need to point to hit that location?
+            const auto newAngle = (newPos - entity->GetPosition()).CalcHeadingDegrees();
+            //Lead the target
+            entity->SetOrientationDegrees(newAngle);
+            //Fire
+            entity->OnFire();
+            if(!bullets.empty()) {
+                bullets.back()->SetVelocity(newVelocity);
+            }
+        }
+    }
+}
+
+void MainState::FireAtClosestAsteroidToPlayer(TimeUtils::FPSeconds deltaSeconds) const noexcept {
+    FireAtClosestAsteroid(deltaSeconds, GetShip());
+}
+
+void MainState::FireAtPlayer(TimeUtils::FPSeconds deltaSeconds, GameEntity* entity, bool leadTarget) const noexcept {
+    if (!entity) {
+        return;
+    }
+    if (const auto* s = GetShip(); s != nullptr) {
+        const auto weaponProjectileSpeed = entity->GetWeapon()->GetSpeed();
+        auto vel = Vector2::X_Axis * weaponProjectileSpeed;
+        if (auto [valid, newVelocity] = MathUtils::CalculateVelocityFromMovingTarget(deltaSeconds.count(), entity->GetPosition(), vel, entity->GetAcceleration(), s->GetPosition(), s->GetVelocity()); valid) {
+            if (leadTarget) {
+                //Time to target
+                const auto distance = (s->GetPosition() - entity->GetPosition()).CalcLength();
+                const auto ttt = distance / weaponProjectileSpeed;
+                //Where will target be in that time?
+                const auto newPos = s->GetPosition() + s->GetVelocity() * ttt;
+                //Where does the ship need to point to hit that location?
+                const auto newAngle = (newPos - entity->GetPosition()).CalcHeadingDegrees();
+                //Lead the target
+                entity->SetOrientationDegrees(newAngle);
+            }
+            entity->OnFire();
+        }
+    }
 }
 
 void MainState::HandlePlayerInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) {
@@ -947,6 +1006,22 @@ void MainState::PostFrameCleanup() noexcept {
 
 bool MainState::IsWaveComplete() const noexcept {
     return asteroids.empty();
+}
+
+Asteroid* MainState::GetClosestAsteroidToEntity(GameEntity* entity) const noexcept {
+    if (asteroids.empty()) {
+        return nullptr;
+    }
+    if (!entity) {
+        return nullptr;
+    }
+    return *std::min_element(std::cbegin(asteroids), std::cend(asteroids), [e = entity](const Asteroid* a, const Asteroid* b) {
+        return MathUtils::CalcDistanceSquared(e->GetPosition(), a->GetPosition()) < MathUtils::CalcDistanceSquared(e->GetPosition(), b->GetPosition());
+        });
+}
+
+Asteroid* MainState::GetClosestAsteroidToPlayer() const noexcept {
+    return GetClosestAsteroidToEntity(GetShip());
 }
 
 void MainState::RenderPausedOverlay() const noexcept {

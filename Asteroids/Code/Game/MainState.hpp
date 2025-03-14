@@ -56,6 +56,11 @@ private:
 
     void HandleDebugInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds);
     void HandleDebugKeyboardInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds);
+
+    void FireAtPlayer(TimeUtils::FPSeconds deltaSeconds, GameEntity* entity, bool leadTarget) const noexcept;
+    void FireAtClosestAsteroid(TimeUtils::FPSeconds deltaSeconds, GameEntity* entity) const noexcept;
+    void FireAtClosestAsteroidToPlayer(TimeUtils::FPSeconds deltaSeconds) const noexcept;
+
     void HandlePlayerInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds);
     void ClampCameraToWorld() noexcept;
 
@@ -68,6 +73,8 @@ private:
     void MakeLargeAsteroid(Vector2 pos, Vector2 vel, float rotationSpeed) noexcept;
 
     void AddNewAsteroidToWorld(std::unique_ptr<Asteroid> newAsteroid);
+    Asteroid* GetClosestAsteroidToEntity(GameEntity* entity) const noexcept;
+    Asteroid* GetClosestAsteroidToPlayer() const noexcept;
 
     Ship* GetShip() const noexcept;
 
