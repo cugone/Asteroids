@@ -32,6 +32,7 @@ void Player::AdjustScore(long long amount) noexcept {
         _scoreRemainingForOneUp -= amount;
         if(_scoreRemainingForOneUp < 0ll) {
             _scoreRemainingForOneUp = MathUtils::Wrap(_scoreRemainingForOneUp, 0ll, desc.oneUpScore);
+            IncrementLives();
         }
     }
 }
