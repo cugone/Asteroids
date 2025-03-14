@@ -4,6 +4,7 @@
 
 #include <limits>
 #include <numeric>
+#include <utility>
 
 Player::Player(const PlayerDesc& playerDesc) noexcept
     : desc(playerDesc)
@@ -13,15 +14,11 @@ Player::Player(const PlayerDesc& playerDesc) noexcept
 }
 
 void Player::IncrementLives() noexcept {
-    if(desc.lives <= (std::numeric_limits<decltype(desc.lives)>::max)()) {
-        ++desc.lives;
-    }
+    desc.lives = (std::min)(++desc.lives, (std::numeric_limits<decltype(desc.lives)>::max)());
 }
 
 void Player::DecrementLives() noexcept {
-    if(desc.lives > 0) {
-        --desc.lives;
-    }
+    desc.lives = (std::max)(decltype(desc.lives){0}, --desc.lives);
 }
 
 long long Player::GetScore() const noexcept {
