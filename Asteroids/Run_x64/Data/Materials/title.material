@@ -1,0 +1,7 @@
+<material name="title">
+    <!-- <shader src="Data/Shaders/background.shader" /> -->
+    <shader src="__2D" />    
+    <textures>
+        <diffuse src="Data/Images/title.png" />
+    </textures>
+</material>

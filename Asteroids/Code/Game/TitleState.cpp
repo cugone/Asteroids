@@ -61,25 +61,42 @@ void TitleState::Render() const noexcept {
     m_ui_camera.SetupView(ui_leftBottom, ui_rightTop, ui_nearFar, MathUtils::M_16_BY_9_RATIO);
     g_theRenderer->SetCamera(m_ui_camera);
 
-    const auto* font = g_theRenderer->GetFont("System32");
-    const auto line_height = font->GetLineHeight();
-
-    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x, ui_view_half_extents.y + line_height * 0.0f}));
-    g_theRenderer->DrawTextLine(font, "ASTEROIDS");
-
-    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x, ui_view_half_extents.y + line_height * 2.0f}));
-    g_theRenderer->DrawTextLine(font, "START", m_selected_item == TitleMenu::Start ? Rgba::Yellow : Rgba::White);
-
-    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x, ui_view_half_extents.y + line_height * 4.0f}));
-    g_theRenderer->DrawTextLine(font, "OPTIONS", m_selected_item == TitleMenu::Options ? Rgba::Yellow : Rgba::White);
-
-    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x, ui_view_half_extents.y + line_height * 6.0f}));
-    g_theRenderer->DrawTextLine(font, "EXIT", m_selected_item == TitleMenu::Exit ? Rgba::Yellow : Rgba::White);
+    RenderBackground(ui_view_half_extents);
+    RenderMenu(ui_view_half_extents);
 
 }
 
 void TitleState::EndFrame() noexcept {
     /* DO NOTHING */
+}
+
+void TitleState::RenderBackground(const Vector2& ui_view_half_extents) const noexcept {
+    if (auto* game = GetGameAs<Game>(); game != nullptr) {
+        const auto S = Matrix4::CreateScaleMatrix(ui_view_half_extents * 2.0f);
+        const auto R = Matrix4::I;
+        const auto T = Matrix4::CreateTranslationMatrix(ui_view_half_extents);
+        const auto M = Matrix4::MakeSRT(S, R, T);
+        g_theRenderer->SetModelMatrix(M);
+        g_theRenderer->SetMaterial("title");
+        g_theRenderer->DrawQuad2D();
+    }
+}
+
+void TitleState::RenderMenu(const Vector2& ui_view_half_extents) const noexcept {
+    const auto* font = g_theRenderer->GetFont("System32");
+    const auto line_height = font->GetLineHeight();
+
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ ui_view_half_extents.x, ui_view_half_extents.y + line_height * 0.0f }));
+    g_theRenderer->DrawTextLine(font, "ASTEROIDS");
+
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ ui_view_half_extents.x, ui_view_half_extents.y + line_height * 2.0f }));
+    g_theRenderer->DrawTextLine(font, "START", m_selected_item == TitleMenu::Start ? Rgba::Yellow : Rgba::White);
+
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ ui_view_half_extents.x, ui_view_half_extents.y + line_height * 4.0f }));
+    g_theRenderer->DrawTextLine(font, "OPTIONS", m_selected_item == TitleMenu::Options ? Rgba::Yellow : Rgba::White);
+
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ ui_view_half_extents.x, ui_view_half_extents.y + line_height * 6.0f }));
+    g_theRenderer->DrawTextLine(font, "EXIT", m_selected_item == TitleMenu::Exit ? Rgba::Yellow : Rgba::White);
 }
 
 std::unique_ptr<GameState> TitleState::HandleInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {

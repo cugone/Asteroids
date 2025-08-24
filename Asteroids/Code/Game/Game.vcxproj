@@ -193,6 +193,7 @@
     <Image Include="..\..\Run_x64\Data\Images\ship.png" />
     <Image Include="..\..\Run_x64\Data\Images\sonic_bullet.png" />
     <Image Include="..\..\Run_x64\Data\Images\thrust.png" />
+    <Image Include="..\..\Run_x64\Data\Images\title.png" />
     <Image Include="..\..\Run_x64\Data\Images\ufo.png" />
     <Image Include="..\..\Run_x64\Data\Resources\Icons\icon.ico" />
   </ItemGroup>
@@ -206,6 +207,7 @@
     <None Include="..\..\Run_x64\Data\Materials\ship.material" />
     <None Include="..\..\Run_x64\Data\Materials\smokeparticle.material" />
     <None Include="..\..\Run_x64\Data\Materials\thrust.material" />
+    <None Include="..\..\Run_x64\Data\Materials\title.material" />
     <None Include="..\..\Run_x64\Data\Materials\ufo.material" />
     <None Include="..\..\Run_x64\Data\ParticleEffects\flame_emission.effect" />
     <None Include="..\..\Run_x64\Data\ShaderPrograms\entity_PS.cso" />
