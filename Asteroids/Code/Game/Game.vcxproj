@@ -203,6 +203,7 @@
     <None Include="..\..\Run_x64\Data\Materials\bullet.material" />
     <None Include="..\..\Run_x64\Data\Materials\explosion.material" />
     <None Include="..\..\Run_x64\Data\Materials\flameparticle.material" />
+    <None Include="..\..\Run_x64\Data\Materials\gameover.material" />
     <None Include="..\..\Run_x64\Data\Materials\mine.material" />
     <None Include="..\..\Run_x64\Data\Materials\ship.material" />
     <None Include="..\..\Run_x64\Data\Materials\smokeparticle.material" />

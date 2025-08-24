@@ -21,6 +21,9 @@ public:
 
 protected:
 private:
+
+    void RenderBackground(const Vector2& ui_view_half_extents) const noexcept;
+
     std::unique_ptr<GameState> HandleInput([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept override;
     std::unique_ptr<GameState> HandleKeyboardInput() noexcept;
     std::unique_ptr<GameState> HandleControllerInput() noexcept;

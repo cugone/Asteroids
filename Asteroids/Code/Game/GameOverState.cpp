@@ -88,10 +88,25 @@ void GameOverState::Render() const noexcept {
     m_ui_camera.SetupView(ui_leftBottom, ui_rightTop, ui_nearFar, MathUtils::M_16_BY_9_RATIO);
     g_theRenderer->SetCamera(m_ui_camera);
 
+    RenderBackground(ui_view_half_extents);
+
     const auto* font = g_theRenderer->GetFont("System32");
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(ui_view_half_extents));
     g_theRenderer->DrawTextLine(font, "GAME OVER");
 
+
+}
+
+void GameOverState::RenderBackground(const Vector2& ui_view_half_extents) const noexcept {
+    if (auto* game = GetGameAs<Game>(); game != nullptr) {
+        const auto S = Matrix4::CreateScaleMatrix(ui_view_half_extents * 2.0f);
+        const auto R = Matrix4::I;
+        const auto T = Matrix4::CreateTranslationMatrix(ui_view_half_extents);
+        const auto M = Matrix4::MakeSRT(S, R, T);
+        g_theRenderer->SetModelMatrix(M);
+        g_theRenderer->SetMaterial("gameover");
+        g_theRenderer->DrawQuad2D();
+    }
 }
 
 void GameOverState::EndFrame() noexcept {

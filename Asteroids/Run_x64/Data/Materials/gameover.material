@@ -1,0 +1,6 @@
+<material name="gameover">
+    <shader src="__2D" />
+    <textures>
+        <diffuse src="Data/Images/gameover.png" />
+    </textures>
+</material>

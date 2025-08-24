@@ -280,6 +280,9 @@
     <None Include="..\..\Run_x64\Data\Materials\title.material">
       <Filter>Data\Materials</Filter>
     </None>
+    <None Include="..\..\Run_x64\Data\Materials\gameover.material">
+      <Filter>Data\Materials</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\..\Run_x64\Data\Audio\Sound\Explosion.wav">
