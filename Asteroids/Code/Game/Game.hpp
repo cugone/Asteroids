@@ -154,6 +154,9 @@ public:
     bool IsGameOver() const noexcept;
     void TogglePause() noexcept;
     bool IsPaused() const noexcept;
+    void Pause() noexcept;
+    void Unpause() noexcept;
+    
 
     void SetAsteroidSpriteSheet() noexcept;
     void SetMineSpriteSheet() noexcept;

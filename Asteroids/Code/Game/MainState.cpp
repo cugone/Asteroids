@@ -15,6 +15,9 @@
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/Material.hpp"
 
+#include "Engine/Services/ServiceLocator.hpp"
+#include "Engine/Services/IAppService.hpp"
+
 #include "Engine/UI/UISystem.hpp"
 
 #include "Game/Game.hpp"
@@ -167,6 +170,9 @@ void MainState::EndFrame() noexcept {
             }
         }
         PostFrameCleanup();
+        if(auto* app = ServiceLocator::get<IAppService>(); app && app->LostFocus()) {
+            game->Pause();
+        }
     }
 }
 

@@ -173,6 +173,14 @@ bool Game::IsPaused() const noexcept {
     return _paused;
 }
 
+void Game::Pause() noexcept {
+    _paused = true;
+}
+
+void Game::Unpause() noexcept {
+    _paused = false;
+}
+
 void Game::SetAsteroidSpriteSheet() noexcept {
     if(!asteroid_sheet) {
         asteroid_sheet = g_theRenderer->CreateSpriteSheet("Data/Images/asteroid.png", 6, 5);
