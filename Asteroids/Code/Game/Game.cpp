@@ -136,11 +136,11 @@ void Game::InitializeSounds() noexcept {
 void Game::InitializeMusic() noexcept {
     g_theAudioSystem->RegisterWavFilesFromFolder(g_music_folderpath);
     //TODO: Fix music
-    //AudioSystem::SoundDesc desc{};
-    //desc.loopCount = -1;
-    //desc.frequency = 2.0f;
-    //desc.groupName = g_audiogroup_music;
-    //g_theAudioSystem->Play(g_music_bgmpath, desc);
+    AudioSystem::SoundDesc desc{};
+    desc.loopCount = -1;
+    desc.frequency = 2.0f;
+    desc.groupName = g_audiogroup_music;
+    g_theAudioSystem->Play(g_music_bgmpath, desc);
 }
 
 void Game::BeginFrame() noexcept {
