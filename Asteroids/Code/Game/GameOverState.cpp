@@ -90,7 +90,7 @@ void GameOverState::Render() const noexcept {
 
     RenderBackground(ui_view_half_extents);
 
-    const auto* font = g_theRenderer->GetFont("System32");
+    const auto* font = g_theRenderer->GetDefaultFont();
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(ui_view_half_extents));
     g_theRenderer->DrawTextLine(font, "GAME OVER");
 

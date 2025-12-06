@@ -68,7 +68,7 @@ void OptionsState::Render() const noexcept {
     m_ui_camera.SetupView(ui_leftBottom, ui_rightTop, ui_nearFar, MathUtils::M_16_BY_9_RATIO);
     g_theRenderer->SetCamera(m_ui_camera);
 
-    const auto* font = g_theRenderer->GetFont("System32");
+    const auto* font = g_theRenderer->GetDefaultFont();
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x, ui_view_half_extents.y * 0.25f}));
     g_theRenderer->DrawTextLine(font, "OPTIONS");
 

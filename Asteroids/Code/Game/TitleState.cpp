@@ -83,7 +83,7 @@ void TitleState::RenderBackground(const Vector2& ui_view_half_extents) const noe
 }
 
 void TitleState::RenderMenu(const Vector2& ui_view_half_extents) const noexcept {
-    const auto* font = g_theRenderer->GetFont("System32");
+    const auto* font = g_theRenderer->GetDefaultFont();
     const auto line_height = font->GetLineHeight();
 
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ ui_view_half_extents.x, ui_view_half_extents.y + line_height * 0.0f }));

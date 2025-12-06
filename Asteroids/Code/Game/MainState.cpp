@@ -938,7 +938,7 @@ void MainState::RenderStatus() const noexcept {
     ui_camera.SetupView(ui_leftBottom, ui_rightTop, ui_nearFar, MathUtils::M_16_BY_9_RATIO);
     g_theRenderer->SetCamera(ui_camera);
 
-    const auto* font = g_theRenderer->GetFont("System32");
+    const auto* font = g_theRenderer->GetDefaultFont();
     const auto font_position = ui_cam_pos - ui_view_half_extents + Vector2{5.0f, font->GetLineHeight() * 0.0f};
 
     g_theRenderer->SetModelMatrix();
@@ -949,7 +949,7 @@ void MainState::RenderStatus() const noexcept {
         }
         return std::pair<const long long, const long long>(0LL, 0LL);
     }(); //IIIL
-    g_theRenderer->DrawMultilineText(g_theRenderer->GetFont("System32"), std::format("Score: {}\n{:>6}{}", playerScore, 'x', playerLives));
+    g_theRenderer->DrawMultilineText(font, std::format("Score: {}\n{:>6}{}", playerScore, 'x', playerLives));
 
     const auto uvs = AABB2::Zero_to_One;
     const auto mat = g_theRenderer->GetMaterial("ship");
