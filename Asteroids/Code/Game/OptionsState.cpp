@@ -9,6 +9,9 @@
 
 #include "Engine/Renderer/Renderer.hpp"
 
+#include "Engine/Services/ServiceLocator.hpp"
+#include "Engine/Services/IRendererService.hpp"
+
 #include "Game/Game.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/GameConfig.hpp"
@@ -25,10 +28,41 @@ void OptionsState::OnEnter() noexcept {
         m_selected_item = OptionsMenu::First_;
         m_temp_options = game->gameOptions;
     }
+    const auto* renderer = ServiceLocator::const_get<IRendererService>();
+    for (const auto& mode : renderer->GetDevice()->displayModes) {
+        m_validResolutions.emplace(std::make_pair(mode.width, mode.height));
+    }
+    m_min_resolution = m_validResolutions.begin();
+    m_max_resolution = [&]() {
+        auto cur_iter = m_validResolutions.begin();
+        auto prev_iter = cur_iter;
+        while(cur_iter != m_validResolutions.end()) {
+            prev_iter = cur_iter;
+            cur_iter = std::next(cur_iter);
+        }
+        return prev_iter;
+    }();
+    const auto cur_dims = renderer->GetOutput()->GetDimensions();
+    std::vector<DisplayDesc> dimensions;
+    dimensions.reserve(m_validResolutions.size());
+    for(auto& dim : m_validResolutions) {
+        dimensions.emplace_back(DisplayDesc(dim.first, dim.second));
+    }
+    const auto selected_dimension = renderer->GetDevice()->GetDisplayModeMatchingDimensions(dimensions, cur_dims.x, cur_dims.y);
+    m_selected_resolution = [&]() {
+        auto cur_iter = m_validResolutions.begin();
+        if (cur_iter == m_validResolutions.end()) {
+            return cur_iter;
+        }
+        while(cur_iter->first != selected_dimension.width && cur_iter->second != selected_dimension.height) {
+            ++cur_iter;
+        }
+        return cur_iter;
+    }();
 }
 
 void OptionsState::OnExit() noexcept {
-    /* DO NOTHING */
+    m_validResolutions.clear();
 }
 
 void OptionsState::BeginFrame() noexcept {
@@ -106,10 +140,23 @@ void OptionsState::Render() const noexcept {
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.75f}));
     g_theRenderer->DrawTextLine(font, std::to_string(m_temp_options.GetMusicVolume()), m_selected_item == OptionsMenu::MusicVolume ? Rgba::Yellow : Rgba::White);
 
-    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.95f}));
-    g_theRenderer->DrawTextLine(font, "Back", m_selected_item == OptionsMenu::Cancel ? Rgba::Yellow : Rgba::White);
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.85f }));
+    g_theRenderer->DrawTextLine(font, "Display Mode:", m_selected_item == OptionsMenu::DisplayMode ? Rgba::Yellow : Rgba::White);
+
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.85f }));
+    g_theRenderer->DrawTextLine(font, DisplayModePreferenceToString(), m_selected_item == OptionsMenu::DisplayMode ? Rgba::Yellow : Rgba::White);
+
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 0.95f }));
+    g_theRenderer->DrawTextLine(font, "Resolution:", GetResolutionItemColor());
+
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ ui_view_half_extents.x * 1.5f, ui_view_half_extents.y * 0.95f }));
+    g_theRenderer->DrawTextLine(font, StringUtils::to_string(m_temp_options.GetWindowResolution()), GetResolutionItemColor());
+
 
     g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 1.05f}));
+    g_theRenderer->DrawTextLine(font, "Back", m_selected_item == OptionsMenu::Cancel ? Rgba::Yellow : Rgba::White);
+
+    g_theRenderer->SetModelMatrix(Matrix4::CreateTranslationMatrix(Vector2{ui_view_half_extents.x * 0.25f, ui_view_half_extents.y * 1.15f}));
     g_theRenderer->DrawTextLine(font, "Accept", m_selected_item == OptionsMenu::Accept ? Rgba::Yellow : Rgba::White);
 
 }
@@ -180,8 +227,11 @@ std::unique_ptr<GameState> OptionsState::HandleOptionsMenuState(const bool up, c
         switch(m_selected_item) {
         case OptionsMenu::Cancel: return std::make_unique<TitleState>();
         case OptionsMenu::Accept:
-            SaveCurrentOptions();
-            return std::make_unique<TitleState>(); 
+            if(TrySetResolution()) {
+                SaveCurrentOptions();
+                return std::make_unique<TitleState>();
+            }
+            break;
         default: return {};
         }
     }
@@ -219,6 +269,30 @@ void OptionsState::CycleSelectedOptionDown(OptionsMenu selectedItem) noexcept {
     {
         auto cur_musicVolume = m_temp_options.GetMusicVolume();
         m_temp_options.SetMusicVolume(std::clamp(cur_musicVolume ? --cur_musicVolume : cur_musicVolume, m_min_music_volume, m_max_music_volume));
+        break;
+    }
+    case OptionsMenu::DisplayMode:
+    {
+        if(auto is_windowed = m_temp_options.IsWindowed(); is_windowed) {
+            m_temp_options.SetFullscreenMode();
+        } else {
+            m_temp_options.SetWindowedMode();
+        }
+        break;
+    }
+    case OptionsMenu::Resolution:
+    {
+        if (auto is_fullscreen = m_temp_options.IsWindowed()) {
+            m_selected_resolution = [&]() {
+                if (m_selected_resolution == m_min_resolution) {
+                    return m_selected_resolution;
+                }
+                else {
+                    return std::prev(m_selected_resolution);
+                }
+                }();
+            m_temp_options.SetWindowResolution(IntVector2(m_selected_resolution->first, m_selected_resolution->second));
+        }
         break;
     }
     case OptionsMenu::CameraShake:
@@ -267,6 +341,30 @@ void OptionsState::CycleSelectedOptionUp(OptionsMenu selectedItem) noexcept {
         m_temp_options.SetMusicVolume((std::min)(++cur_musicVolume, m_max_music_volume));
         break;
     }
+    case OptionsMenu::DisplayMode:
+    {
+        if (auto is_windowed = m_temp_options.IsWindowed(); is_windowed) {
+            m_temp_options.SetFullscreenMode();
+        } else {
+            m_temp_options.SetWindowedMode();
+        }
+        break;
+    }
+    case OptionsMenu::Resolution:
+    {
+        if (auto is_fullscreen = m_temp_options.IsWindowed()) {
+            m_selected_resolution = [&]() {
+                if (m_selected_resolution == m_max_resolution) {
+                    return m_selected_resolution;
+                }
+                else {
+                    return std::next(m_selected_resolution);
+                }
+                }();
+            m_temp_options.SetWindowResolution(IntVector2(m_selected_resolution->first, m_selected_resolution->second));
+        }
+        break;
+    }
     case OptionsMenu::CameraShake:
     {
         auto cur_cameraShake = m_temp_options.GetCameraShakeStrength();
@@ -284,11 +382,6 @@ void OptionsState::SaveCurrentOptions() noexcept {
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
         game->gameOptions = m_temp_options;
         game->gameOptions.SaveToConfig(*g_theConfig);
-        g_theConfig->SetValue("difficulty", TypeUtils::GetUnderlyingValue<Difficulty>(game->gameOptions.GetDifficulty()));
-        g_theConfig->SetValue("controlpref", TypeUtils::GetUnderlyingValue<ControlPreference>(game->gameOptions.GetControlPreference()));
-        g_theConfig->SetValue("sound", static_cast<int>(game->gameOptions.GetSoundVolume()));
-        g_theConfig->SetValue("music", static_cast<int>(game->gameOptions.GetMusicVolume()));
-        g_theConfig->SetValue("cameraShakeStrength", game->gameOptions.GetCameraShakeStrength());
         std::ofstream ofs(g_options_filepath);
         g_theConfig->PrintConfigs(ofs);
         ofs.flush();
@@ -318,4 +411,45 @@ std::string OptionsState::ControlPreferenceToString(ControlPreference preference
     case ControlPreference::XboxController: return "Xbox Controller";
     default: return "";
     }
+}
+
+std::string OptionsState::DisplayModePreferenceToString() const noexcept {
+    if (m_temp_options.IsFullscreen()) {
+        return "Borderless Fullscreen";
+    } else if (m_temp_options.IsWindowed()) {
+        return "Windowed";
+    }
+    return "";
+}
+
+Rgba OptionsState::GetResolutionItemColor() const noexcept {
+    auto selected_color = Rgba::White;
+    if(m_temp_options.IsFullscreen()) {
+        selected_color = Rgba::Grey;
+        if(m_selected_item == OptionsMenu::Resolution) {
+            selected_color = Rgba::LightGrey;
+        }
+    } else {
+        if (m_selected_item == OptionsMenu::Resolution) {
+            selected_color = Rgba::Yellow;
+        }
+    }
+    return selected_color;
+}
+
+bool OptionsState::TrySetResolution() noexcept {
+    if(m_temp_options.IsFullscreen()) {
+        if (auto* app = ServiceLocator::get<IAppService>(); app != nullptr) {
+            app->Maximize();
+            return true;
+        }
+        return false;
+    } else if (m_temp_options.IsWindowed()) {
+        if (auto* app = ServiceLocator::get<IAppService>(); app != nullptr) {
+            app->Restore(m_selected_resolution->first, m_selected_resolution->second);
+            return true;
+        }
+        return false;
+    }
+    return false;
 }

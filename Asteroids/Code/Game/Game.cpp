@@ -33,6 +33,11 @@
 
 void GameOptions::SaveToConfig(Config& config) noexcept {
     GameSettings::SaveToConfig(config);
+    config.SetValue("difficulty", TypeUtils::GetUnderlyingValue<Difficulty>(GetDifficulty()));
+    config.SetValue("controlpref", TypeUtils::GetUnderlyingValue<ControlPreference>(GetControlPreference()));
+    config.SetValue("sound", static_cast<int>(GetSoundVolume()));
+    config.SetValue("music", static_cast<int>(GetMusicVolume()));
+    config.SetValue("cameraShakeStrength", GetCameraShakeStrength());
 }
 
 void GameOptions::SetToDefault() noexcept {
@@ -241,6 +246,10 @@ GameState* const Game::GetCurrentState() const noexcept {
     return _current_state.get();
 }
 
+void Game::HandleWindowResize([[maybe_unused]] unsigned int newWidth, [[maybe_unused]] unsigned int newHeight) noexcept {
+    RecreateResources();
+}
+
 void Game::SetControlType() noexcept {
     if(g_theInputSystem->WasAnyKeyPressed()) {
         _keyboard_control_active = true;
@@ -278,6 +287,11 @@ void Game::CreateOptionsFile() const noexcept {
 
 void Game::LoadOptionsFile() const noexcept {
     GUARANTEE_OR_DIE(g_theConfig->AppendFromFile(g_options_filepath), "Could not load options file.");
+}
+
+void Game::RecreateResources() noexcept {
+    auto* renderer = ServiceLocator::get<IRendererService>();
+    renderer->ReloadMaterials();
 }
 
 void Game::CreateOrLoadOptionsFile() noexcept {

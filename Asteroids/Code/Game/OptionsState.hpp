@@ -8,6 +8,7 @@
 #include "Game/GameState.hpp"
 
 #include <memory>
+#include <set>
 
 enum class OptionsMenu {
     First_,
@@ -16,6 +17,8 @@ enum class OptionsMenu {
     CameraShake,
     SoundVolume,
     MusicVolume,
+    DisplayMode,
+    Resolution,
     Cancel,
     Last_Valid_,
     Accept = Last_Valid_,
@@ -52,6 +55,10 @@ private:
     void SetOptionsToDefault() noexcept;
     std::string DifficultyToString(Difficulty difficulty) const noexcept;
     std::string ControlPreferenceToString(ControlPreference preference) const noexcept;
+    std::string DisplayModePreferenceToString() const noexcept;
+    Rgba GetResolutionItemColor() const noexcept;
+
+    bool TrySetResolution() noexcept;
 
     mutable Camera2D m_ui_camera{};
     OptionsMenu m_selected_item{OptionsMenu::First_};
@@ -63,4 +70,8 @@ private:
     const uint8_t m_max_music_volume{10u};
     const uint8_t m_min_music_volume{0u};
 
+    std::set<std::pair<unsigned int, unsigned int>> m_validResolutions{};
+    std::set<std::pair<unsigned int, unsigned int>>::iterator m_selected_resolution{};
+    std::set<std::pair<unsigned int, unsigned int>>::iterator m_min_resolution{};
+    std::set<std::pair<unsigned int, unsigned int>>::iterator m_max_resolution{};
 };

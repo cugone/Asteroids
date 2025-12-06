@@ -70,6 +70,20 @@ struct TypeUtils::is_incrementable_enum_type<ControlPreference> : std::true_type
 template<>
 struct TypeUtils::is_decrementable_enum_type<ControlPreference> : std::true_type {};
 
+enum class DisplayModePreference {
+    First_,
+    BorderlessFullscreen = First_,
+    Last_Valid_,
+    Windowed = Last_Valid_,
+    Last_,
+};
+
+template<>
+struct TypeUtils::is_incrementable_enum_type<DisplayModePreference> : std::true_type {};
+
+template<>
+struct TypeUtils::is_decrementable_enum_type<DisplayModePreference> : std::true_type {};
+
 class GameOptions : public GameSettings {
 public:
     GameOptions() noexcept = default;
@@ -112,6 +126,8 @@ protected:
     Difficulty _defaultDifficulty{Difficulty::Normal};
     ControlPreference _controlPref{ControlPreference::Mouse};
     ControlPreference _defaultControlPref{ControlPreference::Mouse};
+    DisplayModePreference _displayModePref{DisplayModePreference::BorderlessFullscreen};
+    DisplayModePreference _defaultDisplayModePref{DisplayModePreference::BorderlessFullscreen};
     uint8_t _soundVolume{5};
     uint8_t _defaultSoundVolume{5};
     uint8_t _musicVolume{5};
@@ -182,6 +198,8 @@ public:
     std::unique_ptr<ParticleSystem> particleSystem{};
 
     GameState* const GetCurrentState() const noexcept;
+
+    void HandleWindowResize([[maybe_unused]] unsigned int newWidth, [[maybe_unused]] unsigned int newHeight) noexcept override;
 protected:
 private:
     void InitializeAudio() noexcept;
@@ -191,6 +209,8 @@ private:
     void CreateOrLoadOptionsFile() noexcept;
     void CreateOptionsFile() const noexcept;
     void LoadOptionsFile() const noexcept;
+
+    void RecreateResources() noexcept;
 
     std::unique_ptr<GameState> _current_state{nullptr};
     std::unique_ptr<GameState> _next_state{nullptr};

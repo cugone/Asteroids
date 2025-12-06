@@ -10,6 +10,8 @@ cameraShakeStrength=1.0
 maxShakeOffsetHorizontal=25.0
 maxShakeOffsetVertical=25.0
 maxShakeAngle=2.5
+width=1600
+height=900
 )"
 };
 
