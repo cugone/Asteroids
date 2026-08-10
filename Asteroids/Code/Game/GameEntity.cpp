@@ -182,7 +182,7 @@ float GameEntity::GetOrientationRadians() const noexcept {
 
 void GameEntity::OnDestroy() noexcept {
     if(auto* game = GetGameAs<Game>(); game != nullptr) {
-        game->player.AdjustScore(scoreValue);
+        game->OnScoreEvent.trigger(scoreValue);
     }
 }
 
