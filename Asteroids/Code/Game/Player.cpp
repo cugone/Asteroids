@@ -31,8 +31,10 @@ void Player::AdjustScore(long long amount) noexcept {
         desc.score += amount;
         _scoreRemainingForOneUp -= amount;
         if(_scoreRemainingForOneUp <= 0ll) {
-            _scoreRemainingForOneUp = MathUtils::Wrap(_scoreRemainingForOneUp, 0ll, desc.oneUpScore);
-            IncrementLives();
+            const auto lives_to_add = MathUtils::WrapCount(_scoreRemainingForOneUp, 0ll, desc.oneUpScore, _scoreRemainingForOneUp);
+            for(std::size_t i{ 0u }; i < lives_to_add; ++i) {
+                IncrementLives();
+            }
         }
     }
 }
