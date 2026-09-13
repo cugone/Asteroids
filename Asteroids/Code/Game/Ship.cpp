@@ -49,6 +49,18 @@ Ship::Ship(std::weak_ptr<Scene> scene, Vector2 position)
     _laserWeapon.Initialize(laser_weaponDesc);
     m_weapon = &_laserWeapon;
     _mineFireRate.SetFrequency(1u);
+
+    m_OnCreateSubscription = m_OnCreateEvent.subscribe(this, &Ship::OnCreate);
+    m_OnDestroySubscription = m_OnDestroyEvent.subscribe(this, &Ship::OnDestroy);
+    m_OnFireSubscription = m_OnFireEvent.subscribe(this, &Ship::OnFire);
+    m_OnCollisionSubscription = m_OnCollisionEvent.subscribe(this, &Ship::OnCollision);
+}
+
+Ship::~Ship() {
+    m_OnCreateEvent.unsubscribe(m_OnCreateSubscription);
+    m_OnDestroyEvent.unsubscribe(m_OnDestroySubscription);
+    m_OnFireEvent.unsubscribe(m_OnFireSubscription);
+    m_OnCollisionEvent.unsubscribe(m_OnCollisionSubscription);
 }
 
 void Ship::BeginFrame() noexcept {

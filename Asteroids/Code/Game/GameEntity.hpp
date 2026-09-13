@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Engine/Core/Event.hpp"
 #include "Engine/Core/TimeUtils.hpp"
 
 #include "Engine/Math/Matrix4.hpp"
@@ -76,6 +77,12 @@ public:
 
     long long scoreValue = 0ll;
     Faction faction = Faction::None;
+
+    Event<> m_OnCreateEvent;
+    Event<> m_OnDestroyEvent;
+    Event<> m_OnFireEvent;
+    Event<GameEntity*, GameEntity*> m_OnCollisionEvent;
+
 protected:
     void SetHealth(int newHealth) noexcept;
 
@@ -88,6 +95,11 @@ protected:
     IWeapon* m_weapon{};
     const GameEntity* m_gameParent{};
     Mesh::Builder m_mesh_builder{};
+
+    Event<>::Subscription m_OnCreateSubscription;
+    Event<>::Subscription m_OnDestroySubscription;
+    Event<>::Subscription m_OnFireSubscription;
+    Event<GameEntity*, GameEntity*>::Subscription m_OnCollisionSubscription;
 private:
 
     Vector2 CalcAcceleration() noexcept;
@@ -105,4 +117,5 @@ private:
     Vector4 m_cosmeticphysicalradius_velocitydirection{};
     Vector4 m_acceleration_force{};
     Vector4 m_invmass_rotationspeed_health_padding{1.0f, 90.0f, 1.0f, 0.0f};
+
 };

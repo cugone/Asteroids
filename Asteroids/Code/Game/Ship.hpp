@@ -17,7 +17,7 @@ class Ship : public GameEntity {
 public:
     Ship(std::weak_ptr<Scene> scene);
     explicit Ship(std::weak_ptr<Scene> scene, Vector2 position);
-    virtual ~Ship() = default;
+    virtual ~Ship();
 
     void BeginFrame() noexcept override;
     void Update(TimeUtils::FPSeconds deltaSeconds) noexcept override;

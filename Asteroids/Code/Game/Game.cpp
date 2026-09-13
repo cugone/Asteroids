@@ -127,6 +127,7 @@ void Game::Initialize() noexcept {
     g_theRenderer->SetWindowTitle(g_title_str);
     InitializeAudio();
     particleSystem->RegisterEffectsFromFolder(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameData) / "ParticleEffects");
+    OnScoreEvent_Subscription = OnScoreEvent.subscribe([this](long long value) { player.AdjustScore(value); });
 }
 
 void Game::InitializeAudio() noexcept {

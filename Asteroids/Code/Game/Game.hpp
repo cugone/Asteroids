@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Engine/Core/Event.hpp"
 #include "Engine/Core/TimeUtils.hpp"
 #include "Engine/Core/TypeUtils.hpp"
 #include "Engine/Core/OrthographicCameraController.hpp"
@@ -200,6 +201,9 @@ public:
     GameState* const GetCurrentState() const noexcept;
 
     void HandleWindowResize([[maybe_unused]] unsigned int newWidth, [[maybe_unused]] unsigned int newHeight) noexcept override;
+
+    Event<long long> OnScoreEvent;
+    Event<long long>::Subscription OnScoreEvent_Subscription;
 protected:
 private:
     void InitializeAudio() noexcept;
